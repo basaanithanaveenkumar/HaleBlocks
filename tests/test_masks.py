@@ -1,6 +1,6 @@
 import torch
 
-from hale_core.components.attention.masks import build_attn_mask
+from hale_core.nn.layers.attention.masks import build_attn_mask
 
 
 def test_block_mask_shape():

@@ -2,7 +2,7 @@
 
 Import submodules for side effects when adding new plugins:
   - ``hale_llm.models`` registers variants (model/loss/sampler/collate)
-  - ``hale_core.optimizers`` registers optimizers
+  - ``hale_core.nn.optim`` registers optimizers
   - ``hale_llm.metrics.llm`` registers generic metrics
 
 Two registry primitives:
@@ -12,6 +12,10 @@ Two registry primitives:
 
 from hale_core.registry.base import NamedRegistry
 from hale_core.registry.plugins import (
+    CONFIGS,
+    CONFIGS_REGISTRY,
+    LOGGERS,
+    LOGGERS_REGISTRY,
     LOSSES,
     LOSSES_REGISTRY,
     METRICS,
@@ -22,21 +26,30 @@ from hale_core.registry.plugins import (
     OPTIMIZERS_REGISTRY,
     SAMPLERS,
     SAMPLERS_REGISTRY,
+    TRAINERS,
+    TRAINERS_REGISTRY,
     VARIANTS,
+    build_logger,
+    get_config_schema,
     get_loss,
     get_model,
     get_optimizer,
     get_sampler,
+    get_trainer,
     get_variant,
     instantiate_metrics,
+    register_config,
     register_loss,
+    register_logger,
     register_metric,
     register_model,
     register_optimizer,
     register_sampler,
+    register_trainer,
     register_variant,
 )
 from hale_core.registry.variant import VariantRegistry
+import hale_core.registry.bootstrap  # noqa: F401 — built-in plugins
 
 __all__ = [
     "NamedRegistry",
@@ -45,23 +58,35 @@ __all__ = [
     "LOSSES_REGISTRY",
     "SAMPLERS_REGISTRY",
     "OPTIMIZERS_REGISTRY",
+    "CONFIGS_REGISTRY",
+    "LOGGERS_REGISTRY",
+    "TRAINERS_REGISTRY",
     "METRICS_REGISTRY",
     "MODELS",
     "VARIANTS",
     "LOSSES",
     "SAMPLERS",
     "OPTIMIZERS",
+    "CONFIGS",
+    "LOGGERS",
+    "TRAINERS",
     "METRICS",
     "register_model",
     "register_variant",
     "register_loss",
     "register_sampler",
     "register_optimizer",
+    "register_config",
+    "register_logger",
+    "register_trainer",
     "register_metric",
     "get_model",
     "get_variant",
     "get_loss",
     "get_sampler",
     "get_optimizer",
+    "get_config_schema",
+    "get_trainer",
+    "build_logger",
     "instantiate_metrics",
 ]

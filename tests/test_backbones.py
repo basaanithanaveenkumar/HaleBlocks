@@ -1,11 +1,11 @@
 import torch
 
-import hale_core.optimizers  # noqa: F401
-from hale_core.backbones import BACKBONES, TransformerBackbone, build_backbone
-from hale_core.components import build_attn_mask
-from hale_core.optimizers import build_optimizer
+import hale_core.nn.optim  # noqa: F401
+from hale_core.nn.backbones import BACKBONES, TransformerBackbone, build_backbone
+from hale_core.nn.layers import build_attn_mask
+from hale_core.nn.optim import build_optimizer
 from hale_core.registry import OPTIMIZERS, get_optimizer
-from hale_core.tensors import format_model_summary
+from hale_core.runtime.tensors import format_model_summary
 
 
 def test_backbone_registry():
@@ -26,9 +26,9 @@ def test_backbone_causal_forward():
 
 
 def test_build_backbone_factory():
-  model = build_backbone(32, arch="transformer", d_model=16, n_heads=4, n_layers=1, d_ff=32, max_length=8)
-  x = torch.randint(0, 32, (2, 8))
-  assert model(x).shape == (2, 8, 32)
+    model = build_backbone(32, arch="transformer", d_model=16, n_heads=4, n_layers=1, d_ff=32, max_length=8)
+    x = torch.randint(0, 32, (2, 8))
+    assert model(x).shape == (2, 8, 32)
 
 
 def test_format_model_summary_lists_modules():

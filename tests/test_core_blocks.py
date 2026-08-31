@@ -1,9 +1,9 @@
 import torch
 
-from hale_core.backbones import TransformerBackbone
-from hale_core.components.attention import build_attention, build_attn_mask
-from hale_core.components.ffn import build_ffn
-from hale_core.transformers import GPTStack
+from hale_core.nn.backbones import TransformerBackbone
+from hale_core.nn.layers.attention import build_attention, build_attn_mask
+from hale_core.nn.layers.ffn import build_ffn
+from hale_core.nn.stacks import GPTStack
 
 
 def test_gqa_and_mqa_forward():

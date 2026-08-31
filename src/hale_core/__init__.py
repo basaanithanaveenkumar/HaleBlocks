@@ -1,15 +1,17 @@
-"""hale-llm-core: components, transformer stacks, token backbones, and registries."""
+"""hale-blocks: reusable transformer core, config, training, and plugin registries."""
 
-from hale_core.backbones import (
+from hale_core.nn import (
     BACKBONES,
     DiTBackbone,
+    DiTStack,
     GPTBackbone,
+    GPTStack,
     LGTBackbone,
+    LGTStack,
     TransformerBackbone,
+    build_attn_mask,
     build_backbone,
 )
-from hale_core.checkpoint import CheckpointStore, load_checkpoint, save_checkpoint
-from hale_core.components import build_attn_mask
 from hale_core.registry import (
     NamedRegistry,
     VariantRegistry,
@@ -19,7 +21,7 @@ from hale_core.registry import (
     get_sampler,
     get_variant,
 )
-from hale_core.transformers import DiTStack, GPTStack, LGTStack
+from hale_core.runtime import CheckpointStore, load_checkpoint, save_checkpoint
 
 __version__ = "0.1.0"
 

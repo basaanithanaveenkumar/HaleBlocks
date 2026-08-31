@@ -1,6 +1,6 @@
 import torch
 
-from hale_core.components.embeddings import SinusoidalTimeEmbedding
+from hale_core.nn.layers.embeddings import SinusoidalTimeEmbedding
 
 
 def test_sinusoidal_time_embedding_batch():

@@ -1,4 +1,4 @@
-"""Compatibility shim. Prefer `hale_core.components`."""
+"""Compatibility shim. Prefer ``hale_core.nn.layers``."""
 
-from hale_core.components import *  # noqa: F403
-from hale_core.components import __all__
+from hale_core.nn.layers import *  # noqa: F403
+from hale_core.nn.layers import __all__

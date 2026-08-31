@@ -1,7 +1,7 @@
 """Training/eval plugin registries.
 
 NamedRegistry plugins (strict 1:1 name lookup):
-  model, loss, sampler, optimizer
+  model, loss, sampler, optimizer, config, logger, trainer
 
 VariantRegistry plugins (name + variant resolution):
   metric
@@ -21,6 +21,9 @@ MODELS_REGISTRY = NamedRegistry("model")
 LOSSES_REGISTRY = NamedRegistry("loss")
 SAMPLERS_REGISTRY = NamedRegistry("sampler")
 OPTIMIZERS_REGISTRY = NamedRegistry("optimizer")
+CONFIGS_REGISTRY = NamedRegistry("config")
+LOGGERS_REGISTRY = NamedRegistry("logger")
+TRAINERS_REGISTRY = NamedRegistry("trainer")
 METRICS_REGISTRY = VariantRegistry("metric")
 
 MODELS: dict[str, type] = MODELS_REGISTRY.items
@@ -28,6 +31,9 @@ VARIANTS = MODELS
 LOSSES: dict[str, Callable[..., Any]] = LOSSES_REGISTRY.items
 SAMPLERS: dict[str, Callable[..., Any]] = SAMPLERS_REGISTRY.items
 OPTIMIZERS: dict[str, type] = OPTIMIZERS_REGISTRY.items
+CONFIGS: dict[str, type] = CONFIGS_REGISTRY.items
+LOGGERS: dict[str, Callable[..., Any]] = LOGGERS_REGISTRY.items
+TRAINERS: dict[str, type] = TRAINERS_REGISTRY.items
 METRICS = METRICS_REGISTRY.items
 
 
@@ -91,6 +97,42 @@ def get_sampler(name: str) -> Callable[..., Any]:
 
 def get_optimizer(name: str) -> type:
     return OPTIMIZERS_REGISTRY.get(name.lower())
+
+
+def register_config(name: str) -> Callable[[type[T]], type[T]]:
+    def deco(cls: type[T]) -> type[T]:
+        CONFIGS_REGISTRY.add(name, cls)
+        return cls
+
+    return deco
+
+
+def get_config_schema(name: str = "llm") -> type:
+    return CONFIGS_REGISTRY.get(name)
+
+
+def register_logger(name: str) -> Callable[[T], T]:
+    def deco(factory: T) -> T:
+        LOGGERS_REGISTRY.add(name, factory)
+        return factory
+
+    return deco
+
+
+def build_logger(name: str, *, cfg: Any = None, **kwargs: Any) -> Any:
+    return LOGGERS_REGISTRY.get(name)(cfg=cfg, **kwargs)
+
+
+def register_trainer(name: str) -> Callable[[type[T]], type[T]]:
+    def deco(cls: type[T]) -> type[T]:
+        TRAINERS_REGISTRY.add(name, cls)
+        return cls
+
+    return deco
+
+
+def get_trainer(name: str = "default") -> type:
+    return TRAINERS_REGISTRY.get(name)
 
 
 def instantiate_metrics(names: list[str], variant: str) -> list[Any]:
