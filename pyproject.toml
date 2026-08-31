@@ -1,0 +1,43 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "hale-blocks"
+version = "0.1.0"
+description = "Reusable transformer components, stacks, backbones, and plugin registries"
+readme = "README.md"
+requires-python = ">=3.12"
+license = { text = "MIT" }
+authors = [{ name = "Naveenkumar Basaanitha" }]
+dependencies = [
+    "loguru>=0.7",
+    "torch>=2.13.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "ruff>=0.8",
+]
+
+[project.urls]
+Repository = "https://github.com/basaanithanaveenkumar/HaleBlocks"
+Documentation = "https://github.com/basaanithanaveenkumar/HaleBlocks#readme"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/hale_core"]
+
+[tool.hatch.build.targets.sdist]
+only-include = ["src/hale_core", "README.md", "pyproject.toml", "tests"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP"]
