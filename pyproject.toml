@@ -37,6 +37,10 @@ only-include = ["src/hale_core", "README.md", "pyproject.toml", "tests"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["src"]
+markers = [
+    "smoke: fast sanity checks",
+    "integration: multi-module workflows",
+]
 
 [tool.ruff]
 line-length = 100

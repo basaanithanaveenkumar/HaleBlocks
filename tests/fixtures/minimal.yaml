@@ -1,0 +1,23 @@
+variant: mock_ar
+model:
+  d_model: 32
+  n_heads: 4
+  n_layers: 1
+  d_ff: 64
+  max_length: 16
+train:
+  steps: 4
+  batch_size: 2
+  lr: 1e-2
+  resume: false
+  checkpoint_path: checkpoints/test.pt
+logging:
+  tensorboard: false
+  log_file: null
+  backend: noop
+experiment:
+  enabled: false
+eval:
+  every_n_epochs: null
+viz:
+  enabled: false

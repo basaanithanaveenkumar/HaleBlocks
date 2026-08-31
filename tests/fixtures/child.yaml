@@ -1,0 +1,6 @@
+inherits: minimal.yaml
+variant: mock_ar
+train:
+  steps: 8
+model:
+  d_model: 48

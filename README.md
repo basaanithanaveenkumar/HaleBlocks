@@ -37,11 +37,12 @@ hale_core/
   runtime/        checkpoint, tensors, device, protocols
 ```
 
-Legacy imports (`hale_core.components`, `hale_core.transformers`, …) remain as thin shims.
-
 ## Develop
 
 ```bash
 uv sync --extra dev
-uv run pytest -q
+uv run pytest tests/unit -q          # unit tests
+uv run pytest tests/smoke -q -m smoke
+uv run pytest tests/integration -q -m integration
+uv run pytest -q                     # all tests
 ```
