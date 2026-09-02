@@ -28,6 +28,8 @@ from hale_core.registry.plugins import (
     SAMPLERS_REGISTRY,
     TRAINERS,
     TRAINERS_REGISTRY,
+    DATASETS,
+    DATASETS_REGISTRY,
     VARIANTS,
     build_logger,
     get_config_schema,
@@ -36,20 +38,25 @@ from hale_core.registry.plugins import (
     get_optimizer,
     get_sampler,
     get_trainer,
+    get_dataset,
+    list_datasets,
     get_variant,
     instantiate_metrics,
     register_config,
-    register_loss,
     register_logger,
+    register_loss,
     register_metric,
     register_model,
     register_optimizer,
     register_sampler,
     register_trainer,
+    register_dataset,
     register_variant,
 )
 from hale_core.registry.variant import VariantRegistry
-import hale_core.registry.bootstrap  # noqa: F401 — built-in plugins
+from hale_core.registry.bootstrap import register_builtins
+
+register_builtins()
 
 __all__ = [
     "NamedRegistry",
@@ -61,6 +68,7 @@ __all__ = [
     "CONFIGS_REGISTRY",
     "LOGGERS_REGISTRY",
     "TRAINERS_REGISTRY",
+    "DATASETS_REGISTRY",
     "METRICS_REGISTRY",
     "MODELS",
     "VARIANTS",
@@ -70,6 +78,7 @@ __all__ = [
     "CONFIGS",
     "LOGGERS",
     "TRAINERS",
+    "DATASETS",
     "METRICS",
     "register_model",
     "register_variant",
@@ -79,6 +88,7 @@ __all__ = [
     "register_config",
     "register_logger",
     "register_trainer",
+    "register_dataset",
     "register_metric",
     "get_model",
     "get_variant",
@@ -87,6 +97,8 @@ __all__ = [
     "get_optimizer",
     "get_config_schema",
     "get_trainer",
+    "get_dataset",
+    "list_datasets",
     "build_logger",
     "instantiate_metrics",
 ]

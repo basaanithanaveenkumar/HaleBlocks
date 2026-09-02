@@ -50,7 +50,9 @@ class DeepseekMoE(nn.Module):
             raise ValueError(f"top_k={top_k} > n_experts={n_experts}")
         self.router = NoiseBestKRouter(d_model, n_experts, top_k)
         self.shared = nn.ModuleList([SwiGLUExpert(d_model, d_ff, dropout) for _ in range(n_shared)])
-        self.routed = nn.ModuleList([SwiGLUExpert(d_model, d_ff, dropout) for _ in range(n_experts)])
+        self.routed = nn.ModuleList(
+            [SwiGLUExpert(d_model, d_ff, dropout) for _ in range(n_experts)]
+        )
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         b, s, d = x.shape

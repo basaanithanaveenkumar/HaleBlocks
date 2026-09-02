@@ -1,4 +1,3 @@
-import pytest
 import yaml
 
 from hale_core.config import RunConfig, load_registered_config
@@ -10,7 +9,6 @@ from hale_core.registry import (
     get_config_schema,
     get_trainer,
     register_config,
-    register_logger,
     register_trainer,
 )
 

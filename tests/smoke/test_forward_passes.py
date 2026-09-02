@@ -1,15 +1,12 @@
-import torch
-
 import pytest
+import torch
 
 
 @pytest.mark.smoke
 def test_gpt_backbone_forward():
     from hale_core.nn.backbones import TransformerBackbone
 
-    m = TransformerBackbone(
-        vocab_size=32, d_model=16, n_heads=4, n_layers=1, d_ff=32, max_length=8
-    )
+    m = TransformerBackbone(vocab_size=32, d_model=16, n_heads=4, n_layers=1, d_ff=32, max_length=8)
     x = torch.randint(0, 32, (2, 8))
     y = m(x)
     assert y.shape == (2, 8, 32)

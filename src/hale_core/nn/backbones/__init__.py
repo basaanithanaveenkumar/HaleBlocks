@@ -5,7 +5,12 @@ so a VLM can reuse GPTStack / LGTStack / DiTStack with its own embeddings.
 """
 
 from hale_core.nn.backbones.dit import DiTBackbone
-from hale_core.nn.backbones.factory import BACKBONES, backbone_kwargs, build_backbone, register_backbone
+from hale_core.nn.backbones.factory import (
+    BACKBONES,
+    backbone_kwargs,
+    build_backbone,
+    register_backbone,
+)
 from hale_core.nn.backbones.gpt import GPTBackbone, TransformerBackbone
 from hale_core.nn.backbones.lgt import LGTBackbone
 from hale_core.nn.backbones.sequence import SequenceBackbone

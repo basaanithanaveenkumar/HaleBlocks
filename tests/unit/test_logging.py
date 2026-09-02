@@ -1,7 +1,7 @@
 import pytest
 
-from hale_core.registry import build_logger
 from hale_core.config import RunConfig
+from hale_core.registry import build_logger
 
 
 def test_build_noop_logger():

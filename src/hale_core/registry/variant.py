@@ -34,9 +34,7 @@ class VariantRegistry:
         entries = self.items.setdefault(name, [])
         for existing, _ in entries:
             if existing == key:
-                raise ValueError(
-                    f"{self.kind} {name!r} already registered for variants={variants}"
-                )
+                raise ValueError(f"{self.kind} {name!r} already registered for variants={variants}")
         entries.append((key, cls))
         if attr is not None:
             setattr(cls, attr, name)
@@ -48,7 +46,9 @@ class VariantRegistry:
         if entries is None:
             logger.error("unknown {} {!r}; registered={}", self.kind, name, sorted(self.items))
             raise KeyError(f"unknown {self.kind} {name!r}; registered={sorted(self.items)}")
-        specific = [cls for variants, cls in entries if variants is not None and variant in variants]
+        specific = [
+            cls for variants, cls in entries if variants is not None and variant in variants
+        ]
         generic = [cls for variants, cls in entries if variants is None]
         return (specific or generic or [None])[0]
 

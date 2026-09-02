@@ -26,7 +26,9 @@ def test_backbone_causal_forward():
 
 
 def test_build_backbone_factory():
-    model = build_backbone(32, arch="transformer", d_model=16, n_heads=4, n_layers=1, d_ff=32, max_length=8)
+    model = build_backbone(
+        32, arch="transformer", d_model=16, n_heads=4, n_layers=1, d_ff=32, max_length=8
+    )
     x = torch.randint(0, 32, (2, 8))
     assert model(x).shape == (2, 8, 32)
 

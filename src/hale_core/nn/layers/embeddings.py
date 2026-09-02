@@ -18,9 +18,7 @@ class SinusoidalTimeEmbedding(nn.Module):
         orig = t.shape
         t_flat = t.reshape(-1).float()
         half = self.dim // 2
-        freqs = torch.exp(
-            -math.log(10000) * torch.arange(half, device=t.device).float() / half
-        )
+        freqs = torch.exp(-math.log(10000) * torch.arange(half, device=t.device).float() / half)
         args = t_flat[:, None] * freqs[None, :] * 1000.0
         emb = torch.cat([torch.sin(args), torch.cos(args)], dim=-1)
         if self.dim % 2 == 1:

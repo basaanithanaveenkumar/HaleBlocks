@@ -24,6 +24,7 @@ OPTIMIZERS_REGISTRY = NamedRegistry("optimizer")
 CONFIGS_REGISTRY = NamedRegistry("config")
 LOGGERS_REGISTRY = NamedRegistry("logger")
 TRAINERS_REGISTRY = NamedRegistry("trainer")
+DATASETS_REGISTRY = NamedRegistry("dataset")
 METRICS_REGISTRY = VariantRegistry("metric")
 
 MODELS: dict[str, type] = MODELS_REGISTRY.items
@@ -34,6 +35,7 @@ OPTIMIZERS: dict[str, type] = OPTIMIZERS_REGISTRY.items
 CONFIGS: dict[str, type] = CONFIGS_REGISTRY.items
 LOGGERS: dict[str, Callable[..., Any]] = LOGGERS_REGISTRY.items
 TRAINERS: dict[str, type] = TRAINERS_REGISTRY.items
+DATASETS: dict[str, Callable[..., Any]] = DATASETS_REGISTRY.items
 METRICS = METRICS_REGISTRY.items
 
 
@@ -73,7 +75,9 @@ def register_optimizer(name: str) -> Callable[[type[T]], type[T]]:
     return deco
 
 
-def register_metric(name: str, *, variants: tuple[str, ...] | None = None) -> Callable[[type[T]], type[T]]:
+def register_metric(
+    name: str, *, variants: tuple[str, ...] | None = None
+) -> Callable[[type[T]], type[T]]:
     def deco(cls: type[T]) -> type[T]:
         return METRICS_REGISTRY.add(name, cls, variants=variants)
 
@@ -133,6 +137,48 @@ def register_trainer(name: str) -> Callable[[type[T]], type[T]]:
 
 def get_trainer(name: str = "default") -> type:
     return TRAINERS_REGISTRY.get(name)
+
+
+def register_dataset(name: str) -> Callable[[T], T]:
+    def deco(factory: T) -> T:
+        DATASETS_REGISTRY.add(name, factory)
+        return factory
+
+    return deco
+
+
+def get_dataset(name: str) -> Any:
+    factory = DATASETS_REGISTRY.get(name)
+    return factory()
+
+
+def _spec_attr_matches(value: Any, expected: str) -> bool:
+    if value is None:
+        return False
+    actual = value.value if hasattr(value, "value") else str(value)
+    return actual == expected or str(value) == expected
+
+
+def list_datasets(
+    *,
+    kind: str | None = None,
+    stage: str | None = None,
+    domain: str | None = None,
+) -> list[str]:
+    names = sorted(DATASETS_REGISTRY.items)
+    if not kind and not stage and not domain:
+        return names
+    filtered: list[str] = []
+    for name in names:
+        spec = get_dataset(name)
+        if kind is not None and not _spec_attr_matches(getattr(spec, "kind", None), kind):
+            continue
+        if stage is not None and not _spec_attr_matches(getattr(spec, "stage", None), stage):
+            continue
+        if domain is not None and not _spec_attr_matches(getattr(spec, "domain", None), domain):
+            continue
+        filtered.append(name)
+    return filtered
 
 
 def instantiate_metrics(names: list[str], variant: str) -> list[Any]:

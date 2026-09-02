@@ -27,9 +27,7 @@ class NamedRegistry:
             return self.items[name]
         except KeyError as e:
             logger.error("unknown {} {!r}; registered={}", self.kind, name, sorted(self.items))
-            raise KeyError(
-                f"unknown {self.kind} {name!r}; registered={sorted(self.items)}"
-            ) from e
+            raise KeyError(f"unknown {self.kind} {name!r}; registered={sorted(self.items)}") from e
 
     def __contains__(self, name: str) -> bool:
         return name in self.items

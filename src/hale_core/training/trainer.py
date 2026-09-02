@@ -9,12 +9,13 @@ import torch
 from loguru import logger
 from tqdm import tqdm
 
-from hale_core.runtime.checkpoint import CheckpointStore
 from hale_core.config.experiment import apply_experiment_layout
 from hale_core.config.run import RunConfig
 from hale_core.logging import setup_logging
 from hale_core.nn.optim import build_optimizer
 from hale_core.registry import build_logger, get_loss, get_trainer, get_variant, register_trainer
+from hale_core.runtime.checkpoint import CheckpointStore
+from hale_core.runtime.device import get_device
 from hale_core.runtime.tensors import count_parameters, log_model_summary, move_batch_to_device
 from hale_core.training.distributed import (
     cleanup_distributed,
@@ -24,7 +25,6 @@ from hale_core.training.distributed import (
     wrap_model_parallel,
 )
 from hale_core.training.schedule import TrainSchedule
-from hale_core.runtime.device import get_device
 
 
 class DataModule(Protocol):
@@ -218,7 +218,9 @@ class Trainer:
 
                 self.opt.zero_grad(set_to_none=True)
                 loss.backward()
-                grad_norm = torch.nn.utils.clip_grad_norm_(self.model.parameters(), cfg.train.grad_clip)
+                grad_norm = torch.nn.utils.clip_grad_norm_(
+                    self.model.parameters(), cfg.train.grad_clip
+                )
                 self.opt.step()
                 lr = self.opt.param_groups[0]["lr"]
                 self.losses.append(loss.item())

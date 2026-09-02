@@ -62,7 +62,9 @@ def format_model_summary(model: nn.Module, *, title: str | None = None) -> str:
     for name, tot, tr in rows:
         lines.append(f"{name:<{name_w}}{tot / 1e6:>{num_w - 1}.2f}M{tr / 1e6:>{num_w - 1}.2f}M")
     lines.append(bar)
-    lines.append(f"{'TOTAL':<{name_w}}{total / 1e6:>{num_w - 1}.2f}M{trainable / 1e6:>{num_w - 1}.2f}M")
+    lines.append(
+        f"{'TOTAL':<{name_w}}{total / 1e6:>{num_w - 1}.2f}M{trainable / 1e6:>{num_w - 1}.2f}M"
+    )
     lines.append(bar)
     return "\n".join(lines)
 

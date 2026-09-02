@@ -10,7 +10,7 @@ import torch.nn as nn
 from torch.utils.data import DataLoader, TensorDataset
 
 import hale_core.registry.bootstrap  # noqa: F401
-from hale_core.config import RunConfig, load_config
+from hale_core.config import load_config
 from hale_core.registry import register_loss, register_model
 from hale_core.training.trainer import Trainer
 
@@ -46,8 +46,20 @@ class _MockData:
         )
 
     def train_loader(self):
-        for (ids,) in self._loader:
-            yield {"input_ids": ids}
+        loader = self._loader
+
+        class _DictLoader:
+            def __init__(self, inner):
+                self._inner = inner
+
+            def __iter__(self):
+                for (ids,) in self._inner:
+                    yield {"input_ids": ids}
+
+            def __len__(self):
+                return len(self._inner)
+
+        return _DictLoader(loader)
 
     def val_loader(self, train_loader):
         return self._loader

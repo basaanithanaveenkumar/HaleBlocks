@@ -1,7 +1,7 @@
 import torch
 
 from hale_core.config.sections.model import ModelConfig
-from hale_core.nn.backbones import BACKBONES, TransformerBackbone, build_backbone
+from hale_core.nn.backbones import BACKBONES, build_backbone
 from hale_core.nn.backbones.dit import DiTBackbone
 from hale_core.nn.layers import DiTBlock, build_attention, build_ffn
 

@@ -78,7 +78,9 @@ def _point_latest(cfg: RunConfig, run_dir: Path) -> None:
         logger.warning("could not update latest symlink at {}", latest)
 
 
-def apply_experiment_layout(cfg: RunConfig, *, create: bool = True, name: str | None = None) -> Path | None:
+def apply_experiment_layout(
+    cfg: RunConfig, *, create: bool = True, name: str | None = None
+) -> Path | None:
     """Rewrite checkpoint/log/tb/viz paths onto one experiment folder.
 
     create=True  — new ``{variant}_{YYYYMMDD_HHMMSS}`` run (or ``name`` if given).

@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any, TypeVar
+from typing import Any
 
 import yaml
 from loguru import logger
@@ -11,9 +11,7 @@ from pydantic import BaseModel
 
 from hale_core.config.merge import deep_merge
 from hale_core.config.run import RunConfig
-from hale_core.registry import get_config_schema
-
-T = TypeVar("T", bound=BaseModel)
+from hale_core.registry.plugins import get_config_schema
 
 
 def load_yaml_tree(path: str | Path) -> dict[str, Any]:
@@ -35,7 +33,7 @@ def load_yaml_tree(path: str | Path) -> dict[str, Any]:
     return raw
 
 
-def validate_config(raw: dict[str, Any], schema: type[T]) -> T:
+def validate_config[T: BaseModel](raw: dict[str, Any], schema: type[T]) -> T:
     try:
         return schema.model_validate(raw)
     except Exception:
@@ -51,7 +49,9 @@ def load_registered_config(path: str | Path, schema: str = "llm") -> BaseModel:
     cfg = validate_config(load_yaml_tree(path), model_cls)
     if hasattr(cfg, "experiment") and getattr(cfg.experiment, "source_yaml", None) is not None:
         cfg.experiment.source_yaml = str(path)
-    logger.info("loaded config schema={} variant={} from {}", schema, getattr(cfg, "variant", "?"), path)
+    logger.info(
+        "loaded config schema={} variant={} from {}", schema, getattr(cfg, "variant", "?"), path
+    )
     return cfg
 
 

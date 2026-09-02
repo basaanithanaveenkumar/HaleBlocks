@@ -18,9 +18,7 @@ def build_attn_mask(
     if attn_type == "bidirectional":
         return None
     if attn_type == "causal":
-        return torch.triu(
-            torch.ones(seq_len, seq_len, dtype=torch.bool, device=device), diagonal=1
-        )
+        return torch.triu(torch.ones(seq_len, seq_len, dtype=torch.bool, device=device), diagonal=1)
     if attn_type == "block_causal":
         if block_size is None:
             raise ValueError("block_causal attention requires block_size")
@@ -37,10 +35,6 @@ def build_attn_mask(
         )
         bi, bj = blk_combined.unsqueeze(1), blk_combined.unsqueeze(0)
         ci, cj = is_clean.unsqueeze(1), is_clean.unsqueeze(0)
-        allowed = (
-            (ci & cj & (bj <= bi))
-            | ((~ci) & cj & (bj < bi))
-            | ((~ci) & (~cj) & (bj == bi))
-        )
+        allowed = (ci & cj & (bj <= bi)) | ((~ci) & cj & (bj < bi)) | ((~ci) & (~cj) & (bj == bi))
         return ~allowed
     raise ValueError(f"unknown attn_type {attn_type!r}")

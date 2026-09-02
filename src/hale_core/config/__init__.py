@@ -10,7 +10,7 @@ from hale_core.config.sections import (
     TrainConfig,
     VizConfig,
 )
-from hale_core.registry import CONFIGS, register_config
+from hale_core.registry.plugins import CONFIGS, register_config
 
 register_config("llm")(RunConfig)
 

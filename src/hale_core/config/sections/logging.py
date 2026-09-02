@@ -7,11 +7,11 @@ class LoggingConfig(StrictModel):
     level: Literal["DEBUG", "INFO", "WARNING", "ERROR"] = "INFO"
     log_file: str | None = "logs/hale.log"
     backend: str = "experiment"
-    
+
     # TensorBoard configuration
     tensorboard: bool = True
     tensorboard_dir: str = "runs"
-    
+
     # Weights & Biases configuration
     wandb: bool = False
     wandb_project: str | None = None

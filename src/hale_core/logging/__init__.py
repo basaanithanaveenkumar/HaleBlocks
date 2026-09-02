@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, Protocol
+from typing import Any
 
 from hale_core.config.run import RunConfig
 from hale_core.logging.experiment import ExperimentLogger, make_experiment_logger
@@ -63,7 +63,9 @@ def _experiment_logger(*, cfg: RunConfig | None = None, **kwargs) -> ExperimentL
 def _loguru_logger(*, cfg: RunConfig | None = None, **kwargs) -> None:
     if cfg is None:
         raise TypeError("loguru logger requires cfg=RunConfig")
-    setup_logging(level=cfg.logging.level, log_file=cfg.logging.log_file, force=kwargs.get("force", True))
+    setup_logging(
+        level=cfg.logging.level, log_file=cfg.logging.log_file, force=kwargs.get("force", True)
+    )
     return None
 
 

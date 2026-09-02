@@ -20,8 +20,23 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = [
+    "pre-commit>=4.0",
     "pytest>=8.0",
     "ruff>=0.8",
+]
+vlm = [
+    "datasets>=3.0",
+    "huggingface-hub>=0.26",
+    "httpx>=0.27",
+]
+llm = [
+    "datasets>=3.0",
+    "huggingface-hub>=0.26",
+]
+data = [
+    "datasets>=3.0",
+    "huggingface-hub>=0.26",
+    "httpx>=0.27",
 ]
 
 [project.urls]
@@ -48,3 +63,7 @@ target-version = "py312"
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP"]
+
+[tool.ruff.lint.per-file-ignores]
+"src/hale_core/config/__init__.py" = ["E402"]
+"src/hale_core/registry/__init__.py" = ["I001"]

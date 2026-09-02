@@ -15,7 +15,9 @@ class LossFn(Protocol):
 
 @runtime_checkable
 class SamplerFn(Protocol):
-    def __call__(self, model: nn.Module, tokenizer: Any, prompt_ids: torch.Tensor, **kwargs: Any) -> Any: ...
+    def __call__(
+        self, model: nn.Module, tokenizer: Any, prompt_ids: torch.Tensor, **kwargs: Any
+    ) -> Any: ...
 
 
 @runtime_checkable
