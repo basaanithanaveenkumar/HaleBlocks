@@ -1,6 +1,14 @@
-"""Dataset loading for LLM and VLM training."""
+"""Dataset loading for LLM, VLM, and humanoid locomotion policy training."""
 
-from hale_core.data.kinds import DatasetKind, LLMDomain, TrainingStage, VLMModality
+from hale_core.data.kinds import (
+    DatasetKind,
+    LLMDomain,
+    LocoMotionFormat,
+    LocoRobotTarget,
+    LocoTaskType,
+    TrainingStage,
+    VLMModality,
+)
 from hale_core.data.llm.loader import (
     MixedLLMDataModule,
     SequentialLLMDataLoader,
@@ -14,6 +22,7 @@ from hale_core.data.llm.types import (
     LLMDatasetSpec,
     LLMSample,
 )
+from hale_core.data.loco.types import DEFAULT_LOCO_MIXTURE, LocoDatasetSpec, LocoSample
 from hale_core.data.types import DatasetSpec, Modality
 from hale_core.data.vlm.loader import (
     MixedVLMDataModule,
@@ -27,13 +36,19 @@ __all__ = [
     "TrainingStage",
     "LLMDomain",
     "VLMModality",
+    "LocoTaskType",
+    "LocoMotionFormat",
+    "LocoRobotTarget",
     "Modality",
     "VLMSample",
     "LLMSample",
+    "LocoSample",
     "VLMDatasetSpec",
     "LLMDatasetSpec",
+    "LocoDatasetSpec",
     "DatasetSpec",
     "DEFAULT_VLM_MIXTURE",
+    "DEFAULT_LOCO_MIXTURE",
     "SMOLLM2_PRETRAIN_STAGES",
     "DEFAULT_SMOLLM2_SFT_MIXTURE",
     "DEFAULT_SMOLLM2_RL_MIXTURE",

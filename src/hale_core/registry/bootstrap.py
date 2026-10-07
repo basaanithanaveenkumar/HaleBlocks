@@ -11,6 +11,7 @@ def register_builtins() -> None:
 
     import hale_core.config  # noqa: F401
     import hale_core.data.llm.builtins  # noqa: F401
+    import hale_core.data.loco.builtins  # noqa: F401
     import hale_core.data.vlm.builtins  # noqa: F401
     import hale_core.logging  # noqa: F401
     import hale_core.nn.losses.functions  # noqa: F401
