@@ -16,7 +16,7 @@ Forward: `attn(x, attn_mask=None, key_padding_mask=None, positions=None)`.
 ## Masks — `build_attn_mask(attn_type, seq_len, device, block_size=None)`
 
 Bool, `True` = blocked. `causal` → upper-triangular `[T, T]`. `bidirectional` → `None`.
-`block_causal` → `[2T, 2T]` over `[clean ; noisy]` (see [architecture](architecture.md#4-block-causal-mask-block-diffusion)).
+`block_causal` → `[2T, 2T]` over `[clean ; noisy]` (see [architecture](architecture.md#10-block-causal-mask-block-diffusion)).
 `sliding_window_mask` and `or_masks` compose local attention.
 
 ## FFN — `build_ffn(kind, *, d_model, d_ff, dropout, moe_num_experts, moe_top_k, moe_num_shared)`
