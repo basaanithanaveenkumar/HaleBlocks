@@ -4,9 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>HaleBlocks</title>
-<meta name="description" content="hale_core: attention, MoE, masks, GPT/LGT/DiT stacks, backbones, strict configs, registries, trainer and streaming data.">
-<meta property="og:title" content="HaleBlocks: Composable, Registry-Driven Transformer Building Blocks">
-<meta property="og:description" content="hale_core: attention, MoE, masks, GPT/LGT/DiT stacks, backbones, strict configs, registries, trainer and streaming data.">
+<meta name="description" content="Reusable transformer building blocks — attention, FFN, backbone, registry, streaming data — shared by HALE-WAM, Hale-VLM, HaloDiffusionLLM.">
+<meta property="og:title" content="HaleBlocks: Composable Transformer Primitives for LMs, VLMs, and World Models">
+<meta property="og:description" content="Plugin registries, strict YAML configs, and a sequential streaming data loader — one framework for every Halo research project.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" rel="stylesheet">
 <style>
@@ -57,94 +57,152 @@ a{color:var(--accent)}
 <button class="theme" id="theme" aria-label="Toggle dark mode">Theme</button>
 <div class="wrap">
 <header class="hero">
-  <div class="kicker">Library · Transformers · Registries</div>
-  <h1>HaleBlocks: Composable, Registry-Driven Transformer Building Blocks</h1>
-  <p class="subtitle">Attention variants, MoE, masks (including block-causal), GPT, Gemma-3-style local–global and DiT stacks, tied backbones, strict YAML configs, plugin registries, a trainer and SmolLM2/VLM data registries, all behind stable factories.</p>
+  <div class="kicker">Transformer library · Registry · Streaming data</div>
+  <h1>HaleBlocks: Composable Transformer Primitives for LMs, VLMs, and World Models</h1>
+  <p class="subtitle">Plugin registries, strict pydantic YAML configs, and a bounded-storage sequential streaming loader — the shared foundation across all Halo research projects.</p>
   <div class="authors">B A NaveenKumar</div>
   <div class="affil">Independent research · 2026</div>
-  <div class="buttons"><a class="btn" href="paper.pdf">Paper (PDF)</a><a class="btn alt" href="https://github.com/basaanithanaveenkumar/HaleBlocks">Code</a><a class="btn alt" href="https://github.com/basaanithanaveenkumar/HaleBlocks/tree/main/docs">Docs</a><a class="btn alt" href="https://github.com/basaanithanaveenkumar/HaleBlocks/blob/main/docs/blog/2026-09-28-stop-copying-attention.md">Blog</a></div>
+  <div class="buttons">
+    <a class="btn" href="paper.pdf">Paper (PDF)</a>
+    <a class="btn alt" href="https://github.com/basaanithanaveenkumar/HaleBlocks">Code</a>
+    <a class="btn alt" href="https://pypi.org/project/hale-blocks/">PyPI</a>
+    <a class="btn alt" href="https://github.com/basaanithanaveenkumar/HaleBlocks/tree/main/docs">Docs</a>
+    <a class="btn alt" href="https://github.com/basaanithanaveenkumar/HaleBlocks/blob/main/docs/blog/2026-09-28-stop-copying-attention.md">Blog</a>
+  </div>
 </header>
-<section><div class="tldr"><b>TL;DR.</b> Every component family is a named registry with a <code>build_*</code> factory and a fixed forward contract, so an MoE GPT, a Gemma-3-style long-context model or a block-diffusion DiT over text is a config change, not a fork. 114 tests pass on CPU.</div></section>
-<section><h2>Abstract</h2><p>Research code for language, diffusion and multimodal models tends to copy the same pieces, such as attention variants, mixture-of-experts layers, masks, configuration and training loops, into every new repository, where they slowly diverge. HaleBlocks factors these into one small library organised around a single rule: every component family is a named registry with a factory, and callers depend only on the factory.</p><p>It provides MHA/GQA/MQA with RoPE and QK-norm; dense, GeGLU and DeepSeek-style MoE feed-forward layers; causal, bidirectional and block-causal masks; GPT, local–global (Gemma-3 style) and AdaLN-Zero DiT stacks; tied token-to-logit backbones; token losses; optimisers including Muon; strict typed configuration with YAML inheritance; a trainer with DDP/FSDP helpers and experiment logging; and streaming data registries for the 33-dataset SmolLM2 recipe and a VLM mixture with an LRU media cache.</p></section>
-<section><h2>Highlights</h2><div class="grid"><div class="card"><h3>Registries + factories</h3><p>attention, ffn, backbone, loss, optimizer, logger, trainer, dataset, model, metric and config schema: register a name, never edit a call site.</p></div><div class="card"><h3>Three stacks</h3><p>GPT (pre-LN), LGT (RMSNorm, GQA, 5 local : 1 global, RoPE θ 10⁴/10⁶, p-RoPE) and DiT (AdaLN-Zero, time-conditioned).</p></div><div class="card"><h3>Masks that compose</h3><p>Bool masks, <code>True</code> = blocked: causal, bidirectional, sliding-window, and block-causal over [clean ; noisy] for block diffusion.</p></div><div class="card"><h3>DeepSeek-style MoE</h3><p>Shared + routed SwiGLU experts with a noisy top-k router, available in any stack via <code>ffn_type: moe</code>.</p></div><div class="card"><h3>Strict configs</h3><p>Pydantic sections with <code>extra="forbid"</code>, <code>inherits:</code> deep-merge, and per-run directories with the resolved config dumped.</p></div><div class="card"><h3>Data registries</h3><p>SmolLM2: 15 pretrain, 14 SFT and 4 DPO datasets plus stage mixtures 1–4. VLM: sequential streaming with an LRU MediaCache.</p></div></div></section>
-<section><h2>Architecture</h2><figure><div class="mermaid">flowchart TB
-  subgraph nn[&quot;hale_core.nn&quot;]
-    L[&quot;layers&lt;br/&gt;attention · masks · ffn · norm · embeddings · TransformerLayer · DiTBlock&quot;]
-    S[&quot;stacks&lt;br/&gt;GPTStack · LGTStack · DiTStack&quot;]
-    B[&quot;backbones&lt;br/&gt;SequenceBackbone → GPT / LGT / DiT&quot;]
-    LO[&quot;losses&lt;br/&gt;ce · focal · kl · label smoothing&quot;]
-    O[&quot;optim&lt;br/&gt;sgd · adam · adamw · muon&quot;]
-    L --&gt; S --&gt; B
-  end
-  C[&quot;config&lt;br/&gt;strict RunConfig · YAML inherits · experiment layout&quot;]
-  R[&quot;registry&lt;br/&gt;NamedRegistry · VariantRegistry · register_*&quot;]
-  T[&quot;training&lt;br/&gt;Trainer · schedule · DDP/FSDP&quot;]
-  G[&quot;logging&lt;br/&gt;loguru · TensorBoard · W&amp;B&quot;]
-  D[&quot;data&lt;br/&gt;SmolLM2 LLM registry · VLM registry · MediaCache&quot;]
-  RT[&quot;runtime&lt;br/&gt;checkpoint · device · tensors · protocols&quot;]
-  C --&gt; R --&gt; T
-  B --&gt; R
-  LO --&gt; R
-  O --&gt; R
-  D --&gt; R
-  G --&gt; T
-  RT --&gt; T</div><figcaption><b>Figure 1.</b> Package map.</figcaption></figure><figure><div class="mermaid">sequenceDiagram
-  participant U as caller
-  participant BB as SequenceBackbone
-  participant ST as Stack
-  participant LY as Layer / DiTBlock
-  participant AT as Attention
-  participant FF as FFN
-  U-&gt;&gt;BB: token_ids, attention_mask, t
-  BB-&gt;&gt;BB: embed (+ learned positions), time embedding
-  BB-&gt;&gt;BB: attn_mask (causal / bidirectional / block_causal), key_padding_mask
-  BB-&gt;&gt;ST: h, t_emb, attn_mask, key_padding_mask, positions
-  loop n_layers
-    ST-&gt;&gt;LY: same arguments
-    LY-&gt;&gt;AT: norm(h), attn_mask, key_padding_mask, positions
-    AT--&gt;&gt;LY: residual update
-    LY-&gt;&gt;FF: norm(h)
-    FF--&gt;&gt;LY: residual update
-  end
-  ST--&gt;&gt;BB: h
-  BB--&gt;&gt;U: logits = tied LM head(h)</div><figcaption><b>Figure 2.</b> The forward contract shared by every backbone, stack, layer, attention and FFN.</figcaption></figure><figure><div class="mermaid">flowchart LR
-  subgraph GPT[&quot;GPTStack&quot;]
-    g1[&quot;LayerNorm → MHA/GQA → +&quot;] --&gt; g2[&quot;LayerNorm → MLP/GeGLU/MoE → +&quot;] --&gt; g3[&quot;× n, final LayerNorm&quot;]
-  end
-  subgraph LGT[&quot;LGTStack (Gemma-3 style)&quot;]
-    l1[&quot;5 local layers&lt;br/&gt;sliding window, RoPE θ=10⁴&lt;br/&gt;GQA n_kv = n_kv_heads&quot;] --&gt; l2[&quot;1 global layer&lt;br/&gt;full attention, RoPE θ=10⁶, p-RoPE 25%&lt;br/&gt;GQA n_kv = n_heads/8&quot;] --&gt; l3[&quot;repeat · RMSNorm · GeGLU&quot;]
-  end
-  subgraph DiT[&quot;DiTStack&quot;]
-    d1[&quot;t → sinusoidal MLP → t_emb&quot;] --&gt; d2[&quot;AdaLN-Zero: shift/scale/gate&lt;br/&gt;for attention and FFN&quot;] --&gt; d3[&quot;× n (zero-init = identity at start)&quot;]
-  end</div><figcaption><b>Figure 3.</b> The three stacks.</figcaption></figure><figure><div class="mermaid">flowchart LR
-  Y[&quot;child.yaml&lt;br/&gt;inherits: base.yaml&quot;] --&gt; M[&quot;deep merge&quot;] --&gt; V[&quot;validate against&lt;br/&gt;registered schema (strict)&quot;]
-  V --&gt; RC[&quot;RunConfig&quot;]
-  RC --&gt; RM[&quot;get_model(variant)&quot;]
-  RC --&gt; RL[&quot;get_loss(variant)&quot;]
-  RC --&gt; RO[&quot;build_optimizer(type)&quot;]
-  RC --&gt; RD[&quot;get_dataset / data module&quot;]
-  RM &amp; RL &amp; RO &amp; RD --&gt; TR[&quot;Trainer.fit()&lt;br/&gt;resume · epochs · eval · viz · checkpoints&quot;]
-  TR --&gt; EX[&quot;experiments/&amp;lt;variant&amp;gt;/&amp;lt;run&amp;gt;/&lt;br/&gt;config dump · logs · ckpts · latest →&quot;]</div><figcaption><b>Figure 4.</b> From YAML to a trained model through the registries.</figcaption></figure></section>
-<section><h2>Reference backbones (measured; V = 32k, d = 256, 8 heads, 6 layers, d_ff = 1024)</h2><div class="tablewrap"><table><thead><tr><th>Backbone</th><th>Variant</th><th>Parameters</th></tr></thead><tbody><tr><td>GPT</td><td>dense MLP</td><td>12.96M</td></tr><tr><td>GPT</td><td>MoE: 8 routed + 1 shared, top-2</td><td>52.30M</td></tr><tr><td>LGT</td><td>GeGLU, GQA (n_kv = 2 local)</td><td>13.88M</td></tr><tr><td>DiT</td><td>bidirectional, time-conditioned</td><td>15.60M</td></tr></tbody></table></div></section>
 
-<section><h2>Quick start</h2><pre><code>uv add &quot;hale-blocks @ git+https://github.com/basaanithanaveenkumar/HaleBlocks.git&quot;
-# or, to develop:
-git clone https://github.com/basaanithanaveenkumar/HaleBlocks &amp;&amp; cd HaleBlocks
-uv sync --extra dev &amp;&amp; uv run pytest -q      # 114 passed</code></pre><pre><code>import torch
+<section>
+<div class="tldr"><b>TL;DR.</b> <code>from hale_core import build_attention, GPTStack, register_model, load_config</code> — wire any combination of attention (MHA/GQA/MQA), FFN (MLP/GeGLU/MoE), backbone (GPT/LGT/DiT), and loss through a YAML config. New components register with a decorator; experiments inherit from a base config.</div>
+</section>
+
+<section>
+<h2>Abstract</h2>
+<p>Research projects that explore different model architectures — autoregressive LLMs, VLMs, world models, diffusion models — typically duplicate scaffolding code: training loops, config validation, dataset streaming, logging, checkpointing. HaleBlocks is a small library that eliminates this duplication by providing the shared primitives as composable plugins behind a unified registry interface.</p>
+<p>Imported as <code>hale_core</code>, the library provides attention modules (MHA, GQA, MQA), FFN blocks (MLP, GeGLU, DeepSeekMoE), transformer stacks (GPT-style causal, LGT local-global, DiT adaLN-Zero), token backbones, a flexible loss registry, a pydantic-validated YAML config system with <code>inherits:</code> support, a sequential multi-dataset streaming loader with background warm-up, and loguru-based logging with TensorBoard and W&amp;B backends. HALE-WAM, Hale-VLM, HaloDiffusionLLM, and Halos-lift are all built on HaleBlocks.</p>
+</section>
+
+<section>
+<h2>Highlights</h2>
+<div class="grid">
+  <div class="card"><h3>Plugin registries</h3><p><code>@register_model</code>, <code>@register_loss</code>, <code>@register_sampler</code> — one decorator adds a component to the registry; a YAML key selects it at runtime.</p></div>
+  <div class="card"><h3>Strict configs</h3><p>All experiments are pydantic-validated <code>RunConfig</code> objects. An unknown field is an error. Configs can <code>inherits: base.yaml</code> and override individual keys.</p></div>
+  <div class="card"><h3>Attention à la carte</h3><p><code>build_attention(variant, heads, kv_heads, …)</code> — swap MHA, GQA, MQA, or block-causal attention. Masks and RoPE are applied in one place.</p></div>
+  <div class="card"><h3>Stacks for every paradigm</h3><p><code>GPTStack</code> (causal), <code>LGTStack</code> (local-global + dual RoPE for diffusion/flow), <code>DiTStack</code> (adaLN-Zero for world models).</p></div>
+  <div class="card"><h3>Streaming loader</h3><p>Stream datasets sequentially up to a cap while the next warms up in a background thread. Bounded storage, no shuffle buffers, no full-dataset downloads.</p></div>
+  <div class="card"><h3>33 LLM datasets</h3><p>SmolLM2 pretrain stages (1–4), SFT (SmolTalk), and RL/DPO datasets, all as typed <code>DatasetSpec</code> entries in the LLM registry.</p></div>
+</div>
+</section>
+
+<section>
+<h2>Architecture</h2>
+<figure><div class="mermaid">flowchart TB
+  YAML["YAML (inherits: base.yaml)"] --> CFG["load_config → RunConfig\n(pydantic, strict)"]
+  BOOT["register_*_plugins()"] --> REG{"NamedRegistry / VariantRegistry"}
+  CFG --> REG
+  REG -->|"model: gpt_small"| M["backbone\n(GPTStack / LGTStack / DiTStack)"]
+  REG -->|"loss: ce"| LS["loss fn\n(ce / focal / diffusion)"]
+  REG -->|"sampler: autoregressive"| SA["sampler"]
+  REG -->|"dataset: smollm2_pretrain"| DS["DatasetSpec → streaming loader"]
+  M & LS & SA & DS --> TR["Trainer.fit()"]</div>
+<figcaption><b>Figure 1.</b> Registry wiring: one YAML key selects any registered component at runtime.</figcaption>
+</figure>
+
+<figure><div class="mermaid">flowchart LR
+  subgraph "nn.layers"
+    ATT["build_attention\n(mha / gqa / mqa)"]
+    FFN["FeedForward\n(mlp / geglu / moe)"]
+    NORM["RMSNorm / LayerNorm"]
+    EMB["RoPE / Sinusoidal / ALiBi"]
+  end
+  subgraph "nn.stacks"
+    GPS["GPTStack\ncausal, single RoPE"]
+    LGT["LGTStack\nlocal-global + dual RoPE\nfor diffusion"]
+    DIT["DiTStack\nadaLN-Zero\nfor world models"]
+  end
+  subgraph "nn.backbones"
+    BB["id → logits\n(ALBERT factored / full table)"]
+  end
+  ATT & FFN & NORM & EMB --> GPS & LGT & DIT
+  GPS & LGT & DIT --> BB</div>
+<figcaption><b>Figure 2.</b> Module hierarchy: layers compose into stacks; stacks compose into backbones.</figcaption>
+</figure>
+
+<figure><div class="mermaid">sequenceDiagram
+  participant T as Trainer
+  participant S as SequentialMultiDatasetStream
+  participant P as Prefetch thread
+  participant H as HF Hub
+  S->>P: warm up dataset 2
+  P->>H: resolve and open stream
+  loop up to max_samples_per_dataset
+    S->>H: stream dataset 1 rows
+    S-->>T: sample
+  end
+  S->>P: wait for dataset 2, start warming dataset 3
+  loop up to max_samples_per_dataset
+    S->>H: stream dataset 2 rows
+    S-->>T: sample
+  end</div>
+<figcaption><b>Figure 3.</b> Streaming loader: datasets play sequentially with background warm-up of the next dataset.</figcaption>
+</figure>
+</section>
+
+<section>
+<h2>Package layout</h2>
+<div class="tablewrap"><table>
+<thead><tr><th>Package</th><th>Contents</th></tr></thead>
+<tbody>
+<tr><td><code>hale_core.registry</code></td><td>NamedRegistry, VariantRegistry, decorators: <code>register_model</code>, <code>register_loss</code>, <code>register_sampler</code>, <code>register_metric</code></td></tr>
+<tr><td><code>hale_core.config</code></td><td>RunConfig pydantic schema, <code>load_config</code>, <code>inherits:</code> YAML merge, experiment path helpers</td></tr>
+<tr><td><code>hale_core.nn.layers</code></td><td>MHA/GQA/MQA attention, <code>build_attn_mask</code>, FeedForward (MLP/GeGLU/MoE), RMSNorm, RoPE, sinusoidal</td></tr>
+<tr><td><code>hale_core.nn.stacks</code></td><td>GPTStack, LGTStack (local-global + dual RoPE), DiTStack (adaLN-Zero)</td></tr>
+<tr><td><code>hale_core.nn.backbones</code></td><td><code>build_backbone</code> — maps token ids to logits; ALBERT factored or full embedding table</td></tr>
+<tr><td><code>hale_core.nn.losses</code></td><td>token_nll, focal, diffusion/flow cross-entropy; <code>register_token_loss</code></td></tr>
+<tr><td><code>hale_core.data</code></td><td>MixedVLMDataModule, SequentialMultiDatasetStream, LLM dataset registry (33 datasets)</td></tr>
+<tr><td><code>hale_core.training</code></td><td>Trainer, LR schedule, gradient clipping, AMP, distributed (DDP stub)</td></tr>
+<tr><td><code>hale_core.logging</code></td><td>loguru integration, TensorBoard + W&amp;B backends, <code>build_logger</code></td></tr>
+<tr><td><code>hale_core.runtime</code></td><td>Checkpoint save/restore (full state), device selection, tensor utilities</td></tr>
+</tbody>
+</table></div>
+</section>
+
+<section>
+<h2>Quick start</h2>
+<pre><code>uv add "hale-blocks @ git+https://github.com/basaanithanaveenkumar/HaleBlocks"
+# or editable install:
+uv add --editable /path/to/HaleBlocks</code></pre>
+<pre><code>from hale_core.nn.layers import build_attention, build_attn_mask
+from hale_core.nn.stacks import GPTStack, LGTStack
 from hale_core.nn.backbones import build_backbone
+from hale_core.nn.losses import token_nll
+from hale_core.config import load_config
+from hale_core.registry import register_model, register_loss
 
-lgt = build_backbone(32000, arch=&quot;lgt&quot;, d_model=256, n_heads=8, n_layers=6,
-                     d_ff=1024, max_length=128, n_kv_heads=2)
-dit = build_backbone(32000, arch=&quot;dit&quot;, d_model=256, n_heads=8, n_layers=6, d_ff=1024,
-                     max_length=128, attn_type=&quot;bidirectional&quot;, use_time_cond=True)
-logits = dit(torch.randint(0, 32000, (2, 64)), t=torch.rand(2))   # (2, 64, 32000)</code></pre></section>
-<section><h2>Citation</h2><pre><code>@misc{naveenkumar2026haleblocks,
-  title  = {HaleBlocks: Composable, Registry-Driven Transformer Building Blocks
-            for Autoregressive, Diffusion and Multimodal Models},
+# Register a custom model variant
+@register_model("my_model")
+class MyModel(nn.Module):
+    def __init__(self, cfg): ...
+
+# Load and validate a YAML config (supports inherits:)
+cfg = load_config("configs/my_experiment.yaml")</code></pre>
+<pre><code># Stream all SmolLM2 SFT datasets, 1000 samples each
+from hale_core.data import build_llm_dataloader
+
+loader = build_llm_dataloader(stage="finetune", samples_per_dataset=1000)
+for sample in loader:
+    print(sample.dataset, sample.prompt, sample.response)</code></pre>
+</section>
+
+<section>
+<h2>Citation</h2>
+<pre><code>@misc{naveenkumar2026haleblocks,
+  title  = {HaleBlocks: Composable Transformer Primitives for Language Models,
+            Vision-Language Models, and World Models},
   author = {NaveenKumar, B A},
   year   = {2026},
   url    = {https://github.com/basaanithanaveenkumar/HaleBlocks}
-}</code></pre></section>
+}</code></pre>
+</section>
 </div>
 <footer>HaleBlocks · <a href="https://github.com/basaanithanaveenkumar/HaleBlocks">Source on GitHub</a> · MIT License</footer>
 <script type="module">

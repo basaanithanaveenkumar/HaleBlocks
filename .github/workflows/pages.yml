@@ -10,6 +10,8 @@ on:
     paths:
       - "paper/**"
       - "project-page/**"
+      - "assets/**"
+      - "README.md"
       - ".github/workflows/pages.yml"
   workflow_dispatch:
 
@@ -34,12 +36,23 @@ jobs:
           working_directory: paper
       - name: Assemble site
         run: |
-          mkdir -p _site
-          cp -r project-page/. _site/
+          if [ -d project-page ]; then
+            cp -r project-page/. _site/
+          else
+            mkdir -p _site
+          fi
+          if [ ! -f _site/index.html ]; then
+            sudo apt-get install -y pandoc
+            pandoc README.md -s --metadata title="HaleBlocks" \
+              --css https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.5.0/github-markdown.min.css \
+              -o _site/index.html
+          fi
           cp paper/main.pdf _site/paper.pdf
+          [ -d assets ] && cp -r assets _site/assets || true
       - uses: actions/upload-pages-artifact@v3
         with:
           path: _site
+
   deploy:
     needs: build
     runs-on: ubuntu-latest
