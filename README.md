@@ -48,6 +48,17 @@ from hale_core.registry import register_model, register_loss, build_logger, get_
 from hale_core.data import MixedVLMDataModule
 ```
 
+## Resources
+
+| | |
+|---|---|
+| Paper (arXiv source) | [`paper/main.tex`](paper/main.tex) — build with `make -C paper` |
+| Project page | [basaanithanaveenkumar.github.io/HaleBlocks](https://basaanithanaveenkumar.github.io/HaleBlocks/) ([source](project-page/index.html)) |
+| Documentation | [`docs/`](docs/README.md) — getting started, components, configuration, data |
+| Architecture diagrams | [`docs/architecture.md`](docs/architecture.md) (Mermaid) |
+| Blog | [Stop copying attention.py: a registry for transformer research](docs/blog/2026-09-28-stop-copying-attention.md) |
+| Claude Code skills | [`.claude/skills/`](.claude/skills) — `haleblocks-dev`, `haleblocks-components`, `haleblocks-data`, `hale-publish` |
+
 ## Install
 
 ```bash
