@@ -10,6 +10,30 @@
 
 </div>
 
+## How it works
+
+You write one YAML file describing your experiment. HaleBlocks reads it, validates every field, then uses a plugin registry to look up and assemble the exact model architecture, training loop, loss function, and datasets you asked for — all from names in the config. To add a new model or dataset, you write one class with a decorator; nothing else changes.
+
+```mermaid
+flowchart LR
+  subgraph CONFIG["Your experiment config"]
+    YAML["📄 experiment.yaml\nmodel: gpt_small\nloss: ce\ndata: smollm2_pretrain\n(inherits: base.yaml)"]
+  end
+
+  subgraph REGISTRY["Plugin registry\n(looks up components by name)"]
+    MODEL["🧠 Transformer\n(GPT / LGT / DiT backbone)"]
+    LOSS["📉 Loss function\n(cross-entropy / diffusion / flow)"]
+    DATA["📦 Streaming dataset\n(downloads & prefetches\none dataset at a time)"]
+    TRAINER["⚙️ Trainer\n(AMP, gradient clipping,\ncheckpointing, logging)"]
+  end
+
+  YAML --> REGISTRY
+  REGISTRY --> MODEL & LOSS & DATA & TRAINER
+  DATA --> TRAINER --> MODEL
+```
+
+> **Why a registry?** Each project (HALE-WAM, Hale-VLM, HaloDiffusionLLM) registers its own components but shares the same config system, trainer, and data streaming — no duplication.
+
 Reusable transformer building blocks for language models, VLMs, and world models.
 
 Import as `hale_core`:
