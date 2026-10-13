@@ -19,3 +19,9 @@ __all__ = [
     "log_model_summary",
     "move_batch_to_device",
 ]
+
+# Profiling is imported lazily to keep the runtime import lightweight.
+def get_profiler():
+    """Return :class:`~hale_core.profiling.ModelProfiler` (lazy import)."""
+    from hale_core.profiling import ModelProfiler  # noqa: PLC0415
+    return ModelProfiler

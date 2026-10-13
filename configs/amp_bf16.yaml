@@ -1,0 +1,44 @@
+# amp_bf16.yaml — GPT training with bf16 mixed precision (recommended for A100/H100)
+#
+# Effect: ~2× throughput, ~50% activation memory reduction vs fp32.
+# Safe to use on: A100, H100, RTX 3090+, any Ampere+ GPU.
+# For fp16 (Volta/Turing), use dtype: fp16 and init_scale: 65536.
+
+variant: llm
+
+model:
+  arch: transformer
+  d_model: 1024
+  n_heads: 16
+  n_layers: 24
+  d_ff: 4096
+  dropout: 0.1
+
+train:
+  steps: 100000
+  lr: 3.0e-4
+  optimizer_type: adamw
+  weight_decay: 0.1
+  grad_clip: 1.0
+
+  # ── Module 1: Mixed Precision ──────────────────────────────────────────────
+  amp:
+    enabled: true
+    dtype: bf16           # use fp16 for Volta/Turing GPUs
+    # GradScaler settings (only used when dtype=fp16):
+    init_scale: 65536.0
+    growth_factor: 2.0
+    backoff_factor: 0.5
+    growth_interval: 2000
+
+  scheduler:
+    type: warmup_cosine
+    warmup_steps: 2000
+    min_lr_ratio: 0.1
+
+data:
+  dataset: Salesforce/wikitext
+  loader:
+    num_workers: 8
+    pin_memory: true
+    persistent_workers: true

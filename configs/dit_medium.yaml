@@ -1,0 +1,49 @@
+# dit_medium.yaml — DiT (Diffusion Transformer) for image/video generation
+variant: llm
+
+model:
+  arch: dit
+  d_model: 1024
+  n_heads: 16
+  n_layers: 24
+  d_ff: 4096
+  dropout: 0.0
+  max_length: 4096
+  # Full nested block config for DiT:
+  block:
+    norm_type: layer
+    post_norm: false
+    use_time_cond: true           # enables AdaLN-Zero conditioning on t_emb
+    attention:
+      impl: mha
+      qk_norm: false
+      dropout: 0.0
+    ffn:
+      type: mlp
+      dropout: 0.0
+    norm:
+      type: layer
+      eps: 1.0e-6
+      affine: true
+
+data:
+  dataset: image_tokens
+  loader:
+    num_workers: 16
+    pin_memory: true
+    prefetch_factor: 4
+    persistent_workers: true
+    shuffle: true
+    drop_last: true
+
+train:
+  steps: 500000
+  lr: 1.0e-4
+  weight_decay: 0.0
+  grad_clip: 1.0
+  optimizer_type: adamw
+  # Cosine decay — common for image diffusion training
+  scheduler:
+    type: cosine
+    min_lr_ratio: 0.05
+  log_every: 200

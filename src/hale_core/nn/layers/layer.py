@@ -1,4 +1,4 @@
-"""Pre-norm layer: injected attention + FFN (open for new impls, closed for callers)."""
+"""Pre-norm transformer layer registered as the ``"transformer"`` block."""
 
 from __future__ import annotations
 
@@ -37,7 +37,7 @@ class TransformerLayer(nn.Module):
             scale, shift = scale.unsqueeze(1), shift.unsqueeze(1)
         return h * (1 + scale) + shift
 
-    def forward(
+    def forward(  # noqa: PLR0913
         self,
         x: torch.Tensor,
         t_emb: torch.Tensor | None = None,
@@ -63,3 +63,13 @@ class TransformerLayer(nn.Module):
         if self.ln2_post is not None:
             x = self.ln2_post(x)
         return x
+
+
+def _register_transformer_block() -> None:
+    from hale_core.registry.plugins import BLOCKS_REGISTRY
+
+    if "transformer" not in BLOCKS_REGISTRY:
+        BLOCKS_REGISTRY.add("transformer", TransformerLayer)
+
+
+_register_transformer_block()

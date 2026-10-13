@@ -1,0 +1,82 @@
+# qat_export.yaml — Full pipeline: bf16 training → QAT → export ONNX + MLX
+#
+# Pipeline:
+#   0 → 5000 steps : normal bf16 training (model converges first)
+#   5000 → end     : fake-quant nodes active (QAT fine-tuning)
+#   post-train      : convert to int8, then export to ONNX and MLX
+#
+# This is the recommended pipeline for deploying LLMs on:
+#   - x86 CPUs (via ONNX Runtime with fbgemm backend)
+#   - Apple Silicon Macs (via MLX 4-bit quantization)
+#   - NVIDIA GPUs (via TensorRT FP16)
+
+variant: llm
+
+model:
+  arch: transformer
+  d_model: 512
+  n_heads: 8
+  n_layers: 6
+  d_ff: 2048
+
+train:
+  steps: 20000
+  lr: 3.0e-4
+  optimizer_type: adamw
+
+  # ── Module 1: AMP — train in bf16 ─────────────────────────────────────────
+  amp:
+    enabled: true
+    dtype: bf16
+
+  # ── Module 2: Pruning (optional — combine with QAT for maximum compression) ─
+  pruning:
+    enabled: false    # set true to add 50% sparsity on top of int8
+
+  # ── Module 3: QAT — start fake-quant at step 5000 ─────────────────────────
+  quant:
+    enabled: true
+    backend: fbgemm           # x86 CPU deployment target
+    bits: 8                   # int8 quantization
+    per_channel: true         # per-output-channel scale for Linear (more accurate)
+    symmetric: true           # symmetric int8 (simpler, works well for weights)
+    calibration_batches: 200  # batches to collect observer statistics
+    qat_start_step: 5000      # train FP32 first, then insert fake quant
+    convert_at_end: true      # convert to int8 after training
+
+  # ── Module 4: Export ───────────────────────────────────────────────────────
+  export:
+    enabled: true
+    targets:
+      - onnx           # ONNX for cross-platform inference
+      - mlx            # Apple Silicon native inference
+      # - tensorrt     # uncomment for NVIDIA GPU deployment
+
+    output_dir: exports/qat_model
+
+    # ONNX settings
+    onnx_opset: 17
+    onnx_dynamic_axes: true    # variable batch + seq_len at inference
+    onnx_simplify: true
+
+    # TensorRT settings (only if tensorrt in targets)
+    trt_fp16: true
+    trt_workspace_mb: 4096
+
+    # MLX settings (Apple Silicon)
+    mlx_quantize_bits: 4       # 4-bit weight-only quantization for MLX
+    mlx_group_size: 64
+
+    # Dummy input shape for tracing
+    sample_batch_size: 1
+    sample_seq_len: 128
+
+  scheduler:
+    type: warmup_cosine
+    warmup_steps: 500
+
+data:
+  dataset: Salesforce/wikitext
+  loader:
+    num_workers: 4
+    pin_memory: true

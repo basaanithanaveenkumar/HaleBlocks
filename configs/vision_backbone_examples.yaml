@@ -1,0 +1,148 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# Vision Backbone Configuration Examples
+# ─────────────────────────────────────────────────────────────────────────────
+#
+# All examples use the BackboneConfig schema from:
+#   hale_core.config.sections.backbone.BackboneConfig
+#
+# Usage in model builders:
+#   from hale_core.config.sections.backbone import BackboneConfig
+#   backbone = cfg.backbone.build()   # returns BaseVisionBackbone instance
+#
+# Or directly via the registry:
+#   from hale_core.registry import build_vision_backbone
+#   backbone = build_vision_backbone("convnext_base", img_size=224)
+#
+# All registered names (grouped by family):
+#   CNN:    resnet18/34/50/101/152/200
+#           resnet50_dcn  resnet101_dcn
+#           convnext_tiny/small/base/large/xlarge/huge
+#           mobile_one_s0/s1/s2/s3/s4
+#           efficientnet_v2_s/m/l/xl
+#           internimage_tiny/small/base/large/huge
+#   ViT:    vit_tiny/small/base/large/huge  vit_22b
+#           dino_vit_small/base/large/giant
+#           eva_02_small/base/large
+#           deit3_small/base/large/huge
+#   Swin:   swinv2_tiny/small/base/large/giant
+#   Hybrid: coatnet_0/1/2/3/7
+#           maxvit_tiny/small/base/large/xlarge
+# ─────────────────────────────────────────────────────────────────────────────
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Example 1: ConvNeXt-Base (good default for VLM / detection)
+# ─────────────────────────────────────────────────────────────────────────────
+backbone_convnext_base: &backbone_convnext_base
+  name: convnext_base
+  img_size: 224
+  in_chans: 3
+  drop_rate: 0.0
+  out_indices: null        # return all 4 scales
+  freeze_encoder: false
+  freeze_up_to_stage: -1   # fine-tune all stages
+  pretrained_path: null
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Example 2: SwinV2-Tiny frozen feature extractor (fast, efficient)
+# ─────────────────────────────────────────────────────────────────────────────
+backbone_swinv2_tiny_frozen: &backbone_swinv2_tiny_frozen
+  name: swinv2_tiny
+  img_size: 224
+  drop_rate: 0.0
+  out_indices: [2, 3]      # only coarsest 2 scales for BEV encoder
+  freeze_encoder: true
+  freeze_up_to_stage: -1
+  pretrained_path: null
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Example 3: ViT-Large for VLM (336px high-res, fine-tune later stages)
+# ─────────────────────────────────────────────────────────────────────────────
+backbone_vit_large_vlm: &backbone_vit_large_vlm
+  name: vit_large
+  img_size: 336
+  drop_rate: 0.1
+  out_indices: null
+  freeze_encoder: false
+  freeze_up_to_stage: 16   # freeze first 16 blocks; fine-tune blocks 17-24
+  pretrained_path: null
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Example 4: DINOv2 ViT-Giant (best zero-shot features, use frozen)
+# ─────────────────────────────────────────────────────────────────────────────
+backbone_dino_giant: &backbone_dino_giant
+  name: dino_vit_giant
+  img_size: 224
+  drop_rate: 0.0
+  out_indices: null
+  freeze_encoder: true     # DINOv2 features are very strong frozen
+  freeze_up_to_stage: -1
+  pretrained_path: null    # or: /path/to/dinov2_vitg14.pt
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Example 5: EVA-02-Large (CLIP-aligned, good for VLM)
+# ─────────────────────────────────────────────────────────────────────────────
+backbone_eva02_large: &backbone_eva02_large
+  name: eva_02_large
+  img_size: 336
+  drop_rate: 0.0
+  out_indices: null
+  freeze_encoder: false
+  freeze_up_to_stage: 18   # fine-tune the last 6 blocks
+  pretrained_path: null
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Example 6: ResNet-50 with Deformable Conv (detection backbone)
+# ─────────────────────────────────────────────────────────────────────────────
+backbone_resnet50_dcn: &backbone_resnet50_dcn
+  name: resnet50_dcn
+  img_size: 800
+  drop_rate: 0.0
+  out_indices: [1, 2, 3]   # strides 8, 16, 32
+  freeze_encoder: false
+  freeze_up_to_stage: 1    # freeze stem + stage0; fine-tune stages 1-3
+  pretrained_path: null
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Example 7: MobileOne-S2 (edge device, real-time)
+# ─────────────────────────────────────────────────────────────────────────────
+backbone_mobileone_s2: &backbone_mobileone_s2
+  name: mobile_one_s2
+  img_size: 224
+  drop_rate: 0.0
+  out_indices: [0, 1, 2, 3]
+  freeze_encoder: false
+  freeze_up_to_stage: -1
+  pretrained_path: null
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Example 8: MaxViT-XL (best accuracy, large-scale vision)
+# ─────────────────────────────────────────────────────────────────────────────
+backbone_maxvit_xlarge: &backbone_maxvit_xlarge
+  name: maxvit_xlarge
+  img_size: 512
+  drop_rate: 0.1
+  out_indices: [0, 1, 2, 3]
+  freeze_encoder: false
+  freeze_up_to_stage: -1
+  pretrained_path: null
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Example 9: InternImage-Huge (DCNv3, best dense prediction backbone)
+# ─────────────────────────────────────────────────────────────────────────────
+backbone_internimage_huge: &backbone_internimage_huge
+  name: internimage_huge
+  img_size: 640
+  drop_rate: 0.0
+  out_indices: [0, 1, 2, 3]
+  freeze_encoder: false
+  freeze_up_to_stage: -1
+  pretrained_path: null

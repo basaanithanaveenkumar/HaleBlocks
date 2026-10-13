@@ -3,224 +3,286 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>HaleBlocks</title>
-<meta name="description" content="Reusable transformer building blocks — attention, FFN, backbone, registry, streaming data — shared by HALE-WAM, Hale-VLM, HaloDiffusionLLM.">
+<title>HaleBlocks — Composable Transformer Primitives</title>
+<meta name="description" content="Plugin registries, strict pydantic configs, and bounded-storage streaming — the shared foundation for HALE-WAM, Hale-VLM, and HaloDiffusionLLM.">
 <meta property="og:title" content="HaleBlocks: Composable Transformer Primitives for LMs, VLMs, and World Models">
-<meta property="og:description" content="Plugin registries, strict YAML configs, and a sequential streaming data loader — one framework for every Halo research project.">
+<meta property="og:description" content="One decorator registers a component. One YAML key selects it. No duplicated scaffolding across projects.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]})"></script>
 <style>
-:root{--bg:#fbfaf7;--fg:#1d1d1f;--muted:#5b5b63;--card:#ffffff;--line:#e4e2dc;--accent:#2f5bd3;--accent-soft:#e8eefc;--code:#f3f2ee;--chip:#efeee9}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#111214;--fg:#ececee;--muted:#a0a0aa;--card:#1a1b1f;--line:#2c2d33;--accent:#8aa8ff;--accent-soft:#1e2640;--code:#1f2025;--chip:#24252b}}
+:root{--bg:#fbfaf7;--fg:#1d1d1f;--muted:#5b5b63;--card:#fff;--line:#e4e2dc;--accent:#2f5bd3;--accent-soft:#e8eefc;--code:#f3f2ee;--chip:#efeee9}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#111214;--fg:#ececee;--muted:#a0a0aa;--card:#1a1b1f;--line:#2c2d33;--accent:#8aa8ff;--accent-soft:#1e2640;--code:#1f2025;--chip:#24252b}}
 :root[data-theme="dark"]{--bg:#111214;--fg:#ececee;--muted:#a0a0aa;--card:#1a1b1f;--line:#2c2d33;--accent:#8aa8ff;--accent-soft:#1e2640;--code:#1f2025;--chip:#24252b}
-*{box-sizing:border-box}
-html{-webkit-text-size-adjust:100%}
+*{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
 body{margin:0;background:var(--bg);color:var(--fg);font:17px/1.65 "Source Serif 4",Georgia,serif}
-.wrap{max-width:920px;margin:0 auto;padding:0 16px}
-header.hero{padding:64px 0 28px;text-align:center}
-.kicker{font:600 13px/1 Inter,system-ui,sans-serif;letter-spacing:.12em;text-transform:uppercase;color:var(--accent)}
-h1{font:700 clamp(30px,5.4vw,48px)/1.15 Inter,system-ui,sans-serif;margin:14px 0 10px;letter-spacing:-.02em}
-.subtitle{font-size:clamp(17px,2.4vw,21px);color:var(--muted);max-width:720px;margin:0 auto}
-.authors{margin:20px 0 4px;font:500 16px Inter,system-ui,sans-serif}
-.affil{color:var(--muted);font:14px Inter,system-ui,sans-serif}
-.buttons{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin:26px 0 8px}
-.btn{display:inline-flex;align-items:center;gap:8px;padding:9px 16px;border-radius:999px;background:var(--fg);color:var(--bg);text-decoration:none;font:600 14px Inter,system-ui,sans-serif}
-.btn.alt{background:transparent;color:var(--fg);border:1px solid var(--line)}
-.btn:hover{opacity:.88}
-section{padding:26px 0;border-top:1px solid var(--line)}
-h2{font:700 24px/1.3 Inter,system-ui,sans-serif;margin:0 0 14px;letter-spacing:-.01em}
-h3{font:650 17px/1.35 Inter,system-ui,sans-serif;margin:0 0 6px}
+.wrap{max-width:900px;margin:0 auto;padding:0 18px}
+header.hero{padding:68px 0 32px;text-align:center}
+.kicker{font:600 12px/1 Inter,system-ui,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin-bottom:10px}
+h1{font:700 clamp(28px,5vw,46px)/1.15 Inter,system-ui,sans-serif;margin:0 0 12px;letter-spacing:-.02em}
+.tagline{font-size:clamp(17px,2.2vw,20px);color:var(--muted);max-width:680px;margin:0 auto 20px}
+.authors{font:500 15px/1.6 Inter,system-ui,sans-serif;margin:0 0 4px}
+.affil{color:var(--muted);font:14px Inter,system-ui,sans-serif;margin-bottom:22px}
+.buttons{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+.btn{display:inline-flex;align-items:center;gap:7px;padding:9px 18px;border-radius:999px;background:var(--fg);color:var(--bg);text-decoration:none;font:600 14px Inter,system-ui,sans-serif;transition:opacity .15s}
+.btn.alt{background:transparent;color:var(--fg);border:1.5px solid var(--line)}
+.btn:hover{opacity:.82}
+section{padding:28px 0;border-top:1px solid var(--line)}
+h2{font:700 22px/1.3 Inter,system-ui,sans-serif;margin:0 0 14px;letter-spacing:-.01em}
+h3{font:650 16px/1.35 Inter,system-ui,sans-serif;margin:0 0 6px}
 p{margin:0 0 12px}
-.tldr{background:var(--accent-soft);border-radius:14px;padding:18px 20px;font-size:18px}
-.tldr b{font-family:Inter,system-ui,sans-serif}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px}
+.tldr-box{background:var(--accent-soft);border-radius:14px;padding:20px 24px}
+.tldr-list{list-style:none;padding:0;margin:12px 0 0}
+.tldr-list li{padding:5px 0 5px 26px;position:relative;font-size:16.5px}
+.tldr-list li::before{content:"→";position:absolute;left:0;color:var(--accent);font-weight:700}
+.metric{display:inline-block;background:var(--accent);color:#fff;border-radius:8px;padding:4px 12px;font:700 14px Inter,system-ui,sans-serif;margin-top:10px}
+.problem-box{border-left:3px solid var(--accent);background:var(--card);border-radius:0 12px 12px 0;padding:14px 18px;margin:14px 0}
+.method-steps{list-style:none;padding:0;counter-reset:step}
+.method-step{counter-increment:step;padding:14px 0 14px 54px;position:relative;border-bottom:1px solid var(--line)}
+.method-step:last-child{border-bottom:none}
+.method-step::before{content:counter(step);position:absolute;left:0;top:14px;width:36px;height:36px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font:700 14px Inter,system-ui,sans-serif}
+.callout{background:var(--accent-soft);border-radius:12px;padding:12px 16px;margin:10px 0;font-size:15.5px}
+.callout strong{color:var(--accent);font-family:Inter,system-ui,sans-serif}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
 .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px}
-.card p{font-size:15.5px;color:var(--muted);margin:0}
-figure{margin:0 0 18px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;overflow-x:auto}
-figcaption{font:14px/1.5 Inter,system-ui,sans-serif;color:var(--muted);margin-top:10px}
-.mermaid{display:flex;justify-content:center;min-width:0}
-.mermaid svg{max-width:100%;height:auto}
-pre{background:var(--code);border:1px solid var(--line);border-radius:12px;padding:14px 16px;overflow-x:auto;font:13.5px/1.55 "JetBrains Mono",ui-monospace,monospace;margin:0 0 12px}
-code{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:.9em}
-table{width:100%;border-collapse:collapse;font:15px/1.5 Inter,system-ui,sans-serif}
+.card p{font-size:15px;color:var(--muted);margin:0}
+table{width:100%;border-collapse:collapse;font:14.5px/1.5 Inter,system-ui,sans-serif}
 th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
-th{color:var(--muted);font-weight:600}
-td code{background:var(--chip);padding:1px 6px;border-radius:6px}
-.tablewrap{overflow-x:auto}
+th{color:var(--muted);font-weight:600;font-size:13px}
+td.best{font-weight:700;color:var(--accent)}
+.tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:12px}
+.tablewrap table{margin:0}
+pre{background:var(--code);border:1px solid var(--line);border-radius:12px;padding:14px 16px;overflow-x:auto;font:13px/1.55 "JetBrains Mono",ui-monospace,monospace;margin:0 0 12px}
+code{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:.88em;background:var(--chip);padding:1px 5px;border-radius:5px}
+pre code{background:none;padding:0;font-size:inherit}
+figure{margin:0 0 20px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;overflow-x:auto}
+figcaption{font:13.5px/1.5 Inter,system-ui,sans-serif;color:var(--muted);margin-top:10px}
+.mermaid{display:flex;justify-content:center}
+.mermaid svg{max-width:100%;height:auto}
+.demo-steps{list-style:none;padding:0;counter-reset:run}
+.demo-step{counter-increment:run;padding:4px 0 4px 36px;position:relative;margin-bottom:8px}
+.demo-step::before{content:counter(run);position:absolute;left:0;top:6px;width:24px;height:24px;border-radius:50%;background:var(--fg);color:var(--bg);display:flex;align-items:center;justify-content:center;font:700 12px Inter;flex-shrink:0}
+.lim-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.lim-card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+.tag{display:inline-block;font:600 10px/1 Inter,system-ui,sans-serif;letter-spacing:.06em;text-transform:uppercase;padding:3px 8px;border-radius:6px;margin:0 4px 6px 0}
+.tag-known{background:#d1ecf1;color:#0c5460}
+.tag-warn{background:#fff3cd;color:#856404}
+.tag-open{background:#d4edda;color:#155724}
+:root[data-theme="dark"] .tag-known,:root:not([data-theme="light"]) .tag-known{background:#002530;color:#9df}
+:root[data-theme="dark"] .tag-warn,:root:not([data-theme="light"]) .tag-warn{background:#2e1f00;color:#ffd}
+:root[data-theme="dark"] .tag-open,:root:not([data-theme="light"]) .tag-open{background:#001e0a;color:#9fa}
+.checklist{font:13px/1.9 "JetBrains Mono",monospace;background:var(--code);border:1px solid var(--line);border-radius:12px;padding:14px 18px;list-style:none}
+.checklist li::before{content:"☐  "}
 .note{font:14px/1.55 Inter,system-ui,sans-serif;color:var(--muted)}
-footer{padding:32px 0 48px;color:var(--muted);font:14px Inter,system-ui,sans-serif;text-align:center;border-top:1px solid var(--line)}
-a{color:var(--accent)}
-.theme{position:fixed;top:12px;right:12px;border:1px solid var(--line);background:var(--card);color:var(--fg);border-radius:999px;padding:6px 12px;font:13px Inter,system-ui,sans-serif;cursor:pointer}
+footer{padding:34px 0 52px;color:var(--muted);font:14px Inter,system-ui,sans-serif;text-align:center;border-top:1px solid var(--line)}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+.theme{position:fixed;top:12px;right:12px;border:1px solid var(--line);background:var(--card);color:var(--fg);border-radius:999px;padding:6px 12px;font:13px Inter,system-ui,sans-serif;cursor:pointer;z-index:99}
 </style>
 </head>
 <body>
-<button class="theme" id="theme" aria-label="Toggle dark mode">Theme</button>
+<button class="theme" id="theme">Theme</button>
 <div class="wrap">
+
 <header class="hero">
-  <div class="kicker">Transformer library · Registry · Streaming data</div>
-  <h1>HaleBlocks: Composable Transformer Primitives for LMs, VLMs, and World Models</h1>
-  <p class="subtitle">Plugin registries, strict pydantic YAML configs, and a bounded-storage sequential streaming loader — the shared foundation across all Halo research projects.</p>
+  <div class="kicker">Transformer library · Plugin registry · Streaming data · Shared foundation</div>
+  <h1>HaleBlocks</h1>
+  <p class="tagline">One decorator registers a component. One YAML key selects it. No duplicated training scaffolding across projects.</p>
   <div class="authors">B A NaveenKumar</div>
   <div class="affil">Independent research · 2026</div>
   <div class="buttons">
-    <a class="btn" href="https://github.com/basaanithanaveenkumar/HaleBlocks">Code</a>
-    <a class="btn alt" href="https://pypi.org/project/hale-blocks/">PyPI</a>
-    <a class="btn alt" href="https://github.com/basaanithanaveenkumar/HaleBlocks/tree/main/docs">Docs</a>
+    <a class="btn" href="https://github.com/basaanithanaveenkumar/HaleBlocks">💻 Code</a>
+    <a class="btn alt" href="https://pypi.org/project/hale-blocks/">📦 PyPI</a>
+    <a class="btn alt" href="https://github.com/basaanithanaveenkumar/HaleBlocks/tree/main/docs">📚 Docs</a>
   </div>
 </header>
 
 <section>
-<div class="tldr"><b>TL;DR.</b> <code>from hale_core import build_attention, GPTStack, register_model, load_config</code> — wire any combination of attention (MHA/GQA/MQA), FFN (MLP/GeGLU/MoE), backbone (GPT/LGT/DiT), and loss through a YAML config. New components register with a decorator; experiments inherit from a base config.</div>
-</section>
-
-<section>
-<h2>Abstract</h2>
-<p>Research projects that explore different model architectures — autoregressive LLMs, VLMs, world models, diffusion models — typically duplicate scaffolding code: training loops, config validation, dataset streaming, logging, checkpointing. HaleBlocks is a small library that eliminates this duplication by providing the shared primitives as composable plugins behind a unified registry interface.</p>
-<p>Imported as <code>hale_core</code>, the library provides attention modules (MHA, GQA, MQA), FFN blocks (MLP, GeGLU, DeepSeekMoE), transformer stacks (GPT-style causal, LGT local-global, DiT adaLN-Zero), token backbones, a flexible loss registry, a pydantic-validated YAML config system with <code>inherits:</code> support, a sequential multi-dataset streaming loader with background warm-up, and loguru-based logging with TensorBoard and W&amp;B backends. HALE-WAM, Hale-VLM, HaloDiffusionLLM, and Halos-lift are all built on HaleBlocks.</p>
-</section>
-
-<section>
-<h2>Highlights</h2>
-<div class="grid">
-  <div class="card"><h3>Plugin registries</h3><p><code>@register_model</code>, <code>@register_loss</code>, <code>@register_sampler</code> — one decorator adds a component to the registry; a YAML key selects it at runtime.</p></div>
-  <div class="card"><h3>Strict configs</h3><p>All experiments are pydantic-validated <code>RunConfig</code> objects. An unknown field is an error. Configs can <code>inherits: base.yaml</code> and override individual keys.</p></div>
-  <div class="card"><h3>Attention à la carte</h3><p><code>build_attention(variant, heads, kv_heads, …)</code> — swap MHA, GQA, MQA, or block-causal attention. Masks and RoPE are applied in one place.</p></div>
-  <div class="card"><h3>Stacks for every paradigm</h3><p><code>GPTStack</code> (causal), <code>LGTStack</code> (local-global + dual RoPE for diffusion/flow), <code>DiTStack</code> (adaLN-Zero for world models).</p></div>
-  <div class="card"><h3>Streaming loader</h3><p>Stream datasets sequentially up to a cap while the next warms up in a background thread. Bounded storage, no shuffle buffers, no full-dataset downloads.</p></div>
-  <div class="card"><h3>33 LLM datasets</h3><p>SmolLM2 pretrain stages (1–4), SFT (SmolTalk), and RL/DPO datasets, all as typed <code>DatasetSpec</code> entries in the LLM registry.</p></div>
+<div class="tldr-box">
+  <b>TL;DR.</b> HaleBlocks is a small library (imported as <code>hale_core</code>) that provides the shared scaffolding for the Halo research projects: attention modules, transformer stacks, a plugin registry, strict pydantic YAML configs, and a bounded-storage sequential streaming loader.
+  <ul class="tldr-list">
+    <li><b>Problem:</b> Research projects that explore different architectures — LLMs, VLMs, world models, diffusion — duplicate training loops, config validation, and dataset streaming code.</li>
+    <li><b>Method:</b> Plugin registries (<code>@register_model</code>, <code>@register_loss</code>, …) decouple components from the training loop. A YAML key selects any registered component at runtime.</li>
+    <li><b>Config system:</b> Strict pydantic validation with <code>inherits:</code> — unknown fields are an error, not silently ignored. Single-field overrides without full repetition.</li>
+    <li><b>Stacks:</b> GPTStack (causal), LGTStack (local-global + dual RoPE for diffusion), DiTStack (adaLN-Zero for world models).</li>
+    <li><b>Data:</b> 33 SmolLM2 LLM datasets (15 pretrain, 14 SFT, 4 RL/DPO) in a typed registry alongside the VLM and VLA datasets used by Hale-VLM.</li>
+  </ul>
+  <span class="metric">3 transformer stacks · 33 LLM datasets · 0 duplicated training loops</span>
 </div>
 </section>
 
 <section>
-<h2>Architecture</h2>
-<figure><div class="mermaid">flowchart TB
-  YAML["YAML (inherits: base.yaml)"] --> CFG["load_config → RunConfig\n(pydantic, strict)"]
-  BOOT["register_*_plugins()"] --> REG{"NamedRegistry / VariantRegistry"}
-  CFG --> REG
-  REG -->|"model: gpt_small"| M["backbone\n(GPTStack / LGTStack / DiTStack)"]
-  REG -->|"loss: ce"| LS["loss fn\n(ce / focal / diffusion)"]
-  REG -->|"sampler: autoregressive"| SA["sampler"]
-  REG -->|"dataset: smollm2_pretrain"| DS["DatasetSpec → streaming loader"]
-  M & LS & SA & DS --> TR["Trainer.fit()"]</div>
-<figcaption><b>Figure 1.</b> Registry wiring: one YAML key selects any registered component at runtime.</figcaption>
-</figure>
-
-<figure><div class="mermaid">flowchart LR
-  subgraph "nn.layers"
-    ATT["build_attention\n(mha / gqa / mqa)"]
-    FFN["FeedForward\n(mlp / geglu / moe)"]
-    NORM["RMSNorm / LayerNorm"]
-    EMB["RoPE / Sinusoidal / ALiBi"]
-  end
-  subgraph "nn.stacks"
-    GPS["GPTStack\ncausal, single RoPE"]
-    LGT["LGTStack\nlocal-global + dual RoPE\nfor diffusion"]
-    DIT["DiTStack\nadaLN-Zero\nfor world models"]
-  end
-  subgraph "nn.backbones"
-    BB["id → logits\n(ALBERT factored / full table)"]
-  end
-  ATT & FFN & NORM & EMB --> GPS & LGT & DIT
-  GPS & LGT & DIT --> BB</div>
-<figcaption><b>Figure 2.</b> Module hierarchy: layers compose into stacks; stacks compose into backbones.</figcaption>
-</figure>
-
-<figure><div class="mermaid">sequenceDiagram
-  participant T as Trainer
-  participant S as SequentialMultiDatasetStream
-  participant P as Prefetch thread
-  participant H as HF Hub
-  S->>P: warm up dataset 2
-  P->>H: resolve and open stream
-  loop up to max_samples_per_dataset
-    S->>H: stream dataset 1 rows
-    S-->>T: sample
-  end
-  S->>P: wait for dataset 2, start warming dataset 3
-  loop up to max_samples_per_dataset
-    S->>H: stream dataset 2 rows
-    S-->>T: sample
-  end</div>
-<figcaption><b>Figure 3.</b> Streaming loader: datasets play sequentially with background warm-up of the next dataset.</figcaption>
-</figure>
+<h2>Problem Statement</h2>
+<p>A typical ML research group maintains separate training scripts for each project. When a new model arrives, someone copies the training loop, adds the new model class, renames some variables, and two months later there are three diverged copies of the same AMP + gradient-clipping + checkpoint-restore logic, each with its own bugs.</p>
+<div class="problem-box"><b>Config drift:</b> Each project grows its own argparse or ad-hoc YAML reader. An unknown field is silently ignored; a wrong type becomes a runtime crash deep in training. Reproducing a run from a config file becomes unreliable.</div>
+<div class="problem-box"><b>Data streaming reinvented:</b> Streaming 50+ HuggingFace datasets sequentially, prefetching the next while the current is playing, and capping storage — this is the same logic needed by every project, but it gets reimplemented each time.</div>
+<div class="problem-box"><b>Architecture fragmentation:</b> Attention, FFN, and positional encoding appear in slightly different forms in each project's model file. Bugs fixed in one don't propagate; improvements don't share.</div>
+<p>HaleBlocks solves all three by being the single authoritative implementation that every Halo project imports. New components register with a decorator; the training loop, config system, and data loader are shared without modification.</p>
 </section>
 
 <section>
-<h2>Package layout</h2>
-<div class="tablewrap"><table>
-<thead><tr><th>Package</th><th>Contents</th></tr></thead>
+<h2>Method / Design</h2>
+<figure>
+<div class="mermaid">flowchart LR
+  YAML["YAML (inherits: base.yaml)\nmodel: gpt_small\nloss: ce\ntrainer: default\ndata: smollm2_pretrain"]
+  BOOT["register_*_plugins()\n(called once at startup)"]
+  REG{"NamedRegistry\n/ VariantRegistry"}
+  YAML & BOOT --> REG
+  REG -->|"model key"| M["nn.Module (from registry)"]
+  REG -->|"loss key"| LS["loss fn"]
+  REG -->|"trainer key"| TR["Trainer"]
+  REG -->|"dataset key"| DS["DatasetAdapter"]
+  M & LS & TR & DS --> FIT["Trainer.fit()"]</div>
+<figcaption><b>Figure 1.</b> One YAML file drives the full experiment. Every component is looked up by name from a registry populated at startup.</figcaption>
+</figure>
+
+<ol class="method-steps">
+<li class="method-step">
+  <h3>Plugin registries</h3>
+  <p>Two registry types: <code>NamedRegistry</code> maps a string to a class or function; <code>VariantRegistry</code> also stores and validates a per-variant pydantic schema. Registration is a one-line decorator:</p>
+  <pre><code>@register_model("my_vlm")
+class MyVLM(nn.Module):
+    def __init__(self, cfg: MyVLMConfig): ...</code></pre>
+  <p>Lookup: <code>MODELS.build("my_vlm", cfg)</code>. Unknown names raise immediately. New components in downstream projects (e.g. Hale-VLM) call <code>register_vlm_plugins()</code> once and then use HaleBlocks' <code>Trainer</code> unchanged.</p>
+</li>
+<li class="method-step">
+  <h3>Config system</h3>
+  <p>Configs are pydantic v2 models. <code>load_config(path)</code> performs deep YAML merge (respecting <code>inherits: base.yaml</code>) and then validates the merged dict — unknown fields are a <code>ValidationError</code>, not silently discarded. Experiment output paths are computed deterministically from the config hash.</p>
+  <div class="callout"><strong>★ Reproducibility guarantee:</strong> Two configs that produce the same validated <code>RunConfig</code> object will produce the same experiment, because all randomness is seeded from config fields.</div>
+</li>
+<li class="method-step">
+  <h3>Transformer building blocks</h3>
+  <p><code>build_attention(variant, n_heads, kv_heads, dim, …)</code> returns MHA, GQA, or MQA attention with RoPE and the right causal / bidirectional / block-causal mask. <code>FeedForward(variant, d_model, d_ff)</code> returns MLP, GeGLU, or DeepSeekMoE FFN. Both are used directly in the three stacks:</p>
+  <p><b>GPTStack</b> — standard causal transformer (autoregressive LMs, policy heads). <b>LGTStack</b> — local-global attention with dual RoPE: short-range local heads (window $w$) + long-range global heads, both operating on the same hidden states. Designed for masked diffusion and flow matching where bidirectional context matters at all scales. <b>DiTStack</b> — adaLN-Zero conditioning: each block computes $(\gamma, \beta, \alpha)$ from a conditioning vector $c$ via a linear projection, then modulates layer norms and residual gates.</p>
+</li>
+<li class="method-step">
+  <h3>Sequential streaming loader</h3>
+  <p>Given a list of dataset specs (HuggingFace paths or local directories), <code>SequentialMultiDatasetStream</code> plays each dataset up to a configurable cap while a background thread warms up the next. Peak RAM is bounded to roughly one dataset at a time — no need to download 50 datasets before starting training.</p>
+  <p>Supports VLM samples (image + prompt + response), LLM samples (text chunks), and VLA robot samples (image + action trajectory + annotation).</p>
+</li>
+<li class="method-step">
+  <h3>Trainer loop</h3>
+  <p>The shared <code>Trainer</code> handles: AMP (bfloat16/float16), configurable gradient accumulation, gradient norm clipping, LR scheduling (cosine + warmup), TensorBoard and W&amp;B logging, and full-state checkpoint save/restore (model + optimiser + AMP scaler + step count). Each downstream project passes its own loss function; the trainer calls <code>loss_fn(batch, model_outputs)</code> with no further assumptions.</p>
+</li>
+</ol>
+</section>
+
+<section>
+<h2>Package overview</h2>
+<div class="tablewrap">
+<table>
+<thead><tr><th>Package</th><th>Key exports</th></tr></thead>
 <tbody>
-<tr><td><code>hale_core.registry</code></td><td>NamedRegistry, VariantRegistry, decorators: <code>register_model</code>, <code>register_loss</code>, <code>register_sampler</code>, <code>register_metric</code></td></tr>
-<tr><td><code>hale_core.config</code></td><td>RunConfig pydantic schema, <code>load_config</code>, <code>inherits:</code> YAML merge, experiment path helpers</td></tr>
-<tr><td><code>hale_core.nn.layers</code></td><td>MHA/GQA/MQA attention, <code>build_attn_mask</code>, FeedForward (MLP/GeGLU/MoE), RMSNorm, RoPE, sinusoidal</td></tr>
-<tr><td><code>hale_core.nn.stacks</code></td><td>GPTStack, LGTStack (local-global + dual RoPE), DiTStack (adaLN-Zero)</td></tr>
-<tr><td><code>hale_core.nn.backbones</code></td><td><code>build_backbone</code> — maps token ids to logits; ALBERT factored or full embedding table</td></tr>
-<tr><td><code>hale_core.nn.losses</code></td><td>token_nll, focal, diffusion/flow cross-entropy; <code>register_token_loss</code></td></tr>
-<tr><td><code>hale_core.data</code></td><td>MixedVLMDataModule, SequentialMultiDatasetStream, LLM dataset registry (33 datasets)</td></tr>
-<tr><td><code>hale_core.training</code></td><td>Trainer, LR schedule, gradient clipping, AMP, distributed (DDP stub)</td></tr>
-<tr><td><code>hale_core.logging</code></td><td>loguru integration, TensorBoard + W&amp;B backends, <code>build_logger</code></td></tr>
-<tr><td><code>hale_core.runtime</code></td><td>Checkpoint save/restore (full state), device selection, tensor utilities</td></tr>
+<tr><td><code>hale_core.registry</code></td><td><code>NamedRegistry</code>, <code>VariantRegistry</code>, <code>register_model</code>, <code>register_loss</code>, <code>register_sampler</code>, <code>register_metric</code></td></tr>
+<tr><td><code>hale_core.config</code></td><td><code>RunConfig</code>, <code>load_config</code> (with <code>inherits:</code> merge)</td></tr>
+<tr><td><code>hale_core.nn.layers</code></td><td><code>build_attention</code> (MHA/GQA/MQA), <code>build_attn_mask</code>, <code>FeedForward</code>, <code>RMSNorm</code>, <code>RoPE</code></td></tr>
+<tr><td><code>hale_core.nn.stacks</code></td><td><code>GPTStack</code>, <code>LGTStack</code>, <code>DiTStack</code></td></tr>
+<tr><td><code>hale_core.nn.backbones</code></td><td><code>build_backbone</code> — token ids → logits (ALBERT-factored or full)</td></tr>
+<tr><td><code>hale_core.nn.losses</code></td><td><code>token_nll</code>, focal CE, diffusion / flow CE, <code>register_token_loss</code></td></tr>
+<tr><td><code>hale_core.data</code></td><td><code>SequentialMultiDatasetStream</code>, <code>MixedVLMDataModule</code>, LLM registry (33 datasets)</td></tr>
+<tr><td><code>hale_core.training</code></td><td><code>Trainer</code>, schedule, distributed stub</td></tr>
+<tr><td><code>hale_core.logging</code></td><td><code>build_logger</code>, TensorBoard + W&amp;B backends</td></tr>
+<tr><td><code>hale_core.runtime</code></td><td>Checkpoint save/restore, device selection, tensor utilities</td></tr>
 </tbody>
-</table></div>
+</table>
+</div>
 </section>
 
 <section>
-<h2>Quick start</h2>
-<pre><code>uv add "hale-blocks @ git+https://github.com/basaanithanaveenkumar/HaleBlocks"
-# or editable install:
-uv add --editable /path/to/HaleBlocks</code></pre>
-<pre><code>from hale_core.nn.layers import build_attention, build_attn_mask
-from hale_core.nn.stacks import GPTStack, LGTStack
-from hale_core.nn.backbones import build_backbone
-from hale_core.nn.losses import token_nll
-from hale_core.config import load_config
+<h2>Quick Start</h2>
+<ol class="demo-steps">
+  <li class="demo-step"><pre><code>uv add "hale-blocks @ git+https://github.com/basaanithanaveenkumar/HaleBlocks"
+# or editable:
+uv add --editable /path/to/HaleBlocks</code></pre></li>
+  <li class="demo-step"><pre><code>from hale_core.nn.layers import build_attention, build_attn_mask
+from hale_core.nn.stacks import LGTStack
 from hale_core.registry import register_model, register_loss
+from hale_core.config import load_config
 
-# Register a custom model variant
 @register_model("my_model")
 class MyModel(nn.Module):
-    def __init__(self, cfg): ...
+    def __init__(self, cfg):
+        self.stack = LGTStack(cfg.n_layers, cfg.d_model, cfg.n_heads)
 
-# Load and validate a YAML config (supports inherits:)
-cfg = load_config("configs/my_experiment.yaml")</code></pre>
-<pre><code># Stream all SmolLM2 SFT datasets, 1000 samples each
+cfg = load_config("configs/my_experiment.yaml")</code></pre></li>
+  <li class="demo-step"><pre><code># Stream SmolLM2 SFT datasets (1000 samples each, background prefetch)
 from hale_core.data import build_llm_dataloader
+for sample in build_llm_dataloader(stage="finetune", samples_per_dataset=1000):
+    print(sample.dataset, sample.prompt[:60])</code></pre></li>
+</ol>
+</section>
 
-loader = build_llm_dataloader(stage="finetune", samples_per_dataset=1000)
-for sample in loader:
-    print(sample.dataset, sample.prompt, sample.response)</code></pre>
+<section>
+<h2>Limitations &amp; Ethical Considerations</h2>
+<div class="lim-grid">
+  <div class="lim-card">
+    <span class="tag tag-warn">Stub</span>
+    <h3>Distributed training</h3>
+    <p class="note">DDP support is a stub. Multi-GPU training requires wrapping the model externally with <code>torch.nn.parallel.DistributedDataParallel</code>.</p>
+  </div>
+  <div class="lim-card">
+    <span class="tag tag-open">Missing</span>
+    <h3>Flash Attention</h3>
+    <p class="note">Attention uses standard <code>F.scaled_dot_product_attention</code>. Flash Attention 2 integration (via <code>flash-attn</code> package) is not yet wired up.</p>
+  </div>
+  <div class="lim-card">
+    <span class="tag tag-open">Open</span>
+    <h3>Dataset licences</h3>
+    <p class="note">The 33 LLM datasets and 540 VLA datasets registered in HaleBlocks have varied licences. Users are responsible for checking and complying with each dataset's terms before commercial use.</p>
+  </div>
+  <div class="lim-card">
+    <span class="tag tag-warn">Pending</span>
+    <h3>PyPI release</h3>
+    <p class="note">Only available via git install. A versioned PyPI package with pinned dependencies is pending.</p>
+  </div>
+</div>
+<h3 style="margin-top:18px">Fill-in checklist</h3>
+<ul class="checklist">
+  <li>Publish versioned PyPI release</li>
+  <li>Add Flash Attention 2 backend option</li>
+  <li>Add DDP training support</li>
+  <li>Write integration test that runs one step of HALE-WAM + Hale-VLM + HaloDiffusionLLM</li>
+  <li>Add dataset licence table to docs</li>
+</ul>
 </section>
 
 <section>
 <h2>Citation</h2>
 <pre><code>@misc{naveenkumar2026haleblocks,
-  title  = {HaleBlocks: Composable Transformer Primitives for Language Models,
-            Vision-Language Models, and World Models},
-  author = {NaveenKumar, B A},
-  year   = {2026},
-  url    = {https://github.com/basaanithanaveenkumar/HaleBlocks}
+  title   = {HaleBlocks: Composable Transformer Primitives for Language Models,
+             Vision-Language Models, and World Models},
+  author  = {NaveenKumar, B A},
+  year    = {2026},
+  url     = {https://github.com/basaanithanaveenkumar/HaleBlocks},
+  note    = {Independent research software}
 }</code></pre>
 </section>
+
 </div>
-<footer>HaleBlocks · <a href="https://github.com/basaanithanaveenkumar/HaleBlocks">Source on GitHub</a> · MIT License</footer>
+<footer>
+<div class="wrap">
+  <p><b>HaleBlocks</b> · Independent research · 2026</p>
+  <p>Released under the <a href="https://github.com/basaanithanaveenkumar/HaleBlocks/blob/main/LICENSE">MIT License</a> · <a href="https://github.com/basaanithanaveenkumar/HaleBlocks/issues">Open an issue</a></p>
+</div>
+</footer>
 <script type="module">
 import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
-const root = document.documentElement;
-const saved = (() => { try { return localStorage.getItem('theme'); } catch (e) { return null; } })();
-if (saved) root.dataset.theme = saved;
-const isDark = () => root.dataset.theme ? root.dataset.theme === 'dark'
-  : matchMedia('(prefers-color-scheme: dark)').matches;
-const sources = [...document.querySelectorAll('.mermaid')].map(el => el.textContent);
-async function render() {
-  mermaid.initialize({ startOnLoad: false, theme: isDark() ? 'dark' : 'neutral', securityLevel: 'strict',
-    flowchart: { curve: 'basis', htmlLabels: true } });
-  const els = document.querySelectorAll('.mermaid');
-  els.forEach((el, i) => { el.removeAttribute('data-processed'); el.textContent = sources[i]; });
-  await mermaid.run({ nodes: els });
+const root=document.documentElement;
+const saved=(()=>{try{return localStorage.getItem('theme')}catch(e){return null}})();
+if(saved)root.dataset.theme=saved;
+const isDark=()=>root.dataset.theme?root.dataset.theme==='dark':matchMedia('(prefers-color-scheme:dark)').matches;
+const srcs=[...document.querySelectorAll('.mermaid')].map(el=>el.textContent);
+async function render(){
+  mermaid.initialize({startOnLoad:false,theme:isDark()?'dark':'neutral',securityLevel:'strict',flowchart:{curve:'basis',htmlLabels:true}});
+  const els=document.querySelectorAll('.mermaid');
+  els.forEach((el,i)=>{el.removeAttribute('data-processed');el.textContent=srcs[i];});
+  await mermaid.run({nodes:els});
 }
-document.getElementById('theme').addEventListener('click', () => {
-  root.dataset.theme = isDark() ? 'light' : 'dark';
-  try { localStorage.setItem('theme', root.dataset.theme); } catch (e) {}
+document.getElementById('theme').addEventListener('click',()=>{
+  root.dataset.theme=isDark()?'light':'dark';
+  try{localStorage.setItem('theme',root.dataset.theme)}catch(e){}
   render();
 });
 render();

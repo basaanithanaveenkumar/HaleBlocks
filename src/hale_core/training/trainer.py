@@ -1,4 +1,32 @@
-"""Variant-agnostic training loop resolved from registries."""
+"""Variant-agnostic training loop resolved from registries.
+
+Pluggable training modules
+--------------------------
+Three optional modules are auto-constructed from cfg.train and injected into
+the training loop:
+
+  AMPManager      (cfg.train.amp)     — mixed precision fp16/bf16
+  PruningManager  (cfg.train.pruning) — in-training weight pruning
+  QATManager      (cfg.train.quant)   — quantization-aware training
+
+After training, ExportManager is called when cfg.train.export.enabled is True.
+
+All modules are disabled (no-op) by default; enable each independently via YAML:
+
+    train:
+      amp:
+        enabled: true
+        dtype: bf16
+      pruning:
+        enabled: true
+        target_sparsity: 0.5
+      quant:
+        enabled: true
+        qat_start_step: 5000
+      export:
+        enabled: true
+        targets: [onnx, mlx]
+"""
 
 from __future__ import annotations
 
@@ -17,6 +45,7 @@ from hale_core.registry import build_logger, get_loss, get_trainer, get_variant,
 from hale_core.runtime.checkpoint import CheckpointStore
 from hale_core.runtime.device import get_device
 from hale_core.runtime.tensors import count_parameters, log_model_summary, move_batch_to_device
+from hale_core.training.amp import build_amp_manager
 from hale_core.training.distributed import (
     cleanup_distributed,
     is_main_process,
@@ -24,6 +53,8 @@ from hale_core.training.distributed import (
     setup_distributed,
     wrap_model_parallel,
 )
+from hale_core.training.pruning import build_pruning_manager
+from hale_core.training.qat import build_qat_manager
 from hale_core.training.schedule import TrainSchedule
 
 
@@ -74,6 +105,13 @@ class Trainer:
         self.start_epoch = 0
         self.schedule: TrainSchedule | None = None
 
+        # ── Training modules (constructed lazily in fit() after model is built) ──
+        # These are set to None here; actual instances are created in fit()
+        # once the model exists so PruningManager/QATManager can inspect it.
+        self._amp = None        # AMPManager
+        self._pruner = None     # PruningManager
+        self._qat = None        # QATManager
+
     def _get_device(self, device_str: str | None) -> torch.device:
         if self.dist_config.strategy in ("ddp", "fsdp") and self.dist_config.is_initialized:
             if torch.cuda.is_available():
@@ -103,6 +141,23 @@ class Trainer:
 
         if is_main_process(self.dist_config):
             log_model_summary(self.model, title=f"model summary  variant={cfg.variant}")
+
+        # ── Construct training modules now that the model exists ──────────────
+
+        # Module 1: AMP — wraps forward pass and backward in fp16/bf16 autocast
+        self._amp = build_amp_manager(cfg.train.amp, self.device)
+        if self._amp.enabled:
+            logger.info(
+                "AMP enabled: dtype={}, scaler={}",
+                cfg.train.amp.dtype,
+                cfg.train.amp.dtype == "fp16",
+            )
+
+        # Module 2: Pruning — applies sparsity masks during training
+        self._pruner = build_pruning_manager(cfg.train.pruning, self.model)
+
+        # Module 3: QAT — inserts fake-quant nodes at qat_start_step
+        self._qat = build_qat_manager(cfg.train.quant, self.model, self.device)
 
         loader = self.data.train_loader()
         if len(loader) == 0:
@@ -166,6 +221,27 @@ class Trainer:
 
         if is_main_process(self.dist_config):
             self._save(epoch=n_epochs - 1, vocab_size=vocab_size)
+
+        # ── Post-training: QAT convert ────────────────────────────────────────
+        if self._qat is not None:
+            self.model = self._qat.convert()
+
+        # ── Post-training: Export ─────────────────────────────────────────────
+        if cfg.train.export.enabled and is_main_process(self.dist_config):
+            from hale_core.export.manager import ExportManager  # lazy import
+            exporter = ExportManager(
+                cfg=cfg.train.export,
+                model=self.model,
+                device=self.device,
+                tokenizer=self.tokenizer,
+                model_config=cfg.model.model_dump(),
+            )
+            export_results = exporter.run_all()
+            if self.logger is not None:
+                for target, path in export_results.items():
+                    if path:
+                        self.logger.log_text(f"export/{target}", path)
+
         if self.logger is not None:
             if self.losses:
                 self.logger.log_scalars(self.global_step, {"train/final_loss": self.losses[-1]})
@@ -184,15 +260,21 @@ class Trainer:
             model_to_load.load_state_dict(ckpt["model_state_dict"])
             if "optimizer_state_dict" in ckpt:
                 self.opt.load_state_dict(ckpt["optimizer_state_dict"])
+            # Restore AMP scaler state (critical for fp16 training continuity)
+            if self._amp is not None and "amp_state_dict" in ckpt:
+                self._amp.load_state_dict(ckpt["amp_state_dict"])
             self.start_epoch = int(ckpt.get("epoch", -1)) + 1
             self.global_step = int(ckpt.get("step", 0))
 
     def _save(self, *, epoch: int, vocab_size: int) -> None:
         model_to_save = self.model.module if hasattr(self.model, "module") else self.model
+        # Include AMP scaler state so fp16 training resumes with correct scale
+        amp_state = self._amp.state_dict() if self._amp is not None else {}
         self.checkpoints.save(
             self.cfg.train.checkpoint_path,
             model_state_dict=model_to_save.state_dict(),
             optimizer_state_dict=self.opt.state_dict(),
+            amp_state_dict=amp_state,
             variant=self.cfg.variant,
             vocab_size=vocab_size,
             epoch=epoch,
@@ -212,28 +294,56 @@ class Trainer:
                 if self.global_step >= total_steps:
                     break
                 batch = move_batch_to_device(batch, self.device)
-                loss = self.loss_fn(self.model, batch)
+
+                # ── QAT: enable fake quant at qat_start_step ──────────────
+                if self._qat is not None:
+                    self._qat.maybe_prepare(self.global_step)
+
+                # ── Forward (inside AMP autocast context) ─────────────────
+                with self._amp.forward_context():
+                    loss = self.loss_fn(self.model, batch)
+
                 if not torch.isfinite(loss):
                     raise FloatingPointError(f"non-finite loss at step {self.global_step}")
 
-                self.opt.zero_grad(set_to_none=True)
-                loss.backward()
+                # ── Backward (scaled for fp16, passthrough for bf16/fp32) ──
+                self._amp.zero_grad(self.opt)
+                self._amp.scale_loss(loss).backward()
+
+                # ── Grad clipping (after unscaling so norm is true) ────────
+                self._amp.unscale(self.opt)
                 grad_norm = torch.nn.utils.clip_grad_norm_(
                     self.model.parameters(), cfg.train.grad_clip
                 )
-                self.opt.step()
+
+                # ── Optimizer step + scaler update ─────────────────────────
+                self._amp.step(self.opt)
+                self._amp.update()
+
+                # ── Pruning: recompute masks at prune_interval ─────────────
+                if self._pruner is not None:
+                    self._pruner.step(self.global_step)
+
                 lr = self.opt.param_groups[0]["lr"]
                 self.losses.append(loss.item())
                 epoch_losses.append(loss.item())
-                self.logger.log_scalars(
-                    self.global_step,
-                    {
-                        "train/loss": loss.item(),
-                        "train/lr": lr,
-                        "train/grad_norm": float(grad_norm),
-                        "train/epoch": float(epoch),
-                    },
+
+                # ── Logging ───────────────────────────────────────────────
+                step_metrics: dict[str, float] = {
+                    "train/loss":      loss.item(),
+                    "train/lr":        lr,
+                    "train/grad_norm": float(grad_norm),
+                    "train/epoch":     float(epoch),
+                }
+                # AMP stats (scale factor for fp16, dtype tag)
+                step_metrics.update(
+                    {k: v for k, v in self._amp.stats().items() if isinstance(v, float)}
                 )
+                # Pruning sparsity (every 500 steps to reduce overhead)
+                if self._pruner is not None and self.global_step % 500 == 0:
+                    step_metrics.update(self._pruner.sparsity_stats())
+
+                self.logger.log_scalars(self.global_step, step_metrics)
                 pbar.set_postfix(loss=f"{loss.item():.4f}")
                 self.global_step += 1
                 self._maybe_visualize(tag=f"step{self.global_step}")

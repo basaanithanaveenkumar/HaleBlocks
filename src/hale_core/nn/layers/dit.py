@@ -11,12 +11,24 @@ import torch.nn as nn
 
 
 class DiTBlock(nn.Module):
-    def __init__(self, d_model: int, attention: nn.Module, ffn: nn.Module):
+    def __init__(
+        self,
+        d_model: int,
+        attention: nn.Module,
+        ffn: nn.Module,
+        *,
+        norm: str = "layer",
+        use_time_cond: bool = True,
+        post_norm: bool = False,
+    ):
         super().__init__()
         self.attn = attention
         self.ff = ffn
-        self.ln1 = nn.LayerNorm(d_model)
-        self.ln2 = nn.LayerNorm(d_model)
+        # Build norm layers via registry so "rms" is supported
+        from hale_core.registry.plugins import NORMS_REGISTRY
+        norm_cls = NORMS_REGISTRY.get(norm) if norm in NORMS_REGISTRY else nn.LayerNorm
+        self.ln1 = norm_cls(d_model)
+        self.ln2 = norm_cls(d_model)
         self.adaLN_modulation = nn.Sequential(nn.SiLU(), nn.Linear(d_model, 6 * d_model))
         nn.init.zeros_(self.adaLN_modulation[-1].weight)
         nn.init.zeros_(self.adaLN_modulation[-1].bias)
@@ -44,6 +56,16 @@ class DiTBlock(nn.Module):
         )
         h = self.ln2(x) * (1 + scale_mlp) + shift_mlp
         return x + gate_mlp * self.ff(h)
+
+
+def _register_dit_block() -> None:
+    from hale_core.registry.plugins import BLOCKS_REGISTRY
+
+    if "dit" not in BLOCKS_REGISTRY:
+        BLOCKS_REGISTRY.add("dit", DiTBlock)
+
+
+_register_dit_block()
 
 
 class DiTFinalLayer(nn.Module):

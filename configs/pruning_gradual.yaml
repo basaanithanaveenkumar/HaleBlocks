@@ -1,0 +1,51 @@
+# pruning_gradual.yaml — GPT with gradual magnitude pruning to 50% sparsity
+#
+# Strategy:
+#   - Start training normally for 1000 steps (model partially converges first)
+#   - Gradually increase sparsity from 0% to 50% using cubic polynomial schedule
+#   - Pruning mask is recomputed every 100 steps
+#   - At step 10000, masks are baked into weights (make_permanent=true)
+#
+# Expected outcome: ~50% sparse model with <1% accuracy degradation vs dense.
+
+variant: llm
+
+model:
+  arch: transformer
+  d_model: 768
+  n_heads: 12
+  n_layers: 12
+  d_ff: 3072
+
+train:
+  steps: 50000
+  lr: 2.0e-4
+  optimizer_type: adamw
+
+  # ── Module 1: AMP (combine with pruning for maximum efficiency) ────────────
+  amp:
+    enabled: true
+    dtype: bf16
+
+  # ── Module 2: Gradual Magnitude Pruning ────────────────────────────────────
+  pruning:
+    enabled: true
+    method: magnitude           # prune smallest |w| globally
+    schedule: gradual           # cubic sparsity ramp
+    target_sparsity: 0.5        # 50% of weights zeroed at the end
+    initial_sparsity: 0.0       # start fully dense
+    start_step: 1000            # begin after 1000 warm-up steps
+    end_step: 20000             # reach target_sparsity at step 20000
+    prune_interval: 100         # recompute mask every 100 steps
+    scope: global               # single threshold across all layers
+    structured: false           # unstructured (individual weights)
+    make_permanent: true        # bake masks at end_step
+    # Skip embedding and output layers — pruning these hurts accuracy most:
+    exclude_patterns: [embed, lm_head, norm]
+
+  scheduler:
+    type: warmup_cosine
+    warmup_steps: 1000
+
+data:
+  dataset: Salesforce/wikitext
