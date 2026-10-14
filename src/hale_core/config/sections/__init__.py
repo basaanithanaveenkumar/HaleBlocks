@@ -11,10 +11,12 @@ from hale_core.config.sections.model import ModelConfig
 from hale_core.config.sections.norm import NormConfig
 from hale_core.config.sections.pruning import PruningConfig
 from hale_core.config.sections.quant import ExportConfig, QuantConfig
+from hale_core.config.sections.ray import RayConfig
 from hale_core.config.sections.sample import SampleConfig
 from hale_core.config.sections.schedule import SchedulerConfig
 from hale_core.config.sections.train import TrainConfig
 from hale_core.config.sections.viz import VizConfig
+from hale_core.config.sections.webdataset import WebDatasetConfig
 
 __all__ = [
     # existing
@@ -38,4 +40,7 @@ __all__ = [
     "PruningConfig",
     "QuantConfig",
     "ExportConfig",
+    # distributed launch / data format
+    "RayConfig",
+    "WebDatasetConfig",
 ]

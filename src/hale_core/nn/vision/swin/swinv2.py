@@ -128,9 +128,6 @@ class LogContinuousPositionBias(nn.Module):
             nn.ReLU(inplace=True),
             nn.Linear(512, num_heads, bias=False),
         )
-        # Cache the last computed bias grid for efficiency
-        self._cached_grid_size: Optional[tuple] = None
-        self._cached_bias: Optional[torch.Tensor] = None
 
     def _compute_bias(self, window_size: int) -> torch.Tensor:
         """Compute relative position bias for a given window size.
@@ -163,11 +160,15 @@ class LogContinuousPositionBias(nn.Module):
         return bias
 
     def forward(self, window_size: int) -> torch.Tensor:
-        """Return relative position bias for given window size (cached per size)."""
-        if self._cached_grid_size != window_size:
-            self._cached_bias = self._compute_bias(window_size)
-            self._cached_grid_size = window_size
-        return self._cached_bias  # type: ignore[return-value]
+        """Return the relative position bias for ``window_size``, recomputed on every call.
+
+        The bias must not be cached: it is a function of the trainable ``cpb_mlp``. A cached
+        tensor either has no autograd graph (if first computed under ``no_grad`` / in eval, so
+        the MLP never trains) or a graph that is freed after the first ``backward()`` (so the
+        second training step fails), and it goes stale after every optimiser step or
+        ``load_state_dict``. The MLP runs on only window² × window² coordinate pairs.
+        """
+        return self._compute_bias(window_size)
 
 
 # ─── SwinV2 Attention ─────────────────────────────────────────────────────────

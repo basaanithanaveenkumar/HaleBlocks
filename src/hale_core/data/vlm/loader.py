@@ -10,6 +10,7 @@ from pathlib import Path
 
 from loguru import logger
 
+from hale_core.config.sections.webdataset import WebDatasetConfig
 from hale_core.data.kinds import DatasetKind
 from hale_core.data.vlm.cache import MediaCache
 from hale_core.data.vlm.parse import default_row_parser
@@ -91,7 +92,14 @@ def build_vlm_dataloader(
 
 
 class MixedVLMDataModule:
-    """Trainer-compatible wrapper around :class:`SequentialVLMDataLoader`."""
+    """Trainer-compatible wrapper around :class:`SequentialVLMDataLoader`.
+
+    With ``webdataset.enabled`` the mixture is written once to WebDataset shards (the HF streams
+    are only opened when the shards are missing or stale) and training streams the shards. The
+    mixture must then be finite: set ``samples_per_dataset`` (or ``webdataset.max_samples``).
+    Image / video fields are :class:`~pathlib.Path` objects into ``cache_dir``; they are stored
+    as paths, so keep that media cache next to the shards.
+    """
 
     def __init__(
         self,
@@ -103,15 +111,25 @@ class MixedVLMDataModule:
         prefetch_workers: int = 4,
         batch_size: int = 1,
         tokenizer=None,
+        webdataset: WebDatasetConfig | None = None,
     ) -> None:
+        from hale_core.data.webdataset import WebDatasetAdapter  # lazy: avoids an import cycle
+        from hale_core.data.webdataset.fingerprint import fingerprint
+
         self.tokenizer = tokenizer
         self.batch_size = batch_size
-        self._loader = build_vlm_dataloader(
-            dataset_names,
-            cache_dir=cache_dir,
-            cache_max_bytes=cache_max_bytes,
-            samples_per_dataset=samples_per_dataset,
-            prefetch_workers=prefetch_workers,
+        names = tuple(dataset_names or DEFAULT_VLM_MIXTURE)
+        fp = fingerprint(kind="vlm", names=names, samples_per_dataset=samples_per_dataset)
+        self._loader = WebDatasetAdapter(webdataset or WebDatasetConfig()).prepare_iterable(
+            lambda: build_vlm_dataloader(
+                names,
+                cache_dir=cache_dir,
+                cache_max_bytes=cache_max_bytes,
+                samples_per_dataset=samples_per_dataset,
+                prefetch_workers=prefetch_workers,
+            ),
+            f"vlm-mixture-{fp[:12]}",
+            fingerprint=fp,
         )
 
     def train_loader(self) -> Iterator[dict]:

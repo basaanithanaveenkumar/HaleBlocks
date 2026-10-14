@@ -412,15 +412,11 @@ class InternImageBackbone(BaseVisionBackbone):
                          drop_rate=drop_rate, out_indices=out_indices)
 
         # ── Stem: patch-like embedding with 4×4 stride-4 conv ─────────────────
-        self.stem = nn.Sequential(
-            nn.Conv2d(in_chans, channels[0], kernel_size=4, stride=4, bias=False),
-            nn.LayerNorm(channels[0]),   # expects [B, C] — we'll do channels-last
-        )
-        # Wrap stem to handle channels-last LN
-        stem_conv  = nn.Conv2d(in_chans, channels[0], kernel_size=4, stride=4, bias=False)
-        stem_norm  = nn.LayerNorm(channels[0], eps=1e-6)
-        self.stem_conv = stem_conv
-        self.stem_norm = stem_norm
+        # Conv and LayerNorm are separate modules because the LN runs channels-last
+        # (see forward). There is deliberately no other stem module: unused parameters
+        # never get a gradient and make DistributedDataParallel fail.
+        self.stem_conv = nn.Conv2d(in_chans, channels[0], kernel_size=4, stride=4, bias=False)
+        self.stem_norm = nn.LayerNorm(channels[0], eps=1e-6)
 
         # ── Stages ───────────────────────────────────────────────────────────
         total_blocks = sum(depths)

@@ -55,6 +55,21 @@ uv add "hale-blocks @ git+https://github.com/basaanithanaveenkumar/HaleBlocks.gi
 uv add --editable /path/to/HaleBlocks
 ```
 
+### Optional: Ray Train and WebDataset
+
+```bash
+uv add "hale-blocks[distributed]"       # = [ray] + [webdataset]
+```
+
+```yaml
+train:
+  ray: {enabled: true, num_workers: 8, use_gpu: true}      # launch on Ray Train (DDP in every worker)
+data:
+  webdataset: {enabled: true, root: /fast_disk/shards}     # any dataset -> tar shards -> streamed
+```
+
+Both flags are off by default. See [`docs/distributed_training.md`](docs/distributed_training.md).
+
 ## Layout
 
 ```text
@@ -63,7 +78,10 @@ hale_core/
   config/         RunConfig, YAML load, experiment paths
   logging/        loguru + experiment backends (tensorboard, wandb)
   data/           VLM dataset registry + sequential streaming loader
-  training/       Trainer, schedule, distributed
+    webdataset/   any dataset -> WebDataset shards -> streamed IterableDataset (flag-driven)
+  distributed/
+    ray/          Ray Train launcher, worker context, reporter
+  training/       Trainer, schedule, distributed, Ray worker entry
   nn/
     layers/       attention, FFN, norm, embeddings
     stacks/       GPT, LGT, DiT depth modules

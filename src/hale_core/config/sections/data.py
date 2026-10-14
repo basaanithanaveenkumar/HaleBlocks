@@ -6,6 +6,7 @@ from pydantic import Field
 
 from hale_core.config.sections.common import StrictModel
 from hale_core.config.sections.dataloader import DataLoaderConfig
+from hale_core.config.sections.webdataset import WebDatasetConfig
 
 
 class DataConfig(StrictModel):
@@ -47,3 +48,7 @@ class DataConfig(StrictModel):
 
     # ── DataLoader ────────────────────────────────────────────────────────────
     loader: DataLoaderConfig = Field(default_factory=DataLoaderConfig)
+
+    # ── WebDataset ────────────────────────────────────────────────────────────
+    webdataset: WebDatasetConfig = Field(default_factory=WebDatasetConfig)
+    """Convert the dataset to WebDataset tar shards and stream from them (``enabled: true``)."""

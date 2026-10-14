@@ -88,9 +88,17 @@ def agc_clip(model: nn.Module, lambda_: float = 0.01) -> None:
     for p in model.parameters():
         if p.grad is None:
             continue
-        # Per-parameter weight and gradient norms (across all dims except batch)
-        param_norm = p.data.norm(dim=list(range(1, p.data.ndim)), keepdim=True).clamp(min=1e-3)
-        grad_norm  = p.grad.norm(dim=list(range(1, p.grad.ndim)), keepdim=True)
+        # Unit-wise norms (paper Sec. 4.1): one norm per output unit = per row of the weight,
+        # i.e. over every dim except dim 0. Vectors (biases, gains) are clipped element-wise.
+        # torch.linalg.vector_norm is required: Tensor.norm(dim=[1, 2, 3]) uses the Frobenius
+        # *matrix* norm, which rejects more than two dims on recent PyTorch.
+        dims = tuple(range(1, p.ndim))
+        if dims:
+            param_norm = torch.linalg.vector_norm(p.detach(), dim=dims, keepdim=True)
+            grad_norm  = torch.linalg.vector_norm(p.grad, dim=dims, keepdim=True)
+        else:
+            param_norm, grad_norm = p.detach().abs(), p.grad.abs()
+        param_norm = param_norm.clamp(min=1e-3)
         max_norm   = param_norm * lambda_
         clip_coef  = (max_norm / grad_norm.clamp(min=1e-6)).clamp(max=1.0)
         p.grad.mul_(clip_coef)

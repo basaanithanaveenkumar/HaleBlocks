@@ -31,6 +31,7 @@ All modules are disabled (no-op) by default; enable each independently via YAML:
 from __future__ import annotations
 
 from collections.abc import Callable
+from pathlib import Path
 from typing import Any, Protocol
 
 import torch
@@ -39,6 +40,8 @@ from tqdm import tqdm
 
 from hale_core.config.experiment import apply_experiment_layout
 from hale_core.config.run import RunConfig
+from hale_core.distributed.ray.reporter import RayReporter
+from hale_core.distributed.ray.worker_context import WorkerContext
 from hale_core.logging import setup_logging
 from hale_core.nn.optim import build_optimizer
 from hale_core.registry import build_logger, get_loss, get_trainer, get_variant, register_trainer
@@ -94,6 +97,11 @@ class Trainer:
             strategy=cfg.train.parallel_strategy,
             backend=cfg.train.distributed_backend,
         )
+        # DDP options from the config (setup_distributed only knows strategy/backend); without
+        # this, train.find_unused_parameters & co. were silently ignored.
+        self.dist_config.find_unused_parameters = cfg.train.find_unused_parameters
+        self.dist_config.gradient_as_bucket_view = cfg.train.gradient_as_bucket_view
+        self.dist_config.static_graph = cfg.train.static_graph
         self.device = self._get_device(cfg.device)
         self.tokenizer = tokenizer
         self.model = None
@@ -108,6 +116,7 @@ class Trainer:
         # ── Training modules (constructed lazily in fit() after model is built) ──
         # These are set to None here; actual instances are created in fit()
         # once the model exists so PruningManager/QATManager can inspect it.
+        self._reporter = RayReporter()  # no-op unless running inside a Ray Train worker
         self._amp = None        # AMPManager
         self._pruner = None     # PruningManager
         self._qat = None        # QATManager
@@ -288,6 +297,10 @@ class Trainer:
         total_steps = self.schedule.total_steps
         for epoch in range(self.start_epoch, n_epochs):
             self.model.train()
+            # DistributedSampler (DDP / Ray) reshuffles only when told the epoch.
+            sampler = getattr(loader, "sampler", None)
+            if hasattr(sampler, "set_epoch"):
+                sampler.set_epoch(epoch)
             epoch_losses: list[float] = []
             pbar = tqdm(loader, desc=f"epoch {epoch + 1}/{n_epochs}", leave=True)
             for batch in pbar:
@@ -351,6 +364,7 @@ class Trainer:
             epoch_mean = sum(epoch_losses) / max(len(epoch_losses), 1)
             self.logger.log_scalars(epoch, {"train/epoch_loss": epoch_mean})
 
+            eval_metrics: dict[str, float] = {}
             if cfg.eval.every_n_epochs and (epoch + 1) % cfg.eval.every_n_epochs == 0:
                 eval_loader = self.data.val_loader(loader)
                 eval_metrics = self.evaluator.run(self.model, eval_loader)
@@ -359,8 +373,22 @@ class Trainer:
 
             if is_main_process(self.dist_config):
                 self._maybe_visualize(tag=f"epoch{epoch + 1}", by_epoch=True)
-            if cfg.train.checkpoint_every_epoch and is_main_process(self.dist_config):
+            saved = cfg.train.checkpoint_every_epoch and is_main_process(self.dist_config)
+            if saved:
                 self._save(epoch=epoch, vocab_size=vocab_size)
+
+            # Ray Train: every rank reports; rank 0 attaches the checkpoint directory so Ray can
+            # persist it and restart from it after a failure. No-op outside Ray.
+            epoch_report = {
+                "epoch": float(epoch),
+                "global_step": float(self.global_step),
+                "train/epoch_loss": epoch_mean,
+                **{f"eval/{k}": v for k, v in eval_metrics.items()},
+            }
+            self._reporter.report(
+                epoch_report,
+                checkpoint_dir=Path(cfg.train.checkpoint_path).parent if saved else None,
+            )
 
     def _maybe_visualize(self, *, tag: str, by_epoch: bool = False) -> None:
         if self.on_visualize is None:
@@ -382,5 +410,24 @@ class Trainer:
         self.on_visualize(self, tag, by_epoch)
 
 
-def train(cfg: RunConfig, tokenizer=None, *, trainer: str = "default", **kwargs) -> tuple:
-    return get_trainer(trainer)(cfg, tokenizer, **kwargs).fit()
+def train(cfg: RunConfig, tokenizer=None, *, trainer: str = "default", **kwargs) -> Any:
+    """Build the registered ``trainer`` and run it.
+
+    With ``cfg.train.ray.enabled`` the run is launched on Ray Train instead: every Ray worker
+    builds the trainer with ``parallel_strategy=ddp`` (unless ``fsdp`` is configured) and the
+    driver gets a :class:`hale_core.distributed.RayRunResult` (metrics + checkpoint path)
+    instead of the ``(model, tokenizer, losses)`` tuple, because the model lives in the workers.
+    ``kwargs`` are shipped to the workers; pass ``<name>_factory=callable`` for objects that
+    cannot be pickled - it is called inside each worker and passed as ``<name>``.
+    """
+    if cfg.train.ray.enabled and not WorkerContext.current().in_ray:
+        from hale_core.training.ray_entry import launch_on_ray  # lazy: only needed with Ray
+
+        return launch_on_ray(cfg, train, tokenizer, trainer=trainer, **kwargs)
+    resolved: dict[str, Any] = {}
+    for key, value in kwargs.items():
+        if key.endswith("_factory"):  # e.g. data_module_factory=... -> data_module=factory()
+            resolved[key.removesuffix("_factory")] = value()
+        else:
+            resolved[key] = value
+    return get_trainer(trainer)(cfg, tokenizer, **resolved).fit()

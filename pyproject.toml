@@ -38,6 +38,17 @@ data = [
     "huggingface-hub>=0.26",
     "httpx>=0.27",
 ]
+# Distributed training on a Ray cluster (train.ray.enabled: true).
+ray = [
+    "ray[train]>=2.44",
+]
+# Convert any dataset to WebDataset tar shards and stream them (data.webdataset.enabled: true).
+webdataset = [
+    "webdataset>=0.2.100",
+]
+distributed = [
+    "hale-blocks[ray,webdataset]",
+]
 
 [project.urls]
 Repository = "https://github.com/basaanithanaveenkumar/HaleBlocks"

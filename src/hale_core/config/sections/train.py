@@ -6,6 +6,7 @@ from pydantic import Field
 
 from hale_core.config.sections.amp import AMPConfig
 from hale_core.config.sections.common import StrictModel
+from hale_core.config.sections.ray import RayConfig
 from hale_core.config.sections.pruning import PruningConfig
 from hale_core.config.sections.quant import ExportConfig, QuantConfig
 from hale_core.config.sections.schedule import SchedulerConfig
@@ -61,6 +62,8 @@ class TrainConfig(StrictModel):
     find_unused_parameters: bool = False
     gradient_as_bucket_view: bool = True
     static_graph: bool = False
+    ray: RayConfig = Field(default_factory=RayConfig)
+    """Launch through Ray Train (multi-GPU / multi-node, fault tolerant). Disabled by default."""
 
     # ── Mixed precision ────────────────────────────────────────────────────────
     amp: AMPConfig = Field(default_factory=AMPConfig)

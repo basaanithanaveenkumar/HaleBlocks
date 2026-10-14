@@ -51,7 +51,9 @@ def _default_dataloader(
     *,
     collate_fn: Any = None,
 ) -> DataLoader:
-    from torch.utils.data import DataLoader
+    import torch.distributed as dist
+    from torch.utils.data import DataLoader, IterableDataset
+    from torch.utils.data.distributed import DistributedSampler
 
     loader_kwargs: dict[str, Any] = {
         "batch_size":         batch_size,
@@ -59,8 +61,19 @@ def _default_dataloader(
         "pin_memory":         cfg.pin_memory,
         "persistent_workers": cfg.persistent_workers and cfg.num_workers > 0,
         "drop_last":          cfg.drop_last,
-        "shuffle":            cfg.shuffle,
     }
+    if isinstance(dataset, IterableDataset):
+        # Streams (e.g. WebDataset) shuffle and split across ranks / workers themselves;
+        # DataLoader forbids shuffle and samplers for them.
+        pass
+    elif dist.is_available() and dist.is_initialized() and dist.get_world_size() > 1:
+        # DDP / Ray: each rank must read a disjoint 1/world_size of the data. The trainer
+        # calls sampler.set_epoch(epoch) so the shuffle changes every epoch.
+        loader_kwargs["sampler"] = DistributedSampler(
+            dataset, shuffle=cfg.shuffle, drop_last=cfg.drop_last
+        )
+    else:
+        loader_kwargs["shuffle"] = cfg.shuffle
     if cfg.prefetch_factor is not None and cfg.num_workers > 0:
         loader_kwargs["prefetch_factor"] = cfg.prefetch_factor
     if collate_fn is not None:
