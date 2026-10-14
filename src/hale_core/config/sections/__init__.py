@@ -7,6 +7,7 @@ from hale_core.config.sections.eval import EvalConfig
 from hale_core.config.sections.experiment import ExperimentConfig
 from hale_core.config.sections.ffn import FFNConfig
 from hale_core.config.sections.logging import LoggingConfig
+from hale_core.config.sections.llm_backbone import LLMBackboneConfig, LoRASettings
 from hale_core.config.sections.model import ModelConfig
 from hale_core.config.sections.norm import NormConfig
 from hale_core.config.sections.pruning import PruningConfig
@@ -42,5 +43,8 @@ __all__ = [
     "ExportConfig",
     # distributed launch / data format
     "RayConfig",
+    # language backbones for VLM / VLA
+    "LLMBackboneConfig",
+    "LoRASettings",
     "WebDatasetConfig",
 ]

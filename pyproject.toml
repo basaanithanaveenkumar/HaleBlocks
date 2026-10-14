@@ -49,6 +49,11 @@ webdataset = [
 distributed = [
     "hale-blocks[ray,webdataset]",
 ]
+# Pretrained LLM backbones + LoRA for VLM / VLA (hale_core.nn.llm).
+finetune = [
+    "transformers>=4.51",
+    "peft>=0.14",
+]
 
 [project.urls]
 Repository = "https://github.com/basaanithanaveenkumar/HaleBlocks"
