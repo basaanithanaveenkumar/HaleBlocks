@@ -1,9 +1,14 @@
 name: Project page
 
+# Builds the arXiv-style paper (paper/main.tex) and publishes it together with
+# the project page in project-page/ to GitHub Pages.
+# One-time setup: Settings -> Pages -> Build and deployment -> Source: "GitHub Actions".
+
 on:
   push:
     branches: [main]
     paths:
+      - "paper/**"
       - "project-page/**"
       - "assets/**"
       - "README.md"
@@ -24,6 +29,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Compile paper
+        uses: xu-cheng/latex-action@v3
+        with:
+          root_file: main.tex
+          working_directory: paper
       - name: Assemble site
         run: |
           if [ -d project-page ]; then
@@ -37,6 +47,7 @@ jobs:
               --css https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.5.0/github-markdown.min.css \
               -o _site/index.html
           fi
+          cp paper/main.pdf _site/paper.pdf
           [ -d assets ] && cp -r assets _site/assets || true
       - uses: actions/upload-pages-artifact@v3
         with:
