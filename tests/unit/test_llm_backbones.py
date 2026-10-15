@@ -68,7 +68,7 @@ TEXT_ONLY = [n for n in list_llm_backbones("hf") if not get_llm_backbone_spec(n)
 
 def test_registry_holds_only_causal_finetunable_backbones() -> None:
     hf, hale = list_llm_backbones("hf"), list_llm_backbones("hale")
-    assert len(TEXT_ONLY) == 26 and len(hf) == 47 and hale == ["hale-autoregressive", "hale-mtp"]
+    assert len(TEXT_ONLY) == 26 and len(hf) == 47 and hale == ["hale-autoregressive", "hale-looped", "hale-mtp"]
     assert {get_llm_backbone_spec(n).family for n in TEXT_ONLY} == set(MODEL_TYPES)
     assert all(get_llm_backbone_spec(n).params_b <= 9.0 for n in hf)  # 8B class
     assert get_llm_backbone_spec("deepseek-r1-qwen-7b").name == "deepseek-r1-distill-qwen-7b"  # alias

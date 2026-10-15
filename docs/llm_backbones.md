@@ -133,6 +133,7 @@ attention, so they are rejected with an explanation. Any other Hub causal LM can
 | `smolvlm2-2.2b` | smolvlm2 | [`HuggingFaceTB/SmolVLM2-2.2B-Base`](https://huggingface.co/HuggingFaceTB/SmolVLM2-2.2B-Base) | 1.81B | text tower of a VLM | full | `q_proj k_proj v_proj o_proj gate_proj up_proj down_proj` | base checkpoint |
 | `hale-autoregressive` | hale | HaloDiffusionLLM `autoregressive` checkpoint | from checkpoint | text | full | all block linears (auto) | needs `checkpoint:`; size comes from the checkpoint |
 | `hale-mtp` | hale | HaloDiffusionLLM `mtp` checkpoint | from checkpoint | text | full | all block linears (auto) | needs `checkpoint:`; the main next-token head is used, extra heads are dropped |
+| `hale-looped` | hale | HaloDiffusionLLM `looped` checkpoint | from checkpoint | text | full | all block linears (auto) | needs `checkpoint:`; weight-tied looped block, ACT ponder loss not applied while fine-tuning |
 
 Gated models (Llama, Gemma 2/3, Cosmos-Reason2) need their licence accepted on the Hub and `HF_TOKEN` set.
 

@@ -130,12 +130,15 @@ class LoopStats:
         ponder_cost: mean ``N(i) + R(i)`` over real tokens (ACT only; carries gradient).
         mean_updates: mean ``N(i)``, the average passes per token (ACT only).
         residual: largest relative change of the last pass (when ``exit_tolerance`` is set).
+        token_updates: ``(batch, seq)`` passes each token used, ``N(i)`` (ACT only; detached,
+            scratch slots removed, 0 at padding).
     """
 
     loops: int
     ponder_cost: torch.Tensor | None = None
     mean_updates: float | None = None
     residual: float | None = None
+    token_updates: torch.Tensor | None = None
 
 
 class LoopedStack(nn.Module):
@@ -328,6 +331,7 @@ class LoopedStack(nn.Module):
             loops=loops,
             ponder_cost=ACTHalting.ponder_cost(act, active),
             mean_updates=float((act.n_updates * real).sum() / real.sum().clamp_min(1.0)),
+            token_updates=act.n_updates.detach()[:, self.spec.scratch_tokens :],
         )
         return torch.where(active.unsqueeze(-1), act.output, state)
 

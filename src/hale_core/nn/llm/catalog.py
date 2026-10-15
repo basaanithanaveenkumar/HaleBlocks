@@ -161,6 +161,11 @@ _HALE_BACKBONES = (
     LLMBackboneSpec("hale-mtp", "hale", "hale", "mtp", 0.0, lora_targets=(),
                     paper="Gloeckle et al., Better & Faster LLMs via Multi-token Prediction, arXiv:2404.19737",
                     notes="needs `checkpoint:`; the main next-token head is used, extra heads are dropped"),
+    LLMBackboneSpec("hale-looped", "hale", "hale", "looped", 0.0, lora_targets=(),
+                    paper="Dehghani et al., Universal Transformers, arXiv:1807.03819; Geiping et al., "
+                          "recurrent depth, arXiv:2502.05171",
+                    notes="needs `checkpoint:`; weight-tied looped block, ACT ponder loss not applied "
+                          "while fine-tuning"),
 )
 
 for _spec in _HF_BACKBONES + _MULTIMODAL_TEXT_TOWERS + _HALE_BACKBONES:
