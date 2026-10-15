@@ -24,7 +24,7 @@ config and updates a `latest` pointer.
 |---|---|---|
 | `d_model`, `n_heads`, `n_layers`, `d_ff` | 128, 4, 4, 512 | size |
 | `dropout`, `max_length` | 0.0, 64 | |
-| `arch` | `default` | `default`, `transformer`, `lgt`, `dit` |
+| `arch` | `default` | `default`, `transformer`, `lgt`, `dit`, `looped` |
 | `attn_type` | `causal` | `causal`, `bidirectional`, `block_causal` |
 | `block_size` | null | required for `block_causal` |
 | `attn_impl`, `n_kv_heads` | `mha`, null | `mha`, `gqa`, `mqa` |
@@ -35,3 +35,4 @@ config and updates a `latest` pointer.
 | `sliding_window`, `local_global_ratio` | 512, 5 | LGT |
 | `rope_theta_local`, `rope_theta_global`, `p_rope` | 1e4, 1e6, 0.25 | LGT |
 | `qk_norm` | false | |
+| `loop` | `LoopConfig()` | `arch: looped` only - `n_loops`, `prelude_layers`, `coda_layers`, `depth_embedding`, `input_injection`, `sandwich_norm`, `halting` (`none` / `act`), `act_threshold`, `act_init_bias`, `ponder_weight`, `min_loops`, `bptt_loops`, `exit_tolerance`, `scratch_tokens` (mirrors `LoopSpec`) |

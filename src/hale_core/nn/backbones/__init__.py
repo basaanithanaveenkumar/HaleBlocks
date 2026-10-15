@@ -1,7 +1,7 @@
 """Token-sequence backbones: embeddings + transformer stack + optional LM head.
 
 Swap via `model.arch` or `build_backbone`. Stacks are in `hale_core.nn.stacks`
-so a VLM can reuse GPTStack / LGTStack / DiTStack with its own embeddings.
+so a VLM can reuse GPTStack / LGTStack / DiTStack / LoopedStack with its own embeddings.
 """
 
 from hale_core.nn.backbones.dit import DiTBackbone
@@ -13,6 +13,7 @@ from hale_core.nn.backbones.factory import (
 )
 from hale_core.nn.backbones.gpt import GPTBackbone, TransformerBackbone
 from hale_core.nn.backbones.lgt import LGTBackbone
+from hale_core.nn.backbones.looped import LoopedBackbone
 from hale_core.nn.backbones.sequence import SequenceBackbone
 
 __all__ = [
@@ -22,6 +23,7 @@ __all__ = [
     "TransformerBackbone",
     "LGTBackbone",
     "DiTBackbone",
+    "LoopedBackbone",
     "build_backbone",
     "backbone_kwargs",
     "register_backbone",

@@ -6,5 +6,28 @@ Use these from a VLM or world model: you supply embeddings, this module runs the
 from hale_core.nn.stacks.dit import DiTStack
 from hale_core.nn.stacks.gpt import GPTStack
 from hale_core.nn.stacks.lgt import LGTStack, is_global_layer
+from hale_core.nn.stacks.looped import (
+    LoopedStack,
+    LoopSpec,
+    LoopStats,
+    loop_aux_loss,
+    loop_budget,
+    loop_stats,
+    looped_stacks,
+    set_loop_budget,
+)
 
-__all__ = ["GPTStack", "LGTStack", "DiTStack", "is_global_layer"]
+__all__ = [
+    "GPTStack",
+    "LGTStack",
+    "DiTStack",
+    "LoopedStack",
+    "LoopSpec",
+    "LoopStats",
+    "is_global_layer",
+    "loop_aux_loss",
+    "loop_budget",
+    "loop_stats",
+    "looped_stacks",
+    "set_loop_budget",
+]

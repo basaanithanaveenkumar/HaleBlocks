@@ -6,6 +6,7 @@ from pydantic import Field
 
 from hale_core.config.sections.block import BlockConfig
 from hale_core.config.sections.common import StrictModel
+from hale_core.config.sections.loop import LoopConfig
 
 
 class ModelConfig(StrictModel):
@@ -36,7 +37,7 @@ class ModelConfig(StrictModel):
     """
 
     # ── Backbone ───────────────────────────────────────────────────────────────
-    arch: Literal["default", "transformer", "lgt", "dit"] = "default"
+    arch: Literal["default", "transformer", "lgt", "dit", "looped"] = "default"
     d_model: int = 128
     n_heads: int = 4
     n_layers: int = 4
@@ -67,6 +68,9 @@ class ModelConfig(StrictModel):
     rope_theta_local: float = 10_000.0
     rope_theta_global: float = 1_000_000.0
     p_rope: float = 0.25
+
+    # ── Looped transformer (arch: looped) ─────────────────────────────────────
+    loop: LoopConfig = Field(default_factory=LoopConfig)
 
     # ── Fine-grained nested override (optional, takes precedence) ─────────────
     block: BlockConfig | None = Field(default=None)

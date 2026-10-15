@@ -95,7 +95,7 @@ hale_core/
   training/       Trainer, schedule, distributed, Ray worker entry
   nn/
     layers/       attention, FFN, norm, embeddings
-    stacks/       GPT, LGT, DiT depth modules
+    stacks/       GPT, LGT, DiT, Looped (weight-tied, ACT) depth modules
     backbones/    token id -> logits
     losses/       token losses (ce, focal, …)
     optim/        optimizer wrappers

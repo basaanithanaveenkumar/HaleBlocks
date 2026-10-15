@@ -156,7 +156,7 @@ _MULTIMODAL_TEXT_TOWERS = (
 
 _HALE_BACKBONES = (
     LLMBackboneSpec("hale-autoregressive", "hale", "hale", "autoregressive", 0.0, lora_targets=(),
-                    paper="HaloDiffusionLLM autoregressive variant (GPT / LGT stacks from hale_core)",
+                    paper="HaloDiffusionLLM autoregressive variant (GPT / LGT / looped stacks from hale_core)",
                     notes="needs `checkpoint:`; size comes from the checkpoint"),
     LLMBackboneSpec("hale-mtp", "hale", "hale", "mtp", 0.0, lora_targets=(),
                     paper="Gloeckle et al., Better & Faster LLMs via Multi-token Prediction, arXiv:2404.19737",

@@ -40,6 +40,8 @@ def backbone_kwargs(vocab_size: int, model_cfg, **overrides) -> dict:
         "rope_theta_global": model_cfg.rope_theta_global,
         "p_rope": model_cfg.p_rope,
         "qk_norm": model_cfg.qk_norm,
+        # Only the looped backbone reads it; configs without a `loop` section get the defaults.
+        "loop": getattr(model_cfg, "loop", None),
     }
     kwargs.update(overrides)
     return kwargs
@@ -58,6 +60,7 @@ def _register_builtins() -> None:
     from hale_core.nn.backbones.dit import DiTBackbone
     from hale_core.nn.backbones.gpt import GPTBackbone
     from hale_core.nn.backbones.lgt import LGTBackbone
+    from hale_core.nn.backbones.looped import LoopedBackbone
 
     if "transformer" in BACKBONES:
         return
@@ -65,6 +68,7 @@ def _register_builtins() -> None:
     register_backbone("transformer")(GPTBackbone)
     register_backbone("lgt")(LGTBackbone)
     register_backbone("dit")(DiTBackbone)
+    register_backbone("looped")(LoopedBackbone)
 
 
 _register_builtins()

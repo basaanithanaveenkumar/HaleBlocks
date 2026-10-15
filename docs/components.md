@@ -38,6 +38,9 @@ positions on `SequenceBackbone` (`learned_pos=True`), RoPE inside GQA.
   pre-norm residual block, with optional timestep scale/shift of both norms (zero-init).
 - `DiTBlock(d_model, attention, ffn)`: AdaLN-Zero (shift, scale and gate × 2, zero-init).
 - `DiTFinalLayer(d_model, vocab_size)`: modulated LayerNorm + head.
+- Loop components (`hale_core.nn.layers.loop`): `LoopDepthEmbedding` (Universal-Transformer step
+  coordinate, sinusoidal / learned), `LoopInputInjection` (`add` / `concat` / `none`) and
+  `ACTHalting` (Adaptive Computation Time: per-token halting, weighted output, ponder cost).
 
 ## Stacks
 
@@ -46,10 +49,29 @@ positions on `SequenceBackbone` (`learned_pos=True`), RoPE inside GQA.
 | `GPTStack` | LayerNorm | `attn_impl` | `mlp` | learned (backbone) |
 | `LGTStack` | RMSNorm | GQA; 5 local (window 512, θ=10⁴) : 1 global (θ=10⁶, p-RoPE 0.25, n_kv = n_heads/8) | `geglu` | RoPE |
 | `DiTStack` | LayerNorm + AdaLN-Zero | `attn_impl` | `mlp` | learned (backbone) |
+| `LoopedStack` | LayerNorm (+ optional sandwich) | `attn_impl` | `mlp` | learned (backbone) |
+
+`LoopedStack(..., n_layers, loop=LoopSpec(...))` is a looped (weight-tied, recurrent-depth) transformer:
+optional prelude layers, a shared core of `n_layers` layers applied `n_loops` times, then optional coda
+layers. `LoopSpec` controls the loop:
+
+- the depth embedding and input injection;
+- ACT halting (`halting="act"`; the ponder loss is in `stack.aux_loss`);
+- random `T` during training (`min_loops`) and truncated backprop (`bptt_loops`);
+- fixed-point early exit at inference (`exit_tolerance`);
+- scratchpad memory tokens (`scratch_tokens`).
+
+Helpers in `hale_core.nn.stacks`:
+
+- `loop_budget(model, n)` is a context manager that sets the test-time loop count;
+- `set_loop_budget` sets the same count without a context manager;
+- `loop_aux_loss(model)` returns the summed ponder losses;
+- `loop_stats(model)` returns the passes run, the mean updates per token, the ponder cost and the residual.
 
 ## Backbones — `build_backbone(vocab_size, model_cfg=None, **overrides)`
 
-`arch`: `default`/`transformer` → `GPTBackbone`, `lgt` → `LGTBackbone`, `dit` → `DiTBackbone`.
+`arch`: `default`/`transformer` → `GPTBackbone`, `lgt` → `LGTBackbone`, `dit` → `DiTBackbone`,
+`looped` → `LoopedBackbone` (configured by `model.loop`).
 Forward: `backbone(token_ids, attention_mask=None, t=None, attn_mask=None, pos_ids_len=None) -> logits`.
 The LM head is tied to the token embedding (`tie_embeddings=True`).
 

@@ -12,10 +12,14 @@ from hale_core.nn.layers.dit import DiTBlock, DiTFinalLayer
 from hale_core.nn.layers.embeddings import SinusoidalTimeEmbedding
 from hale_core.nn.layers.ffn import FFN, build_ffn, register_ffn
 from hale_core.nn.layers.layer import TransformerLayer
+from hale_core.nn.layers.loop import ACTHalting, LoopDepthEmbedding, LoopInputInjection
 from hale_core.nn.layers.norm import RMSNorm
 
 __all__ = [
+    "ACTHalting",
     "ATTENTION",
+    "LoopDepthEmbedding",
+    "LoopInputInjection",
     "FFN",
     "RMSNorm",
     "SinusoidalTimeEmbedding",
