@@ -72,8 +72,15 @@ class LanguageBackbone(nn.Module, ABC):
         input_ids: Tensor | None = None,
         attention_mask: Tensor | None = None,
         labels: Tensor | None = None,
+        token_ids: Tensor | None = None,
     ) -> LanguageBackboneOutput:
-        """Run the decoder causally over ``inputs_embeds`` (or ``input_ids``)."""
+        """Run the decoder causally over ``inputs_embeds`` (or ``input_ids``).
+
+        ``token_ids`` ``(B, L)`` are the ids aligned with ``inputs_embeds`` (any id at positions
+        holding image / state embeddings). Backbones whose layers also read token identity
+        (Gemma 4 per-layer embeddings) need them when called with ``inputs_embeds``; the
+        others ignore them.
+        """
 
     # ------------------------------------------------------------------ vocabulary
     @abstractmethod

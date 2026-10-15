@@ -30,6 +30,7 @@ from hale_core.nn.llm.hf_backbone import HFCausalLMBackbone  # noqa: E402
 MODEL_TYPES = {
     "smollm2": "llama", "qwen2.5": "qwen2", "qwen3": "qwen3", "llama3": "llama", "gemma2": "gemma2",
     "gemma3": "gemma3_text", "phi3": "phi3", "phi4": "phi3", "mistral": "mistral", "deepseek-r1": "qwen2",
+    "smollm3": "smollm3", "granite": "granite",
 }
 VOCAB = [f"w{i}" for i in range(60)]
 
@@ -62,17 +63,20 @@ def tiny_hf_backbone(name: str = "qwen3-0.6b") -> HFCausalLMBackbone:
 
 
 # ---------------------------------------------------------------------------- registry
+TEXT_ONLY = [n for n in list_llm_backbones("hf") if not get_llm_backbone_spec(n).is_multimodal_checkpoint]
+
+
 def test_registry_holds_only_causal_finetunable_backbones() -> None:
     hf, hale = list_llm_backbones("hf"), list_llm_backbones("hale")
-    assert len(hf) == 21 and hale == ["hale-autoregressive", "hale-mtp"]
-    assert {get_llm_backbone_spec(n).family for n in hf} == set(MODEL_TYPES)
-    assert all(get_llm_backbone_spec(n).params_b <= 8.2 for n in hf)
+    assert len(TEXT_ONLY) == 26 and len(hf) == 47 and hale == ["hale-autoregressive", "hale-mtp"]
+    assert {get_llm_backbone_spec(n).family for n in TEXT_ONLY} == set(MODEL_TYPES)
+    assert all(get_llm_backbone_spec(n).params_b <= 9.0 for n in hf)  # 8B class
     assert get_llm_backbone_spec("deepseek-r1-qwen-7b").name == "deepseek-r1-distill-qwen-7b"  # alias
     with pytest.raises(KeyError):
         get_llm_backbone_spec("hale-diffusion")
 
 
-@pytest.mark.parametrize("name", list_llm_backbones("hf"))
+@pytest.mark.parametrize("name", TEXT_ONLY)  # multimodal text towers: tests/unit/test_llm_text_towers.py
 def test_default_lora_targets_exist_in_the_architecture(name: str) -> None:
     spec = get_llm_backbone_spec(name)
     model = tiny_hf_model(MODEL_TYPES[spec.family], 64)

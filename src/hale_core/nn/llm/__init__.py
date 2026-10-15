@@ -1,8 +1,10 @@
 """Fine-tunable language-model backbones for VLMs and VLAs.
 
-One registry (:func:`list_llm_backbones`) of causal LLMs - Hugging Face families (SmolLM2,
-Qwen2.5, Qwen3, Llama 3.x, Gemma 2/3, Phi-3.5/4-mini, Mistral, DeepSeek-R1-Distill) and
-HaloDiffusionLLM's causal checkpoints - behind one interface, :class:`LanguageBackbone`, with
+One registry (:func:`list_llm_backbones`) of causal LLMs - Hugging Face text families (SmolLM2/3,
+Qwen2.5, Qwen3, Llama 3.x, Gemma 2/3, Phi-3.5/4-mini, Mistral, Granite 4.2, DeepSeek-R1-Distill),
+the text towers of natively multimodal models (Qwen3.5, Gemma 4, Ministral 3, Cosmos-Reason2,
+LFM2.5-VL, SmolVLM2; see :mod:`hale_core.nn.llm.hf_text_tower`) and HaloDiffusionLLM's causal
+checkpoints - behind one interface, :class:`LanguageBackbone`, with
 LoRA / full / frozen fine-tuning chosen by :class:`~hale_core.config.sections.LLMBackboneConfig`::
 
     from hale_core.config.sections import LLMBackboneConfig

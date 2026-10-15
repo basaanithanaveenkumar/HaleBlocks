@@ -1,4 +1,4 @@
-"""Hugging Face ``AutoModelForCausalLM`` as a :class:`LanguageBackbone`."""
+"""Hugging Face causal LMs (or the text tower of a multimodal checkpoint) as a :class:`LanguageBackbone`."""
 
 from __future__ import annotations
 
@@ -16,11 +16,21 @@ DTYPES = {"float32": torch.float32, "float16": torch.float16, "bfloat16": torch.
 
 
 class HFCausalLMBackbone(LanguageBackbone):
-    """A pretrained decoder-only LM from the Hub (Qwen, Llama, SmolLM2, Gemma, Phi, Mistral ...).
+    """A pretrained decoder-only LM from the Hub (Qwen, Llama, SmolLM, Gemma, Phi, Mistral ...).
+
+    ``vision-language`` specs (Qwen3.5, Gemma 4, Ministral 3, Cosmos-Reason2, LFM2.5-VL,
+    SmolVLM2) load the multimodal checkpoint and keep only its text tower
+    (:mod:`hale_core.nn.llm.hf_text_tower`).
 
     LoRA uses PEFT's ``get_peft_model`` (``task_type=CAUSAL_LM``), so adapters can be saved
     with ``backbone.model.save_pretrained(dir)`` and merged for deployment with
     ``merge_and_unload()``.
+
+    Gemma 4's "E" models add a per-layer embedding looked up from the **token id** of every
+    position. A VLM / VLA splices image / state embeddings into ``inputs_embeds``, so the ids
+    cannot be recovered from the embeddings; pass them as ``token_ids`` to :meth:`forward`
+    (positions holding non-text embeddings may carry any id - ids outside the per-layer table,
+    such as newly added special tokens, use the padding id).
 
     Args:
         spec: registry entry.
@@ -33,6 +43,11 @@ class HFCausalLMBackbone(LanguageBackbone):
         if tokenizer.pad_token is None:
             tokenizer.pad_token = tokenizer.eos_token
         self.model = model
+        decoder = model.get_decoder() if hasattr(model, "get_decoder") else None
+        #: Rows of Gemma 4's per-layer embedding table (``None``: the model has none).
+        self.per_layer_vocab: int | None = None
+        if decoder is not None and getattr(decoder.config, "hidden_size_per_layer_input", None):
+            self.per_layer_vocab = int(decoder.config.vocab_size_per_layer_input)
 
     # ------------------------------------------------------------------ construction
     @classmethod
@@ -52,11 +67,18 @@ class HFCausalLMBackbone(LanguageBackbone):
         kwargs: dict[str, Any] = {"trust_remote_code": trust_remote_code}
         if attn_implementation:
             kwargs["attn_implementation"] = attn_implementation
+        if spec.is_multimodal_checkpoint:
+            from hale_core.nn.llm.hf_text_tower import load_text_tower
+
+            loader = load_text_tower
+        else:
+            loader = AutoModelForCausalLM.from_pretrained
         try:  # transformers >= 4.56 renamed torch_dtype -> dtype
-            model = AutoModelForCausalLM.from_pretrained(repo, dtype=DTYPES[dtype], **kwargs)
+            model = loader(repo, dtype=DTYPES[dtype], **kwargs)
         except TypeError:
-            model = AutoModelForCausalLM.from_pretrained(repo, torch_dtype=DTYPES[dtype], **kwargs)
-        logger.info("llm backbone {} loaded from {} ({})", spec.name, repo, dtype)
+            model = loader(repo, torch_dtype=DTYPES[dtype], **kwargs)
+        logger.info("llm backbone {} loaded from {} ({}{})", spec.name, repo, dtype,
+                    ", text tower of a multimodal checkpoint" if spec.is_multimodal_checkpoint else "")
         return cls(spec, model, tokenizer)
 
     # ------------------------------------------------------------------ geometry
@@ -84,7 +106,11 @@ class HFCausalLMBackbone(LanguageBackbone):
         input_ids: Tensor | None = None,
         attention_mask: Tensor | None = None,
         labels: Tensor | None = None,
+        token_ids: Tensor | None = None,
     ) -> LanguageBackboneOutput:
+        extra: dict[str, Any] = {}
+        if self.per_layer_vocab is not None and inputs_embeds is not None and token_ids is not None:
+            extra["per_layer_inputs"] = self.per_layer_inputs(token_ids)
         out = self.model(
             input_ids=input_ids,
             inputs_embeds=inputs_embeds,
@@ -92,9 +118,20 @@ class HFCausalLMBackbone(LanguageBackbone):
             labels=labels,
             output_hidden_states=True,
             return_dict=True,
+            **extra,
         )
         # hidden_states[-1] is the decoder output after the final norm (what lm_head reads).
         return LanguageBackboneOutput(out.logits, out.hidden_states[-1], out.loss)
+
+    def per_layer_inputs(self, token_ids: Tensor) -> Tensor:
+        """Gemma 4 per-layer token embeddings for ``token_ids`` ``(B, L)``.
+
+        Ids beyond the per-layer table (special tokens added for the VLM / VLA) map to the
+        padding id; those positions hold spliced embeddings whose identity is not a text token.
+        """
+        pad = self.tokenizer.pad_token_id or 0
+        ids = torch.where(token_ids < self.per_layer_vocab, token_ids, torch.full_like(token_ids, pad))
+        return self.base.get_decoder().get_per_layer_inputs(ids, None)
 
     def generate(self, **kwargs: Any) -> Tensor:
         """Hugging Face generation (``inputs_embeds`` / ``input_ids`` + sampling kwargs)."""

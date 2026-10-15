@@ -108,6 +108,7 @@ class HaleSequenceLMBackbone(LanguageBackbone):
         input_ids: Tensor | None = None,
         attention_mask: Tensor | None = None,
         labels: Tensor | None = None,
+        token_ids: Tensor | None = None,  # unused: Hale backbones read only the embeddings
     ) -> LanguageBackboneOutput:
         if inputs_embeds is None:
             if input_ids is None:
