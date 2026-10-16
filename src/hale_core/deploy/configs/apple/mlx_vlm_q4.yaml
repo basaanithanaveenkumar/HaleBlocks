@@ -1,0 +1,5 @@
+# HF vision-language model -> mlx-vlm.
+_base_: ./mlx_lm_q4.yaml
+pipeline:
+  - {type: HuggingFaceCheckpointStage, dtype: float16}
+  - {type: MLXHuggingFaceConvertStage, package: mlx_vlm, q_bits: 4, q_group_size: 64}

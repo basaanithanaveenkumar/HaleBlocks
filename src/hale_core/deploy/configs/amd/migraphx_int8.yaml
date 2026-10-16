@@ -1,0 +1,11 @@
+# MIGraphX INT8, calibrated on the adapter's batches.
+_base_: ./migraphx_fp16.yaml
+calibration: {num_batches: 64}
+pipeline:
+  - {type: OnnxExportStage, opset: 18, exporter: auto}
+  - {type: OnnxSimplifyStage}
+  - type: RuntimeParityStage
+    artifact_kind: onnx
+    runtime: {type: OnnxRuntimeSession, providers: [CPUExecutionProvider]}
+    corners: [min, opt, max]
+  - {type: MIGraphXCompileStage, precision: int8, shape: opt}

@@ -1,0 +1,4 @@
+# resnet50_executorch_qnn: HaleBlocks resnet50 on qualcomm/executorch_qnn_16a8w.
+_base_:
+  - pkg://hale_core.deploy/configs/qualcomm/executorch_qnn_16a8w.yaml
+  - ./_shared/resnet50_adapter.yaml

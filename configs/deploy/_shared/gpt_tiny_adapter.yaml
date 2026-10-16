@@ -1,0 +1,8 @@
+# A tiny GPT backbone: CI-sized, exercises every export path in seconds.
+name: gpt_tiny
+adapter:
+  type: HaleSequenceBackboneAdapter
+  vocab_size: 512
+  max_batch: 4
+  opt_seq: 32
+  backbone: {arch: transformer, d_model: 64, n_heads: 4, n_layers: 2, d_ff: 128, max_length: 128, dropout: 0.0}

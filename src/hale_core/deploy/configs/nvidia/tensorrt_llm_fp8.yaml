@@ -1,0 +1,6 @@
+# LLMs on TensorRT-LLM >= 1.2 (PyTorch backend): HF checkpoint -> ModelOpt FP8 -> trtllm-serve bundle.
+# Requires an adapter implementing `hf_checkpoint()` (HF text towers in Hale-VLM / HALE-WAM).
+_base_: [../_base_/default.yaml, ../devices/nvidia_datacenter.yaml]
+pipeline:
+  - {type: HuggingFaceCheckpointStage, dtype: bfloat16}
+  - {type: TensorRTLLMBundleStage, quantization: fp8, max_batch_size: 16, max_seq_len: 8192}

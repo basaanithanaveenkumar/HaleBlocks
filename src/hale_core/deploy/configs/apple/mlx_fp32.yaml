@@ -1,0 +1,9 @@
+# Exact-precision MLX conversion (debugging conversions: parity is ~1e-6).
+_base_: ./mlx_fp16.yaml
+pipeline:
+  - {type: MLXConvertStage, dtype: float32, export_corners: [min, opt, max]}
+  - type: RuntimeParityStage
+    artifact_kind: mlx_function
+    runtime: {type: MLXFunctionSession}
+    corners: [min, opt, max]
+    atol: 1.0e-4

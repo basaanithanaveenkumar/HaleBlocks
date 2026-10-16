@@ -1,0 +1,12 @@
+# Android flagship (Snapdragon 8 Elite) Hexagon NPU via Qualcomm AI Hub: QNN DLC, W8A16.
+_base_: [../_base_/default.yaml, ../devices/qualcomm_snapdragon_8_elite.yaml]
+calibration: {num_batches: 32}
+pipeline:
+  - type: QAIHubCompileStage
+    device: Samsung Galaxy S25 (Family)
+    source: torchscript
+    target_runtime: qnn_dlc
+    quantize_full_type: w8a16
+    compute_unit: npu
+    profile: true
+    validate_on_device: true

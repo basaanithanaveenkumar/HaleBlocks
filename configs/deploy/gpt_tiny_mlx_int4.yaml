@@ -1,0 +1,10 @@
+_base_:
+  - pkg://hale_core.deploy/configs/apple/mlx_int4.yaml
+  - ./_shared/gpt_tiny_adapter.yaml
+pipeline:
+  - {type: MLXConvertStage, dtype: float16, quantize: {bits: 4, group_size: 32}}
+  - type: RuntimeParityStage
+    artifact_kind: mlx_function
+    runtime: {type: MLXFunctionSession}
+    atol: 5.0e-1
+    min_cosine: 0.98

@@ -1,0 +1,9 @@
+# Device profile: RX 7900 / 9070 (RDNA3/4)
+device:
+  vendor: amd
+  family: radeon
+  chips: RX 7900 / 9070 (RDNA3/4)
+  runtime: migraphx
+  precision:
+  - fp16
+  - int8

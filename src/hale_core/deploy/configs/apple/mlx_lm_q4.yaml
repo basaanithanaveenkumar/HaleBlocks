@@ -1,0 +1,5 @@
+# HF text model -> mlx-lm (native MLX LLM runtime: KV cache, mlx_lm.server).
+_base_: [../_base_/default.yaml, ../devices/apple_silicon.yaml]
+pipeline:
+  - {type: HuggingFaceCheckpointStage, dtype: float16}
+  - {type: MLXHuggingFaceConvertStage, package: mlx_lm, q_bits: 4, q_group_size: 64}

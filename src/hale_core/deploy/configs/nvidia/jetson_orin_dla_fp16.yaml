@@ -1,0 +1,20 @@
+# Jetson Orin: build ON the device (engines are not portable). DLA core 0 with GPU fallback.
+_base_: [../_base_/default.yaml, ../devices/nvidia_jetson_orin.yaml]
+pipeline:
+  - {type: OnnxExportStage, opset: 18, exporter: auto}
+  - {type: OnnxSimplifyStage}
+  - type: RuntimeParityStage
+    artifact_kind: onnx
+    runtime: {type: OnnxRuntimeSession, providers: [CPUExecutionProvider]}
+    corners: [min, opt, max]
+  - type: TensorRTEngineStage
+    precision: fp16
+    strongly_typed: false     # JetPack 6 ships TensorRT 10: legacy FP16 builder flag
+    dla_core: 0
+    gpu_fallback: true
+    workspace_gb: 2.0
+  - type: RuntimeParityStage
+    artifact_kind: tensorrt_engine
+    runtime: {type: TensorRTSession}
+    atol: 5.0e-2
+    min_cosine: 0.999

@@ -56,6 +56,7 @@ from hale_core.data import MixedVLMDataModule
 | Project page | [basaanithanaveenkumar.github.io/HaleBlocks](https://basaanithanaveenkumar.github.io/HaleBlocks/) ([source](project-page/index.html)) |
 | Documentation | [`docs/`](docs/README.md) — getting started, components, configuration, data |
 | Architecture diagrams | [`docs/architecture.md`](docs/architecture.md) (Mermaid) |
+| Deployment | [`docs/deployment.md`](docs/deployment.md) — TensorRT, MLX, AMD, Qualcomm pipelines |
 | Blog | [Stop copying attention.py: a registry for transformer research](docs/blog/2026-09-28-stop-copying-attention.md) |
 | Claude Code skills | [`.claude/skills/`](.claude/skills) — `haleblocks-dev`, `haleblocks-components`, `haleblocks-data`, `hale-publish` |
 
@@ -81,6 +82,21 @@ data:
 
 Both flags are off by default. See [`docs/distributed_training.md`](docs/distributed_training.md).
 
+### Optional: deployment (TensorRT, MLX, AMD, Qualcomm)
+
+```bash
+uv add "hale-blocks[deploy]"            # + [deploy-nvidia] [deploy-apple] [deploy-amd] [deploy-qualcomm]
+hale-deploy env                         # which backends this machine can run
+hale-deploy run configs/deploy/gpt_small_tensorrt_fp16.yaml
+```
+
+`hale_core.deploy` exports any Hale model to TensorRT 10/11 engines (data center, RTX, Jetson
+DLA), TensorRT-LLM bundles, MLX (`.mlxfn` through a PyTorch→MLX graph bridge, or mlx-lm /
+mlx-vlm), AMD MIGraphX and Ryzen AI NPU (Quark + Vitis AI EP), and Qualcomm Snapdragon (AI Hub
+QNN/TFLite/ONNX, ExecuTorch QNN). Each run is checked numerically against PyTorch. Configs
+inherit packaged targets with `_base_: pkg://hale_core.deploy/configs/...`. See
+[`docs/deployment.md`](docs/deployment.md).
+
 ## Layout
 
 ```text
@@ -100,6 +116,9 @@ hale_core/
     losses/       token losses (ce, focal, …)
     optim/        optimizer wrappers
   runtime/        checkpoint, tensors, device, protocols
+  deploy/         export pipelines: registries, _base_ configs, stages per vendor,
+                  PyTorch -> MLX bridge, runtimes + parity, hale-deploy CLI
+ext_pkgs/         vendor SDK sources as shallow git submodules (reference only)
 ```
 
 ## Develop

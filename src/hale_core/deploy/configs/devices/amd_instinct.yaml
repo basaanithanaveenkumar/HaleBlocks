@@ -1,0 +1,12 @@
+# Device profile: MI300X / MI325X / MI355X (CDNA3/4)
+device:
+  vendor: amd
+  family: instinct
+  chips: MI300X / MI325X / MI355X (CDNA3/4)
+  runtime: migraphx
+  precision:
+  - fp16
+  - bf16
+  - int8
+  - fp8
+  rocm: '>=7.0'

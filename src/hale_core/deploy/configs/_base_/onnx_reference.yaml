@@ -1,0 +1,12 @@
+# ONNX export + simplification + ONNX Runtime CPU parity: the common front half of the
+# TensorRT, MIGraphX, Quark and ORT-EP pipelines. Lists are replaced (not merged) on
+# inheritance, so targets repeat these stages in their own `pipeline`.
+_base_: ./default.yaml
+pipeline:
+  - {type: OnnxExportStage, opset: 18, exporter: auto}
+  - {type: OnnxSimplifyStage}
+  - type: RuntimeParityStage
+    artifact_kind: onnx
+    runtime: {type: OnnxRuntimeSession, providers: [CPUExecutionProvider]}
+    corners: [min, opt, max]
+    atol: 1.0e-3

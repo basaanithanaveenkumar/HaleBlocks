@@ -1,0 +1,14 @@
+# ORT + MIGraphXExecutionProvider bundle (ORT keeps dynamic shapes; MIGraphX compiles subgraphs).
+_base_: [../_base_/default.yaml, ../devices/amd_instinct.yaml]
+pipeline:
+  - {type: OnnxExportStage, opset: 18, exporter: auto}
+  - {type: OnnxSimplifyStage}
+  - type: RuntimeParityStage
+    artifact_kind: onnx
+    runtime: {type: OnnxRuntimeSession, providers: [CPUExecutionProvider]}
+    corners: [min, opt, max]
+  - type: OnnxRuntimePackageStage
+    providers: [MIGraphXExecutionProvider, CPUExecutionProvider]
+    provider_options:
+      - {device_id: 0, migraphx_fp16_enable: 1, migraphx_save_compiled_model: 1, migraphx_save_model_path: model.mxr}
+      - {}

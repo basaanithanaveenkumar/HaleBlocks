@@ -1,0 +1,4 @@
+# gpt_small_tensorrt_fp16: HaleBlocks gpt_small on nvidia/tensorrt_fp16.
+_base_:
+  - pkg://hale_core.deploy/configs/nvidia/tensorrt_fp16.yaml
+  - ./_shared/gpt_small_adapter.json

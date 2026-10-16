@@ -1,0 +1,7 @@
+# Defaults shared by every deployment config. Targets inherit this through `_base_`.
+work_dir: work_dirs/deploy
+on_error: raise          # raise | continue
+seed: 0
+calibration:
+  type: AdapterCalibrationSource   # real batches from the adapter, random fallback
+  num_batches: 16

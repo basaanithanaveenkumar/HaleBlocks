@@ -1,0 +1,8 @@
+# Vision tower used by Hale-VLM / HALE-WAM / perception stacks.
+name: resnet50
+adapter:
+  type: HaleVisionBackboneAdapter
+  name: resnet50
+  kwargs: {img_size: 224}
+  outputs: [pooled_output]
+  max_batch: 8

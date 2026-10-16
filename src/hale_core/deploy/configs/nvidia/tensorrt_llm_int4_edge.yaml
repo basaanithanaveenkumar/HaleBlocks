@@ -1,0 +1,5 @@
+# Memory-bound edge GPUs (Jetson Orin, consumer RTX): INT4-AWQ weights.
+_base_: [./tensorrt_llm_fp8.yaml, ../devices/nvidia_jetson_orin.yaml]
+pipeline:
+  - {type: HuggingFaceCheckpointStage, dtype: float16}
+  - {type: TensorRTLLMBundleStage, quantization: int4_awq, max_batch_size: 1, max_seq_len: 4096}

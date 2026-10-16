@@ -1,0 +1,2 @@
+# Jetson Orin GPU, INT8 with ModelOpt Q/DQ (best throughput for vision towers).
+_base_: [./tensorrt_int8_modelopt.yaml, ../devices/nvidia_jetson_orin.yaml]

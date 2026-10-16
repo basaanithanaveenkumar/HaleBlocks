@@ -1,0 +1,12 @@
+# Device profile: H100 / H200 / B200 / L40S
+device:
+  vendor: nvidia
+  family: datacenter
+  chips: H100 / H200 / B200 / L40S
+  runtime: tensorrt
+  precision:
+  - fp16
+  - bf16
+  - fp8
+  - int8
+  notes: FP8 on Hopper/Ada, NVFP4 on Blackwell

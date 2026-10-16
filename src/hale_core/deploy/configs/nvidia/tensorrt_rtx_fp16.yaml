@@ -1,0 +1,15 @@
+# GeForce / RTX PRO GPUs with TensorRT for RTX (small runtime, on-device JIT specialisation).
+_base_: [../_base_/default.yaml, ../devices/nvidia_rtx.yaml]
+pipeline:
+  - {type: OnnxExportStage, opset: 18, exporter: auto}
+  - {type: OnnxSimplifyStage}
+  - type: RuntimeParityStage
+    artifact_kind: onnx
+    runtime: {type: OnnxRuntimeSession, providers: [CPUExecutionProvider]}
+    corners: [min, opt, max]
+  - {type: ModelOptAutoCastStage, low_precision_type: fp16, skip_if_unavailable: true}
+  - {type: TensorRTEngineStage, runtime_module: tensorrt_rtx, precision: fp16}
+  - type: RuntimeParityStage
+    artifact_kind: tensorrt_engine
+    runtime: {type: TensorRTSession, runtime_module: tensorrt_rtx}
+    atol: 5.0e-2

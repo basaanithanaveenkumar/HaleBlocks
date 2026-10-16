@@ -55,6 +55,44 @@ finetune = [
     "peft>=0.14",
 ]
 
+# ── Deployment (hale_core.deploy) ───────────────────────────────────────────
+# Portable core: ONNX export / ORT parity / packaging. Vendor extras add one SDK family each;
+# TensorRT, MIGraphX and the QNN SDK also need system installs (see docs/deployment.md).
+deploy = [
+    "numpy>=1.26",
+    "onnx>=1.17",
+    "onnxruntime>=1.20",
+    "onnxscript>=0.2",
+    "safetensors>=0.4",
+]
+deploy-nvidia = [
+    "hale-blocks[deploy]",
+    "tensorrt>=10.0; sys_platform == 'linux' or sys_platform == 'win32'",
+    "nvidia-modelopt[onnx,torch]>=0.30; sys_platform == 'linux'",
+    "torch-tensorrt>=2.6; sys_platform == 'linux'",
+]
+deploy-nvidia-llm = [
+    "hale-blocks[deploy-nvidia,finetune]",
+    "tensorrt-llm>=1.2; sys_platform == 'linux'",
+]
+deploy-apple = [
+    "hale-blocks[deploy]",
+    "mlx>=0.30; sys_platform == 'darwin'",
+    "mlx-lm>=0.30; sys_platform == 'darwin'",
+    "mlx-vlm>=0.3; sys_platform == 'darwin'",
+]
+deploy-amd = [
+    "hale-blocks[deploy]",
+    "amd-quark>=0.10",
+]
+deploy-qualcomm = [
+    "hale-blocks[deploy]",
+    "qai-hub>=0.30",
+]
+
+[project.scripts]
+hale-deploy = "hale_core.deploy.cli:main"
+
 [project.urls]
 Repository = "https://github.com/basaanithanaveenkumar/HaleBlocks"
 Documentation = "https://github.com/basaanithanaveenkumar/HaleBlocks#readme"

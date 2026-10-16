@@ -1,0 +1,11 @@
+# Device profile: Ryzen AI 300 / Max (XDNA2 NPU)
+device:
+  vendor: amd
+  family: ryzen_ai
+  chips: Ryzen AI 300 / Max (XDNA2 NPU)
+  runtime: onnxruntime-vitisai
+  precision:
+  - a16w8
+  - a8w8
+  - bf16
+  notes: Ryzen AI SW >= 1.6; A16W8 recommended for transformers

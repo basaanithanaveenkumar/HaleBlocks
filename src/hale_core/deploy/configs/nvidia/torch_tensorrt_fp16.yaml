@@ -1,0 +1,5 @@
+# Torch-TensorRT (dynamo): partial TensorRT lowering for graphs the ONNX parser rejects.
+_base_: [../_base_/default.yaml, ../devices/nvidia_datacenter.yaml]
+pipeline:
+  - {type: TorchExportStage}
+  - {type: TorchTensorRTStage, enabled_precisions: [float16]}

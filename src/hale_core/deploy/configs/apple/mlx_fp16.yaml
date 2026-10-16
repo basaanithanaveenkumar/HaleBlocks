@@ -1,0 +1,10 @@
+# MacBook / Mac Studio: any traceable model through the ATen -> MLX bridge, FP16 weights.
+_base_: [../_base_/default.yaml, ../devices/apple_silicon.yaml]
+pipeline:
+  - {type: MLXConvertStage, dtype: float16, export_corners: [min, opt]}
+  - type: RuntimeParityStage
+    artifact_kind: mlx_function
+    runtime: {type: MLXFunctionSession}
+    corners: [min, opt]
+    atol: 5.0e-2
+    min_cosine: 0.999

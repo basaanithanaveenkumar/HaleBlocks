@@ -1,0 +1,11 @@
+# Device profile: Jetson AGX Thor (Blackwell, JetPack 7)
+device:
+  vendor: nvidia
+  family: jetson
+  chips: Jetson AGX Thor (Blackwell, JetPack 7)
+  runtime: tensorrt
+  precision:
+  - fp16
+  - fp8
+  - nvfp4
+  notes: TensorRT-Edge-LLM for on-device LLM/VLM

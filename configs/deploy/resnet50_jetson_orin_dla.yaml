@@ -1,0 +1,4 @@
+# resnet50_jetson_orin_dla: HaleBlocks resnet50 on nvidia/jetson_orin_dla_fp16.
+_base_:
+  - pkg://hale_core.deploy/configs/nvidia/jetson_orin_dla_fp16.yaml
+  - ./_shared/resnet50_adapter.yaml

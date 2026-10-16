@@ -1,0 +1,7 @@
+# Weight-shared QNN context binary (compile + link job) for Genie / QNN HTP apps.
+_base_: ./aihub_qnn_dlc_w8a16.yaml
+pipeline:
+  - type: QAIHubCompileStage
+    device: Samsung Galaxy S25 (Family)
+    target_runtime: context_binary
+    quantize_full_type: w8a16

@@ -1,0 +1,12 @@
+# Device profile: Snapdragon 8 Gen 3 (SM8650)
+device:
+  vendor: qualcomm
+  family: mobile
+  chips: Snapdragon 8 Gen 3 (SM8650)
+  soc: SM8650
+  aihub_device: Samsung Galaxy S24 (Family)
+  runtime: qnn
+  precision:
+  - w8a16
+  - int8
+  - fp16

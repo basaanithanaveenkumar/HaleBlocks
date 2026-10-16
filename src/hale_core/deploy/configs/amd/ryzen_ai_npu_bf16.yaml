@@ -1,0 +1,13 @@
+# Ryzen AI NPU in BF16 (no calibration loss; Ryzen AI SW >= 1.5).
+_base_: ./ryzen_ai_npu_a16w8.yaml
+pipeline:
+  - {type: OnnxExportStage, opset: 18, exporter: auto}
+  - {type: OnnxSimplifyStage}
+  - type: RuntimeParityStage
+    artifact_kind: onnx
+    runtime: {type: OnnxRuntimeSession, providers: [CPUExecutionProvider]}
+    corners: [min, opt, max]
+  - {type: QuarkQuantizeStage, preset: BF16}
+  - type: OnnxRuntimePackageStage
+    providers: [VitisAIExecutionProvider, CPUExecutionProvider]
+    provider_options: [{cache_dir: vitisai_cache, cache_key: model_bf16}, {}]

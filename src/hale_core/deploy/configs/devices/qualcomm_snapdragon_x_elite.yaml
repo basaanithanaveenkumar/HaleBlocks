@@ -1,0 +1,11 @@
+# Device profile: Snapdragon X Elite (Windows on Arm)
+device:
+  vendor: qualcomm
+  family: pc
+  chips: Snapdragon X Elite (Windows on Arm)
+  aihub_device: Snapdragon X Elite CRD
+  runtime: onnxruntime-qnn
+  precision:
+  - w8a16
+  - int8
+  - fp16

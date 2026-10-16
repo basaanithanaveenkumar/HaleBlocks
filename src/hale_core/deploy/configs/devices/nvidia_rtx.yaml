@@ -1,0 +1,11 @@
+# Device profile: RTX 40xx / 50xx (Ada, Blackwell)
+device:
+  vendor: nvidia
+  family: rtx
+  chips: RTX 40xx / 50xx (Ada, Blackwell)
+  runtime: tensorrt_rtx
+  precision:
+  - fp16
+  - fp8
+  - int4
+  notes: TensorRT for RTX JIT-specialises engines on the user's GPU

@@ -1,0 +1,11 @@
+# Device profile: M1-M5 (Metal GPU, unified memory)
+device:
+  vendor: apple
+  family: m-series
+  chips: M1-M5 (Metal GPU, unified memory)
+  runtime: mlx
+  precision:
+  - float16
+  - bfloat16
+  - q8
+  - q4

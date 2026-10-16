@@ -1,0 +1,8 @@
+# LiteRT (TFLite) + QNN delegate: the most portable Android path.
+_base_: ./aihub_qnn_dlc_w8a16.yaml
+pipeline:
+  - type: QAIHubCompileStage
+    device: Samsung Galaxy S24 (Family)
+    target_runtime: tflite
+    quantize_full_type: int8
+    compute_unit: npu

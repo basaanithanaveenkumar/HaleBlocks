@@ -1,0 +1,5 @@
+# CI smoke: tiny GPT -> ONNX -> ONNX Runtime parity at min/opt/max shapes (runs anywhere).
+_base_:
+  - pkg://hale_core.deploy/configs/_base_/onnx_reference.yaml
+  - ./_shared/gpt_tiny_adapter.yaml
+calibration: {type: RandomCalibrationSource, num_batches: 2}

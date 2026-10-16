@@ -1,0 +1,5 @@
+# Local (no cloud) Android export: ExecuTorch + QNN HTP delegate, 16-bit activations / 8-bit weights.
+_base_: [../_base_/default.yaml, ../devices/qualcomm_snapdragon_8_gen3.yaml]
+calibration: {num_batches: 32}
+pipeline:
+  - {type: ExecuTorchQNNStage, soc: SM8650, quantization: 16a8w}

@@ -1,0 +1,4 @@
+# resnet50_tensorrt_int8: HaleBlocks resnet50 on nvidia/tensorrt_int8_modelopt.
+_base_:
+  - pkg://hale_core.deploy/configs/nvidia/tensorrt_int8_modelopt.yaml
+  - ./_shared/resnet50_adapter.yaml

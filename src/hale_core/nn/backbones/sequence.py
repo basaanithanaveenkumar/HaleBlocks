@@ -78,7 +78,8 @@ class SequenceBackbone(nn.Module):
             n = seq_len // 2
             pos = torch.arange(n, device=device)
             return torch.cat([pos, pos], dim=0)
-        return torch.arange(min(seq_len, self.max_length), device=device)
+        # torch.sym_min == min for ints; keeps symbolic lengths guard-free under torch.export
+        return torch.arange(torch.sym_min(seq_len, self.max_length), device=device)
 
     def attention_inputs(
         self,
@@ -88,7 +89,7 @@ class SequenceBackbone(nn.Module):
         pos_ids_len: int | None,
     ) -> tuple[torch.Tensor | None, torch.Tensor | None]:
         _, seq_len = token_ids.shape
-        pos_len = pos_ids_len or min(seq_len, self.max_length)
+        pos_len = pos_ids_len or torch.sym_min(seq_len, self.max_length)
         if pos_len > self.max_length and self.attn_type != "block_causal":
             raise ValueError(f"seq {pos_len} > max_length {self.max_length}")
         key_padding = (attention_mask == 0) if attention_mask is not None else None

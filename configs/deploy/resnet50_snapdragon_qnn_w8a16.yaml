@@ -1,0 +1,4 @@
+# resnet50_snapdragon_qnn_w8a16: HaleBlocks resnet50 on qualcomm/aihub_qnn_dlc_w8a16.
+_base_:
+  - pkg://hale_core.deploy/configs/qualcomm/aihub_qnn_dlc_w8a16.yaml
+  - ./_shared/resnet50_adapter.yaml

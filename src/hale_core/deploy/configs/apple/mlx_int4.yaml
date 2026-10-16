@@ -1,0 +1,10 @@
+# 4-bit weight-only quantization (group 64) for large models on 16-32 GB Macs.
+_base_: ./mlx_fp16.yaml
+pipeline:
+  - {type: MLXConvertStage, dtype: float16, quantize: {bits: 4, group_size: 64}}
+  - type: RuntimeParityStage
+    artifact_kind: mlx_function
+    runtime: {type: MLXFunctionSession}
+    corners: [opt]
+    atol: 5.0e-1
+    min_cosine: 0.98

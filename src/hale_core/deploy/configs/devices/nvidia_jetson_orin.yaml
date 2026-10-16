@@ -1,0 +1,11 @@
+# Device profile: Jetson AGX / NX / Nano Orin (JetPack 6)
+device:
+  vendor: nvidia
+  family: jetson
+  chips: Jetson AGX / NX / Nano Orin (JetPack 6)
+  runtime: tensorrt
+  precision:
+  - fp16
+  - int8
+  dla_cores: 2
+  notes: TensorRT 10.x; DLA for INT8/FP16 convs

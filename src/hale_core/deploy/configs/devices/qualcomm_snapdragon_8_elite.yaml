@@ -1,0 +1,13 @@
+# Device profile: Snapdragon 8 Elite (SM8750, Hexagon NPU)
+device:
+  vendor: qualcomm
+  family: mobile
+  chips: Snapdragon 8 Elite (SM8750, Hexagon NPU)
+  soc: SM8750
+  aihub_device: Samsung Galaxy S25 (Family)
+  runtime: qnn
+  precision:
+  - w8a16
+  - w4a16
+  - int8
+  - fp16

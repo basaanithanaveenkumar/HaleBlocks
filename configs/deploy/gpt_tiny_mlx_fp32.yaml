@@ -1,0 +1,4 @@
+# CI smoke on Apple Silicon: tiny GPT -> MLX (exact precision) -> parity at min/opt/max.
+_base_:
+  - pkg://hale_core.deploy/configs/apple/mlx_fp32.yaml
+  - ./_shared/gpt_tiny_adapter.yaml

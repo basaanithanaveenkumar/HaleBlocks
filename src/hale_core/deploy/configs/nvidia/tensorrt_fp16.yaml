@@ -1,0 +1,19 @@
+# NVIDIA data-center / workstation GPU, FP16 TensorRT engine.
+# TensorRT 11: precision comes from the graph -> ModelOpt AutoCast writes the FP16 ONNX.
+# TensorRT 10 without ModelOpt: AutoCast is skipped and the legacy FP16 builder flag is used.
+_base_: [../_base_/default.yaml, ../devices/nvidia_datacenter.yaml]
+pipeline:
+  - {type: OnnxExportStage, opset: 18, exporter: auto}
+  - {type: OnnxSimplifyStage}
+  - type: RuntimeParityStage
+    artifact_kind: onnx
+    runtime: {type: OnnxRuntimeSession, providers: [CPUExecutionProvider]}
+    corners: [min, opt, max]
+  - {type: ModelOptAutoCastStage, low_precision_type: fp16, skip_if_unavailable: true}
+  - {type: TensorRTEngineStage, precision: fp16, optimization_level: 3, timing_cache: work_dirs/trt_timing.cache}
+  - type: RuntimeParityStage
+    artifact_kind: tensorrt_engine
+    runtime: {type: TensorRTSession}
+    corners: [min, opt, max]
+    atol: 5.0e-2
+    min_cosine: 0.999

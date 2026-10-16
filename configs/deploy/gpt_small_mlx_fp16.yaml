@@ -1,0 +1,4 @@
+# gpt_small_mlx_fp16: HaleBlocks gpt_small on apple/mlx_fp16.
+_base_:
+  - pkg://hale_core.deploy/configs/apple/mlx_fp16.yaml
+  - ./_shared/gpt_small_adapter.json

@@ -1,0 +1,17 @@
+# INT8 with explicit Q/DQ from ModelOpt PTQ (works on TensorRT 10 and is the TensorRT 11 way).
+_base_: [../_base_/default.yaml, ../devices/nvidia_datacenter.yaml]
+calibration: {num_batches: 64}
+pipeline:
+  - {type: OnnxExportStage, opset: 18, exporter: auto}
+  - {type: OnnxSimplifyStage}
+  - type: RuntimeParityStage
+    artifact_kind: onnx
+    runtime: {type: OnnxRuntimeSession, providers: [CPUExecutionProvider]}
+    corners: [min, opt, max]
+  - {type: ModelOptQuantizeStage, quantize_mode: int8, calibration_method: entropy}
+  - {type: TensorRTEngineStage, precision: int8, strongly_typed: true}
+  - type: RuntimeParityStage
+    artifact_kind: tensorrt_engine
+    runtime: {type: TensorRTSession}
+    atol: 1.0e-1
+    min_cosine: 0.99

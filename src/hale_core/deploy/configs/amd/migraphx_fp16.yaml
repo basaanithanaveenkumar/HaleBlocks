@@ -1,0 +1,16 @@
+# AMD Instinct / Radeon (ROCm 7.x): ONNX -> MIGraphX program, FP16, ahead-of-time compiled.
+_base_: [../_base_/default.yaml, ../devices/amd_instinct.yaml]
+pipeline:
+  - {type: OnnxExportStage, opset: 18, exporter: auto}
+  - {type: OnnxSimplifyStage}
+  - type: RuntimeParityStage
+    artifact_kind: onnx
+    runtime: {type: OnnxRuntimeSession, providers: [CPUExecutionProvider]}
+    corners: [min, opt, max]
+  - {type: MIGraphXCompileStage, precision: fp16, shape: opt}
+  - type: RuntimeParityStage
+    artifact_kind: migraphx_program
+    runtime: {type: MIGraphXSession}
+    corners: [opt]
+    atol: 5.0e-2
+    min_cosine: 0.999

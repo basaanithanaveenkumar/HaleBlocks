@@ -1,0 +1,16 @@
+# FP8 (Hopper H100/H200, Ada L40S / RTX 40, Blackwell) via ModelOpt Q/DQ.
+_base_: ./tensorrt_int8_modelopt.yaml
+pipeline:
+  - {type: OnnxExportStage, opset: 18, exporter: auto}
+  - {type: OnnxSimplifyStage}
+  - type: RuntimeParityStage
+    artifact_kind: onnx
+    runtime: {type: OnnxRuntimeSession, providers: [CPUExecutionProvider]}
+    corners: [min, opt, max]
+  - {type: ModelOptQuantizeStage, quantize_mode: fp8, calibration_method: max}
+  - {type: TensorRTEngineStage, precision: fp8, strongly_typed: true}
+  - type: RuntimeParityStage
+    artifact_kind: tensorrt_engine
+    runtime: {type: TensorRTSession}
+    atol: 1.0e-1
+    min_cosine: 0.99

@@ -1,0 +1,17 @@
+# Windows on Snapdragon (X Elite): ONNX for ONNX Runtime's QNN EP, compiled + profiled on AI Hub.
+_base_: [../_base_/default.yaml, ../devices/qualcomm_snapdragon_x_elite.yaml]
+pipeline:
+  - {type: OnnxExportStage, opset: 18, exporter: auto}
+  - {type: OnnxSimplifyStage}
+  - type: RuntimeParityStage
+    artifact_kind: onnx
+    runtime: {type: OnnxRuntimeSession, providers: [CPUExecutionProvider]}
+    corners: [min, opt, max]
+  - type: QAIHubCompileStage
+    device: Snapdragon X Elite CRD
+    source: onnx
+    target_runtime: onnx
+    compute_unit: npu
+  - type: OnnxRuntimePackageStage
+    providers: [QNNExecutionProvider, CPUExecutionProvider]
+    provider_options: [{backend_path: QnnHtp.dll, htp_performance_mode: burst}, {}]

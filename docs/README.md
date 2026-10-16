@@ -10,6 +10,7 @@ and streaming data registries, shared by the Hale projects.
 | [Components](components.md) | attention, FFN, norms, stacks, backbones, losses, optimisers |
 | [Configuration](configuration.md) | `RunConfig` sections and `ModelConfig` fields |
 | [Data](data.md) | SmolLM2 LLM registry, VLM registry and media cache |
+| [Deployment](deployment.md) | export pipelines to NVIDIA TensorRT / TensorRT-LLM / Jetson, Apple MLX, AMD MIGraphX / Ryzen AI, Qualcomm AI Hub / ExecuTorch |
 | [Blog](blog/README.md) | long-form posts |
 
 Also: the [paper](../paper/main.tex) and the [project page](../project-page/index.html).

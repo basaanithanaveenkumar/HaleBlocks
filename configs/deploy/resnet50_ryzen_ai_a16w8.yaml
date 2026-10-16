@@ -1,0 +1,4 @@
+# resnet50_ryzen_ai_a16w8: HaleBlocks resnet50 on amd/ryzen_ai_npu_a16w8.
+_base_:
+  - pkg://hale_core.deploy/configs/amd/ryzen_ai_npu_a16w8.yaml
+  - ./_shared/resnet50_adapter.yaml
