@@ -37,7 +37,9 @@ enabled_on_cpu: whether to use autocast on CPU (only bf16 is supported on CPU)
 """
 
 from __future__ import annotations
+
 from typing import Literal
+
 from hale_core.config.sections.common import StrictModel
 
 

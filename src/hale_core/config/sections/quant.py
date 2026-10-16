@@ -84,8 +84,11 @@ sample_seq_len    : sequence length used to build the dummy export input
 """
 
 from __future__ import annotations
+
 from typing import Literal
+
 from pydantic import Field
+
 from hale_core.config.sections.common import StrictModel
 
 

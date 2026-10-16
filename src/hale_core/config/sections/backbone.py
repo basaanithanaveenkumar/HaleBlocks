@@ -32,10 +32,6 @@ The backbone is built at model construction time:
 
 from __future__ import annotations
 
-from typing import Optional
-
-from pydantic import Field
-
 from hale_core.config.sections.common import StrictModel
 
 
@@ -83,10 +79,10 @@ class BackboneConfig(StrictModel):
     img_size:           int             = 224
     in_chans:           int             = 3
     drop_rate:          float           = 0.0
-    out_indices:        Optional[list[int]] = None
+    out_indices:        list[int] | None = None
     freeze_encoder:     bool            = False
     freeze_up_to_stage: int             = -1
-    pretrained_path:    Optional[str]   = None
+    pretrained_path:    str | None   = None
 
     def build(self):
         """Convenience: build and return the configured backbone.

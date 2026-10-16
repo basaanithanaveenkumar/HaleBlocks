@@ -2,8 +2,10 @@
 
 from __future__ import annotations
 
+from hale_core.exceptions import HaleCoreError
 
-class DeployError(Exception):
+
+class DeployError(HaleCoreError):
     """Base class of every error raised by :mod:`hale_core.deploy`.
 
     Catching ``DeployError`` lets a caller (CLI, trainer hook, CI job) separate deployment

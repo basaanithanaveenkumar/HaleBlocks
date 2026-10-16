@@ -11,7 +11,7 @@ from loguru import logger
 
 from hale_core.deploy.config.config import Config
 from hale_core.deploy.core.deploy_runner import DeployRunner
-from hale_core.deploy.exceptions import DeployError
+from hale_core.exceptions import HaleCoreError
 
 
 class DeployCLI:
@@ -54,7 +54,7 @@ class DeployCLI:
         logger.add(sys.stderr, level=args.log_level)
         try:
             return getattr(self, f"cmd_{args.command}")(args)
-        except DeployError as exc:
+        except HaleCoreError as exc:
             logger.error("{}", exc)
             from hale_core.deploy.exceptions import ConfigError, RegistryError
 

@@ -12,7 +12,8 @@ from hale_core.deploy.core.export_context import ExportContext
 from hale_core.deploy.core.pipeline_report import PipelineReport
 from hale_core.deploy.core.stage import TORCH_MODULE, Stage
 from hale_core.deploy.core.stage_result import StageResult
-from hale_core.deploy.exceptions import DeployError, PipelineError, StageError
+from hale_core.deploy.exceptions import PipelineError, StageError
+from hale_core.exceptions import HaleCoreError
 
 
 class Pipeline:
@@ -94,7 +95,7 @@ class Pipeline:
         start = time.perf_counter()
         try:
             artifacts = stage.run(ctx)
-        except DeployError as exc:
+        except HaleCoreError as exc:
             logger.error("{} failed: {}", stage.name, exc)
             return StageResult(
                 stage.name, kind, "failed", time.perf_counter() - start, message=str(exc)

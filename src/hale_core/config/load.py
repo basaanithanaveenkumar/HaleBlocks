@@ -5,32 +5,31 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
-import yaml
 from loguru import logger
 from pydantic import BaseModel
 
-from hale_core.config.merge import deep_merge
+from hale_core.config.config_loader import ConfigLoader
 from hale_core.config.run import RunConfig
 from hale_core.registry.plugins import get_config_schema
 
 
 def load_yaml_tree(path: str | Path) -> dict[str, Any]:
+    """Load ``path`` with its whole ``inherits:`` / ``_base_`` chain merged in.
+
+    Delegates to :class:`ConfigLoader`, so inheritance can be any depth, may list several
+    bases, may use ``pkg://`` references and ``_delete_`` replacement, and cycles raise
+    :class:`~hale_core.exceptions.ConfigError` instead of recursing forever.
+
+    Raises:
+        FileNotFoundError: if ``path`` does not exist (kept for existing callers).
+        ConfigError: for unreadable files or cyclic inheritance.
+    """
     path = Path(path).resolve()
     logger.debug("loading config from {}", path)
     if not path.exists():
         logger.error("config file not found: {}", path)
         raise FileNotFoundError(path)
-    raw = yaml.safe_load(path.read_text()) or {}
-    if "inherits" in raw:
-        parent = (path.parent / raw["inherits"]).resolve()
-        logger.debug("inheriting from {}", parent)
-        parent_raw = yaml.safe_load(parent.read_text()) or {}
-        if "inherits" in parent_raw:
-            grand = (parent.parent / parent_raw["inherits"]).resolve()
-            grand_raw = yaml.safe_load(grand.read_text()) or {}
-            parent_raw = deep_merge(grand_raw, parent_raw)
-        raw = deep_merge(parent_raw, raw)
-    return raw
+    return ConfigLoader().load(path)
 
 
 def validate_config[T: BaseModel](raw: dict[str, Any], schema: type[T]) -> T:

@@ -2,15 +2,19 @@
 
 .. code-block:: text
 
-    DeployError
-    ├── ConfigError
-    ├── RegistryError (also KeyError)
-    ├── MissingDependencyError (also ImportError)
-    ├── PipelineError
-    ├── StageError
-    ├── CommandError
-    ├── ConversionError
-    └── ParityError
+    HaleCoreError                       (hale_core.exceptions)
+    ├── ConfigError                     shared: config loading is not deploy-only
+    ├── RegistryError                   shared: the registry is not deploy-only
+    ├── MissingDependencyError          shared
+    └── DeployError
+        ├── PipelineError
+        ├── StageError
+        ├── CommandError
+        ├── ConversionError
+        └── ParityError
+
+Catch :class:`hale_core.exceptions.HaleCoreError` to handle every expected failure of a
+deployment run (the CLI does).
 """
 
 from hale_core.deploy.exceptions.command_error import CommandError

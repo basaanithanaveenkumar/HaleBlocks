@@ -6,9 +6,9 @@ from pydantic import Field
 
 from hale_core.config.sections.amp import AMPConfig
 from hale_core.config.sections.common import StrictModel
-from hale_core.config.sections.ray import RayConfig
 from hale_core.config.sections.pruning import PruningConfig
 from hale_core.config.sections.quant import ExportConfig, QuantConfig
+from hale_core.config.sections.ray import RayConfig
 from hale_core.config.sections.schedule import SchedulerConfig
 
 

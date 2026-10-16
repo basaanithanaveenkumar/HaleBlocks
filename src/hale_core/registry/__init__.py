@@ -1,7 +1,9 @@
 """Decorator-based plugin registries.
 
-Two registry primitives:
-  - ``NamedRegistry``: one name → one object
+Registry primitives:
+  - ``Registry``: mmdet-style name → class table with ``register_module``, ``build(cfg)``,
+    parent/child scopes (the canonical implementation; downstream packages build on it)
+  - ``NamedRegistry``: ``Registry`` with the original ``add``/``items`` interface
   - ``VariantRegistry``: one name → many objects, resolved by training variant
 
 Registries exposed here:
@@ -17,6 +19,7 @@ Config-driven builders (from registry.nn):
 """
 
 from hale_core.registry.base import NamedRegistry
+from hale_core.registry.registry import Registry, build_from_cfg
 from hale_core.registry.plugins import (
     # Registries
     BLOCKS,
@@ -157,6 +160,8 @@ def list_vision_backbones_by_family() -> dict[str, list[str]]:
 
 
 __all__ = [
+    "Registry",
+    "build_from_cfg",
     # Primitives
     "NamedRegistry",
     "VariantRegistry",

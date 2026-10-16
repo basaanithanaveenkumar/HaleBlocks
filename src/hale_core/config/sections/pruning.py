@@ -55,8 +55,11 @@ exclude_patterns  : list of parameter name substrings to skip (e.g. "embedding")
 """
 
 from __future__ import annotations
+
 from typing import Literal
+
 from pydantic import Field
+
 from hale_core.config.sections.common import StrictModel
 
 

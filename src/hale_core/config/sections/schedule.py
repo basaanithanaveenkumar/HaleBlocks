@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Literal
 
-from pydantic import Field, model_validator
+from pydantic import model_validator
 
 from hale_core.config.sections.common import StrictModel
 
