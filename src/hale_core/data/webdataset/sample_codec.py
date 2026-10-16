@@ -75,10 +75,17 @@ class SampleCodec:
         # Before the str / JSON checks: a StrEnum or IntEnum is also a str / int.
         if isinstance(node, enum.Enum):
             cls = type(node)
-            return {"kind": "enum", "class": f"{cls.__module__}:{cls.__qualname__}", "name": node.name}
+            return {
+                "kind": "enum",
+                "class": f"{cls.__module__}:{cls.__qualname__}",
+                "name": node.name,
+            }
         if isinstance(node, PurePath):
-            return {"kind": "path", "class": f"{type(node).__module__}:{type(node).__qualname__}",
-                    "value": str(node)}
+            return {
+                "kind": "path",
+                "class": f"{type(node).__module__}:{type(node).__qualname__}",
+                "value": str(node),
+            }
         if dataclasses.is_dataclass(node) and not isinstance(node, type):
             cls = type(node)
             fields = {f.name: getattr(node, f.name) for f in dataclasses.fields(node)}

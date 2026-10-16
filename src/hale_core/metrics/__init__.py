@@ -22,7 +22,6 @@ LinearProbeMetric     — linear separability of features (sklearn probe)
 RetrievalMetric       — nearest-neighbour retrieval R@1, R@5, R@10
 """
 
-from hale_core.metrics.base import BaseMetric
 from hale_core.metrics.backbone import (
     FeatureIsotropyMetric,
     FeatureRankMetric,
@@ -30,6 +29,7 @@ from hale_core.metrics.backbone import (
     StageActivationMetric,
     ThroughputMetric,
 )
+from hale_core.metrics.base import BaseMetric
 from hale_core.metrics.vision import (
     LinearProbeMetric,
     RetrievalMetric,

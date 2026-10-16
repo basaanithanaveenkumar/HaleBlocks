@@ -107,23 +107,27 @@ from hale_core.registry.nn import (  # noqa: E402
 def get_attention_registry():
     """Return the ``ATTENTION`` NamedRegistry from :mod:`hale_core.nn.layers.attention`."""
     from hale_core.nn.layers.attention.factory import ATTENTION
+
     return ATTENTION
 
 
 def get_ffn_registry():
     """Return the ``FFN`` NamedRegistry from :mod:`hale_core.nn.layers.ffn`."""
     from hale_core.nn.layers.ffn.factory import FFN
+
     return FFN
 
 
 def get_backbone_registry():
     """Return the ``BACKBONES`` NamedRegistry from :mod:`hale_core.nn.backbones`."""
     from hale_core.nn.backbones.factory import BACKBONES
+
     return BACKBONES
 
 
 # ── Vision backbone public surface ────────────────────────────────────────────
 # These are the production entry points used by Hale-VLM, HALE-WAM, Halos-lift.
+
 
 def build_vision_backbone(name: str, **kwargs):
     """Build a registered vision backbone by name.
@@ -144,18 +148,21 @@ def build_vision_backbone(name: str, **kwargs):
         out = backbone(images)   # BackboneOutput
     """
     from hale_core.nn.vision.registry import build_vision_backbone as _build
+
     return _build(name, **kwargs)
 
 
 def list_vision_backbones() -> list[str]:
     """Return all registered vision backbone names."""
     from hale_core.nn.vision.registry import list_vision_backbones as _list
+
     return _list()
 
 
 def list_vision_backbones_by_family() -> dict[str, list[str]]:
     """Return registered backbones grouped by family prefix."""
     from hale_core.nn.vision.registry import list_vision_backbones_by_family as _list
+
     return _list()
 
 

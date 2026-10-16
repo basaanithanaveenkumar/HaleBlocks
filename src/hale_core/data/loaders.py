@@ -17,9 +17,11 @@ if TYPE_CHECKING:
 # Collators
 # ---------------------------------------------------------------------------
 
+
 def _default_collate(batch: list) -> Any:
     """PyTorch's default collate (torch.utils.data.default_collate)."""
     from torch.utils.data.dataloader import default_collate
+
     return default_collate(batch)
 
 
@@ -44,6 +46,7 @@ def _pad_sequence_collate(batch: list) -> Any:
 # (signature: factory(dataset, cfg: DataLoaderConfig, batch_size: int, **kwargs))
 # ---------------------------------------------------------------------------
 
+
 def _default_dataloader(
     dataset: Dataset,
     cfg: DataLoaderConfig,
@@ -56,11 +59,11 @@ def _default_dataloader(
     from torch.utils.data.distributed import DistributedSampler
 
     loader_kwargs: dict[str, Any] = {
-        "batch_size":         batch_size,
-        "num_workers":        cfg.num_workers,
-        "pin_memory":         cfg.pin_memory,
+        "batch_size": batch_size,
+        "num_workers": cfg.num_workers,
+        "pin_memory": cfg.pin_memory,
         "persistent_workers": cfg.persistent_workers and cfg.num_workers > 0,
-        "drop_last":          cfg.drop_last,
+        "drop_last": cfg.drop_last,
     }
     if isinstance(dataset, IterableDataset):
         # Streams (e.g. WebDataset) shuffle and split across ranks / workers themselves;
@@ -86,12 +89,13 @@ def _default_dataloader(
 # Registration (side-effect on import)
 # ---------------------------------------------------------------------------
 
+
 def _register_loaders() -> None:
     from hale_core.registry.plugins import COLLATORS_REGISTRY, DATALOADERS_REGISTRY
 
     if "default" not in COLLATORS_REGISTRY:
-        COLLATORS_REGISTRY.add("default",       _default_collate)
-        COLLATORS_REGISTRY.add("pad_sequence",  _pad_sequence_collate)
+        COLLATORS_REGISTRY.add("default", _default_collate)
+        COLLATORS_REGISTRY.add("pad_sequence", _pad_sequence_collate)
 
     if "default" not in DATALOADERS_REGISTRY:
         DATALOADERS_REGISTRY.add("default", _default_dataloader)

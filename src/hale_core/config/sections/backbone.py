@@ -75,14 +75,14 @@ class BackboneConfig(StrictModel):
         Keys are matched by name; missing/extra keys are logged and ignored.
     """
 
-    name:               str             = "convnext_base"
-    img_size:           int             = 224
-    in_chans:           int             = 3
-    drop_rate:          float           = 0.0
-    out_indices:        list[int] | None = None
-    freeze_encoder:     bool            = False
-    freeze_up_to_stage: int             = -1
-    pretrained_path:    str | None   = None
+    name: str = "convnext_base"
+    img_size: int = 224
+    in_chans: int = 3
+    drop_rate: float = 0.0
+    out_indices: list[int] | None = None
+    freeze_encoder: bool = False
+    freeze_up_to_stage: int = -1
+    pretrained_path: str | None = None
 
     def build(self):
         """Convenience: build and return the configured backbone.
@@ -91,6 +91,7 @@ class BackboneConfig(StrictModel):
             BaseVisionBackbone instance.
         """
         from hale_core.registry import build_vision_backbone
+
         backbone = build_vision_backbone(
             self.name,
             img_size=self.img_size,
@@ -117,6 +118,7 @@ def _load_pretrained(backbone, path: str) -> None:
     if path.endswith(".safetensors"):
         try:
             from safetensors.torch import load_file
+
             state_dict = load_file(path)
         except ImportError:
             logger.warning("safetensors not installed; falling back to torch.load")
@@ -133,11 +135,13 @@ def _load_pretrained(backbone, path: str) -> None:
     if result.missing_keys:
         logger.warning(
             "BackboneConfig: {} missing keys when loading from {}",
-            len(result.missing_keys), path,
+            len(result.missing_keys),
+            path,
         )
     if result.unexpected_keys:
         logger.warning(
             "BackboneConfig: {} unexpected keys when loading from {}",
-            len(result.unexpected_keys), path,
+            len(result.unexpected_keys),
+            path,
         )
     logger.info("BackboneConfig: loaded weights from {}", path)

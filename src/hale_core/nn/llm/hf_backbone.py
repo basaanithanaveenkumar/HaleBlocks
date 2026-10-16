@@ -77,8 +77,13 @@ class HFCausalLMBackbone(LanguageBackbone):
             model = loader(repo, dtype=DTYPES[dtype], **kwargs)
         except TypeError:
             model = loader(repo, torch_dtype=DTYPES[dtype], **kwargs)
-        logger.info("llm backbone {} loaded from {} ({}{})", spec.name, repo, dtype,
-                    ", text tower of a multimodal checkpoint" if spec.is_multimodal_checkpoint else "")
+        logger.info(
+            "llm backbone {} loaded from {} ({}{})",
+            spec.name,
+            repo,
+            dtype,
+            ", text tower of a multimodal checkpoint" if spec.is_multimodal_checkpoint else "",
+        )
         return cls(spec, model, tokenizer)
 
     # ------------------------------------------------------------------ geometry
@@ -130,7 +135,9 @@ class HFCausalLMBackbone(LanguageBackbone):
         padding id; those positions hold spliced embeddings whose identity is not a text token.
         """
         pad = self.tokenizer.pad_token_id or 0
-        ids = torch.where(token_ids < self.per_layer_vocab, token_ids, torch.full_like(token_ids, pad))
+        ids = torch.where(
+            token_ids < self.per_layer_vocab, token_ids, torch.full_like(token_ids, pad)
+        )
         return self.base.get_decoder().get_per_layer_inputs(ids, None)
 
     def generate(self, **kwargs: Any) -> Tensor:
@@ -151,8 +158,14 @@ class HFCausalLMBackbone(LanguageBackbone):
 
         self.model = get_peft_model(
             self.model,
-            LoraConfig(r=r, lora_alpha=alpha, lora_dropout=dropout, target_modules=list(targets),
-                       task_type="CAUSAL_LM", bias="none"),
+            LoraConfig(
+                r=r,
+                lora_alpha=alpha,
+                lora_dropout=dropout,
+                target_modules=list(targets),
+                task_type="CAUSAL_LM",
+                bias="none",
+            ),
         )
 
     def embedding_parameters(self) -> list[nn.Parameter]:

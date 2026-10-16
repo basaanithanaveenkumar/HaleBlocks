@@ -120,7 +120,11 @@ def export_mlx(
     # ── Step 2: quantise if requested ────────────────────────────────────────
     bits = cfg.mlx_quantize_bits
     if bits in (4, 8):
-        logger.info("MLX export: applying {}bit groupwise quantization (group_size={})", bits, cfg.mlx_group_size)
+        logger.info(
+            "MLX export: applying {}bit groupwise quantization (group_size={})",
+            bits,
+            cfg.mlx_group_size,
+        )
         state = _quantize_state_dict(state, bits=bits, group_size=cfg.mlx_group_size)
     else:
         # 16-bit: convert to bf16 (MLX uses bf16 natively)
@@ -130,7 +134,9 @@ def export_mlx(
     # ── Step 3: save safetensors ──────────────────────────────────────────────
     weights_path = str(out_dir / "weights.safetensors")
     _save_safetensors(state, weights_path)
-    logger.info("MLX weights saved: {} ({:.1f} MB)", weights_path, os.path.getsize(weights_path) / 1e6)
+    logger.info(
+        "MLX weights saved: {} ({:.1f} MB)", weights_path, os.path.getsize(weights_path) / 1e6
+    )
 
     # ── Step 4: write config.json ─────────────────────────────────────────────
     config_path = str(out_dir / "config.json")
@@ -149,6 +155,7 @@ def export_mlx(
 
 
 # ── Internal helpers ──────────────────────────────────────────────────────────
+
 
 def _collect_state_dict(model: nn.Module) -> dict[str, torch.Tensor]:
     """Extract float tensors from model state_dict, skipping non-float buffers."""
@@ -189,9 +196,9 @@ def _quantize_state_dict(
         # Skip biases, norms, embeddings
         if tensor.ndim == 2 and "weight" in key and "norm" not in key and "embed" not in key:
             q_weights, scales, zeros = _groupwise_quantize(tensor, bits=bits, group_size=group_size)
-            out[key]            = q_weights   # int8/uint8 packed values
-            out[key + "_scales"] = scales      # (out, n_groups) float32
-            out[key + "_zeros"]  = zeros       # (out, n_groups) float32
+            out[key] = q_weights  # int8/uint8 packed values
+            out[key + "_scales"] = scales  # (out, n_groups) float32
+            out[key + "_zeros"] = zeros  # (out, n_groups) float32
         else:
             out[key] = tensor.to(torch.bfloat16)
 
@@ -219,7 +226,7 @@ def _groupwise_quantize(
     Note: 4-bit values are packed as uint8 (two 4-bit values per byte)
           but stored unpacked here for simplicity; mlx-lm handles packing.
     """
-    max_val = (1 << bits) - 1   # 255 for 8-bit, 15 for 4-bit
+    max_val = (1 << bits) - 1  # 255 for 8-bit, 15 for 4-bit
     out_features, in_features = weight.shape
 
     # Pad in_features to a multiple of group_size
@@ -232,16 +239,16 @@ def _groupwise_quantize(
     w = weight.reshape(out_features, n_groups, group_size)
 
     # Per-group min/max for asymmetric quantization
-    w_min = w.min(dim=-1).values     # (out, n_groups)
-    w_max = w.max(dim=-1).values     # (out, n_groups)
+    w_min = w.min(dim=-1).values  # (out, n_groups)
+    w_max = w.max(dim=-1).values  # (out, n_groups)
 
     # Scale: maps [w_min, w_max] → [0, max_val]
-    scales = (w_max - w_min) / max_val           # (out, n_groups)
-    scales = scales.clamp(min=1e-8)              # avoid div-by-zero
-    zeros  = w_min / scales                       # offset
+    scales = (w_max - w_min) / max_val  # (out, n_groups)
+    scales = scales.clamp(min=1e-8)  # avoid div-by-zero
+    zeros = w_min / scales  # offset
 
     # Quantize: w_q = round((w - w_min) / scale)
-    w_min_exp  = w_min.unsqueeze(-1)              # (out, n_groups, 1)
+    w_min_exp = w_min.unsqueeze(-1)  # (out, n_groups, 1)
     scales_exp = scales.unsqueeze(-1)
     w_q = ((w - w_min_exp) / scales_exp).round().clamp(0, max_val).to(torch.uint8)
 
@@ -261,6 +268,7 @@ def _save_safetensors(state: dict[str, torch.Tensor], path: str) -> None:
     """
     try:
         from safetensors.torch import save_file
+
         # safetensors requires contiguous tensors
         contiguous = {k: v.contiguous() for k, v in state.items()}
         save_file(contiguous, path)
@@ -276,9 +284,11 @@ def _write_config(path: str, model_config: dict | None, cfg: ExportConfig) -> No
     mlx_config = {
         **base_config,
         "quantization": {
-            "bits":        cfg.mlx_quantize_bits,
-            "group_size":  cfg.mlx_group_size,
-        } if cfg.mlx_quantize_bits < 16 else None,
+            "bits": cfg.mlx_quantize_bits,
+            "group_size": cfg.mlx_group_size,
+        }
+        if cfg.mlx_quantize_bits < 16
+        else None,
         "model_type": base_config.get("model_type", "hale"),
     }
     # Remove None keys

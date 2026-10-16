@@ -13,6 +13,7 @@ from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
     import torch.optim as optim
+
     from hale_core.config.sections.schedule import SchedulerConfig
 
 
@@ -22,6 +23,7 @@ def _constant(
     total_steps: int,
 ) -> Any:
     from torch.optim.lr_scheduler import ConstantLR
+
     return ConstantLR(optimizer, factor=1.0, total_iters=total_steps)
 
 
@@ -61,9 +63,9 @@ def _warmup_cosine(
     from torch.optim.lr_scheduler import CosineAnnealingLR, LinearLR, SequentialLR
 
     warmup_steps = min(cfg.warmup_steps, total_steps)
-    decay_steps  = max(total_steps - warmup_steps, 1)
-    base_lr      = optimizer.param_groups[0]["lr"]
-    eta_min      = base_lr * cfg.min_lr_ratio
+    decay_steps = max(total_steps - warmup_steps, 1)
+    base_lr = optimizer.param_groups[0]["lr"]
+    eta_min = base_lr * cfg.min_lr_ratio
 
     warmup = LinearLR(
         optimizer,
@@ -97,15 +99,16 @@ def _one_cycle(
 # Registration (side-effect on import)
 # ---------------------------------------------------------------------------
 
+
 def _register_schedulers() -> None:
     from hale_core.registry.plugins import SCHEDULERS_REGISTRY
 
     entries = {
-        "constant":     _constant,
-        "cosine":       _cosine,
-        "linear":       _linear,
+        "constant": _constant,
+        "cosine": _cosine,
+        "linear": _linear,
         "warmup_cosine": _warmup_cosine,
-        "one_cycle":    _one_cycle,
+        "one_cycle": _one_cycle,
     }
     for name, fn in entries.items():
         if name not in SCHEDULERS_REGISTRY:

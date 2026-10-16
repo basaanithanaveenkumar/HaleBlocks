@@ -68,19 +68,32 @@ class HaleSequenceLMBackbone(LanguageBackbone):
         state = torch.load(path, map_location="cpu", weights_only=False)
         variant = state.get("variant")
         if variant in UNSUPPORTED_HALE_VARIANTS:
-            raise ValueError(f"{path}: variant {variant!r} cannot be a backbone - "
-                             f"{UNSUPPORTED_HALE_VARIANTS[variant]}")
+            raise ValueError(
+                f"{path}: variant {variant!r} cannot be a backbone - "
+                f"{UNSUPPORTED_HALE_VARIANTS[variant]}"
+            )
         if variant != spec.model_id:
-            raise ValueError(f"{path} holds variant {variant!r}, but {spec.name} expects {spec.model_id!r}")
+            raise ValueError(
+                f"{path} holds variant {variant!r}, but {spec.name} expects {spec.model_id!r}"
+            )
         config = state["config"]
         overrides = {"tie_embeddings": False} if variant == "mtp" else {}
-        backbone = build_backbone(int(state["vocab_size"]), SimpleNamespace(**config["model"]), **overrides)
-        weights = {k.removeprefix("backbone."): v for k, v in state["model_state_dict"].items()
-                   if k.startswith("backbone.")}  # MTP's extra heads are not part of the backbone
+        backbone = build_backbone(
+            int(state["vocab_size"]), SimpleNamespace(**config["model"]), **overrides
+        )
+        weights = {
+            k.removeprefix("backbone."): v
+            for k, v in state["model_state_dict"].items()
+            if k.startswith("backbone.")
+        }  # MTP's extra heads are not part of the backbone
         backbone.load_state_dict(weights)
         tokenizer = AutoTokenizer.from_pretrained(config["data"]["tokenizer_name"])
-        logger.info("llm backbone {} loaded from {} ({} params)", spec.name, path,
-                    sum(p.numel() for p in backbone.parameters()))
+        logger.info(
+            "llm backbone {} loaded from {} ({} params)",
+            spec.name,
+            path,
+            sum(p.numel() for p in backbone.parameters()),
+        )
         return cls(spec, backbone.to(DTYPES[dtype]), tokenizer)
 
     # ------------------------------------------------------------------ geometry
@@ -117,7 +130,9 @@ class HaleSequenceLMBackbone(LanguageBackbone):
         bb = self.backbone
         length = inputs_embeds.size(1)
         if length > bb.max_length:
-            raise ValueError(f"sequence of {length} tokens exceeds the backbone's max_length {bb.max_length}")
+            raise ValueError(
+                f"sequence of {length} tokens exceeds the backbone's max_length {bb.max_length}"
+            )
         hidden = inputs_embeds if bb.pos_emb is None else inputs_embeds + bb.pos_emb[:, :length]
         device = inputs_embeds.device
         causal = build_attn_mask(bb.attn_type, length, device, block_size=bb.block_size)
@@ -136,7 +151,9 @@ class HaleSequenceLMBackbone(LanguageBackbone):
         with torch.no_grad():
             bb.token_emb.weight.copy_(self._grown_rows(old.detach(), num_tokens))
         head = bb.lm_head
-        new_head = nn.Linear(head.in_features, num_tokens, bias=False, device=old.device, dtype=old.dtype)
+        new_head = nn.Linear(
+            head.in_features, num_tokens, bias=False, device=old.device, dtype=old.dtype
+        )
         if tied:
             new_head.weight = bb.token_emb.weight
         else:
@@ -150,7 +167,11 @@ class HaleSequenceLMBackbone(LanguageBackbone):
         names = []
         for name, module in self.backbone.named_modules():
             leaf = name.split(".")
-            if isinstance(module, nn.Linear) and ".layers." in f".{name}" and not set(leaf) & set(_NO_LORA):
+            if (
+                isinstance(module, nn.Linear)
+                and ".layers." in f".{name}"
+                and not set(leaf) & set(_NO_LORA)
+            ):
                 names.append(f"backbone.{name}")
         return names
 
@@ -159,7 +180,13 @@ class HaleSequenceLMBackbone(LanguageBackbone):
 
         self.requires_grad_(False)
         inject_adapter_in_model(
-            LoraConfig(r=r, lora_alpha=alpha, lora_dropout=dropout, target_modules=list(targets), bias="none"),
+            LoraConfig(
+                r=r,
+                lora_alpha=alpha,
+                lora_dropout=dropout,
+                target_modules=list(targets),
+                bias="none",
+            ),
             self,
         )
         for name, param in self.named_parameters():

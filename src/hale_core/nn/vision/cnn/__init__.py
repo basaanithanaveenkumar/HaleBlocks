@@ -68,24 +68,26 @@ making the following backbones available in the global vision registry:
 
 # Import all backbone modules so their @register_vision_backbone decorators run.
 # Each import is intentional — do not remove.
-from hale_core.nn.vision.cnn import alexnet        # noqa: F401
-from hale_core.nn.vision.cnn import convnext       # noqa: F401
-from hale_core.nn.vision.cnn import convnext_v1    # noqa: F401
-from hale_core.nn.vision.cnn import densenet       # noqa: F401
-from hale_core.nn.vision.cnn import efficientnet   # noqa: F401
-from hale_core.nn.vision.cnn import efficientnet_b # noqa: F401
-from hale_core.nn.vision.cnn import inception      # noqa: F401
-from hale_core.nn.vision.cnn import internimage    # noqa: F401
-from hale_core.nn.vision.cnn import mobile_one     # noqa: F401
-from hale_core.nn.vision.cnn import mobilenet_v1   # noqa: F401
-from hale_core.nn.vision.cnn import nfnet          # noqa: F401
-from hale_core.nn.vision.cnn import regnet         # noqa: F401
-from hale_core.nn.vision.cnn import resnest        # noqa: F401
-from hale_core.nn.vision.cnn import resnet         # noqa: F401
-from hale_core.nn.vision.cnn import resnet_dcn     # noqa: F401
-from hale_core.nn.vision.cnn import resnext        # noqa: F401
-from hale_core.nn.vision.cnn import senet          # noqa: F401
-from hale_core.nn.vision.cnn import vgg            # noqa: F401
+from hale_core.nn.vision.cnn import (
+    alexnet,  # noqa: F401
+    convnext,  # noqa: F401
+    convnext_v1,  # noqa: F401
+    densenet,  # noqa: F401
+    efficientnet,  # noqa: F401
+    efficientnet_b,  # noqa: F401
+    inception,  # noqa: F401
+    internimage,  # noqa: F401
+    mobile_one,  # noqa: F401
+    mobilenet_v1,  # noqa: F401
+    nfnet,  # noqa: F401
+    regnet,  # noqa: F401
+    resnest,  # noqa: F401
+    resnet,  # noqa: F401
+    resnet_dcn,  # noqa: F401
+    resnext,  # noqa: F401
+    senet,  # noqa: F401
+    vgg,  # noqa: F401
+)
 
 __all__ = [
     "alexnet",

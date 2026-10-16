@@ -16,9 +16,11 @@ The registry's _ensure_backbones_imported() calls this package to trigger
 registration; direct imports also work.
 """
 
-from hale_core.nn.vision.vit import vit    # noqa: F401 — registers vit_tiny/small/base/large/huge/22b
-from hale_core.nn.vision.vit import dino   # noqa: F401 — registers dino_vit_small/base/large/giant
-from hale_core.nn.vision.vit import eva    # noqa: F401 — registers eva_02_small/base/large
-from hale_core.nn.vision.vit import deit3  # noqa: F401 — registers deit3_small/base/large/huge
+from hale_core.nn.vision.vit import (
+    deit3,  # noqa: F401 — registers deit3_small/base/large/huge
+    dino,  # noqa: F401 — registers dino_vit_small/base/large/giant
+    eva,  # noqa: F401 — registers eva_02_small/base/large
+    vit,  # noqa: F401 — registers vit_tiny/small/base/large/huge/22b
+)
 
 __all__ = ["vit", "dino", "eva", "deit3"]

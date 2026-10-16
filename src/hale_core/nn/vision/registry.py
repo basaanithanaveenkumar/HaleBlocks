@@ -75,6 +75,7 @@ def register_vision_backbone(name: str) -> "Callable[[T], T]":
             arch_name = "my_backbone"
             embed_dim = 512
     """
+
     def decorator(cls: T) -> T:
         key = name.lower()
         if key in _VISION_BACKBONES:
@@ -85,6 +86,7 @@ def register_vision_backbone(name: str) -> "Callable[[T], T]":
         _VISION_BACKBONES[key] = cls
         logger.debug("registered vision backbone '{}'", key)
         return cls
+
     return decorator
 
 
@@ -112,10 +114,7 @@ def build_vision_backbone(name: str, **kwargs: Any) -> BaseVisionBackbone:
     key = name.lower()
     if key not in _VISION_BACKBONES:
         available = sorted(_VISION_BACKBONES.keys())
-        raise KeyError(
-            f"Unknown vision backbone '{name}'. "
-            f"Available: {available}"
-        )
+        raise KeyError(f"Unknown vision backbone '{name}'. Available: {available}")
     cls = _VISION_BACKBONES[key]
     return cls(**kwargs)
 
@@ -158,6 +157,7 @@ def list_vision_backbones_by_family() -> dict[str, list[str]]:
 # ── Lazy import trigger ───────────────────────────────────────────────────────
 _imported = False
 
+
 def _ensure_backbones_imported() -> None:
     """Import all backbone sub-packages so their @register decorators run.
 
@@ -171,31 +171,38 @@ def _ensure_backbones_imported() -> None:
 
     # Each import triggers @register_vision_backbone decorators in that module
     # CNN Era (2012–2020)
-    from hale_core.nn.vision.cnn import alexnet        # noqa: F401
-    from hale_core.nn.vision.cnn import vgg            # noqa: F401
-    from hale_core.nn.vision.cnn import inception      # noqa: F401
-    from hale_core.nn.vision.cnn import resnet         # noqa: F401
-    from hale_core.nn.vision.cnn import resnet_dcn     # noqa: F401
-    from hale_core.nn.vision.cnn import resnext        # noqa: F401
-    from hale_core.nn.vision.cnn import densenet       # noqa: F401
-    from hale_core.nn.vision.cnn import mobilenet_v1   # noqa: F401
-    from hale_core.nn.vision.cnn import senet          # noqa: F401
-    from hale_core.nn.vision.cnn import efficientnet_b # noqa: F401
-    from hale_core.nn.vision.cnn import resnest        # noqa: F401
     # Transition Era (2020–2021)
-    from hale_core.nn.vision.cnn import nfnet          # noqa: F401
-    from hale_core.nn.vision.cnn import regnet         # noqa: F401
-    from hale_core.nn.vision.cnn import convnext_v1    # noqa: F401
     # Modern CNN Era
-    from hale_core.nn.vision.cnn import convnext       # noqa: F401
-    from hale_core.nn.vision.cnn import mobile_one     # noqa: F401
-    from hale_core.nn.vision.cnn import efficientnet   # noqa: F401
-    from hale_core.nn.vision.cnn import internimage    # noqa: F401
+    from hale_core.nn.vision.cnn import (
+        alexnet,  # noqa: F401
+        convnext,  # noqa: F401
+        convnext_v1,  # noqa: F401
+        densenet,  # noqa: F401
+        efficientnet,  # noqa: F401
+        efficientnet_b,  # noqa: F401
+        inception,  # noqa: F401
+        internimage,  # noqa: F401
+        mobile_one,  # noqa: F401
+        mobilenet_v1,  # noqa: F401
+        nfnet,  # noqa: F401
+        regnet,  # noqa: F401
+        resnest,  # noqa: F401
+        resnet,  # noqa: F401
+        resnet_dcn,  # noqa: F401
+        resnext,  # noqa: F401
+        senet,  # noqa: F401
+        vgg,  # noqa: F401
+    )
+    from hale_core.nn.vision.hybrid import (
+        coatnet,  # noqa: F401
+        maxvit,  # noqa: F401
+    )
+    from hale_core.nn.vision.swin import swinv2  # noqa: F401
+
     # Transformer Era
-    from hale_core.nn.vision.vit import vit            # noqa: F401
-    from hale_core.nn.vision.vit import dino           # noqa: F401
-    from hale_core.nn.vision.vit import eva            # noqa: F401
-    from hale_core.nn.vision.vit import deit3          # noqa: F401
-    from hale_core.nn.vision.swin import swinv2        # noqa: F401
-    from hale_core.nn.vision.hybrid import coatnet     # noqa: F401
-    from hale_core.nn.vision.hybrid import maxvit      # noqa: F401
+    from hale_core.nn.vision.vit import (
+        deit3,  # noqa: F401
+        dino,  # noqa: F401
+        eva,  # noqa: F401
+        vit,  # noqa: F401
+    )

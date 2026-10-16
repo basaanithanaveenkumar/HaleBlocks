@@ -52,9 +52,8 @@ Export output
 
 from __future__ import annotations
 
-import os
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 import torch
 import torch.nn as nn
@@ -97,9 +96,7 @@ def export_onnx(
     model_cpu = model.cpu().eval()
 
     # Normalise sample_input to a tuple (torch.onnx.export arg)
-    input_tuple, input_names, output_names, dynamic_axes = _prepare_onnx_args(
-        sample_input, cfg
-    )
+    input_tuple, input_names, output_names, dynamic_axes = _prepare_onnx_args(sample_input, cfg)
 
     logger.info(
         "Exporting ONNX: opset={}, dynamic_axes={}, path={}",
@@ -118,7 +115,7 @@ def export_onnx(
             input_names=input_names,
             output_names=output_names,
             dynamic_axes=dynamic_axes if cfg.onnx_dynamic_axes else None,
-            export_params=True,           # embed all weights in the .onnx file
+            export_params=True,  # embed all weights in the .onnx file
             verbose=False,
         )
 
@@ -127,6 +124,7 @@ def export_onnx(
     # Validate the exported graph
     try:
         import onnx
+
         onnx_model = onnx.load(onnx_path)
         onnx.checker.check_model(onnx_model)
         logger.info(
@@ -166,7 +164,7 @@ def _prepare_onnx_args(
         input_names = ["input"]
         input_tuple = (sample_input.cpu(),)
         dynamic_axes = {
-            "input":  {0: "batch_size", 1: "seq_len"},
+            "input": {0: "batch_size", 1: "seq_len"},
             "logits": {0: "batch_size", 1: "seq_len"},
         }
     else:
@@ -189,8 +187,8 @@ def _simplify(onnx_path: str, output_path: str) -> None:
     Falls back gracefully if not installed.
     """
     try:
-        from onnxsim import simplify
         import onnx
+        from onnxsim import simplify
 
         model = onnx.load(onnx_path)
         simplified, ok = simplify(model)

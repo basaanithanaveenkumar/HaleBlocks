@@ -61,7 +61,7 @@ from __future__ import annotations
 
 import os
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 import torch
 from loguru import logger
@@ -171,6 +171,7 @@ def export_tensorrt(
 
 # ── Inference helper ──────────────────────────────────────────────────────────
 
+
 class TRTInferenceSession:
     """Load and run a serialised TensorRT engine.
 
@@ -240,11 +241,12 @@ def _trt_to_torch_dtype(trt_dtype) -> torch.dtype:
     """Map TensorRT dtype enum to torch.dtype."""
     try:
         import tensorrt as trt
+
         mapping = {
             trt.float32: torch.float32,
             trt.float16: torch.float16,
-            trt.int32:   torch.int32,
-            trt.int8:    torch.int8,
+            trt.int32: torch.int32,
+            trt.int8: torch.int8,
         }
         return mapping.get(trt_dtype, torch.float32)
     except Exception:

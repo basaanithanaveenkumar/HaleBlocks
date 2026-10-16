@@ -171,8 +171,7 @@ class QATManager:
         torch.backends.quantized.engine = backend
         if backend != self.cfg.backend:
             logger.warning(
-                "QATManager: backend '{}' not available on this platform; "
-                "falling back to '{}'",
+                "QATManager: backend '{}' not available on this platform; falling back to '{}'",
                 self.cfg.backend,
                 backend,
             )
@@ -260,6 +259,7 @@ class QATManager:
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
 
+
 def _resolve_backend(requested: str) -> str:
     """Return a backend that is actually supported on this platform.
 
@@ -267,7 +267,6 @@ def _resolve_backend(requested: str) -> str:
     qnnpack is available.  Tries the requested backend first; falls back
     to qnnpack if it fails.
     """
-    import platform
     try:
         torch.backends.quantized.engine = requested
         return requested

@@ -17,7 +17,12 @@ from typing import Any
 
 import torch
 from torch import nn
-from transformers import AutoModelForCausalLM, AutoModelForImageTextToText, GenerationMixin, PreTrainedModel
+from transformers import (
+    AutoModelForCausalLM,
+    AutoModelForImageTextToText,
+    GenerationMixin,
+    PreTrainedModel,
+)
 from transformers.modeling_outputs import CausalLMOutputWithPast
 
 # Imported lazily by ``hf_backbone`` (``transformers`` is the optional ``finetune`` extra).
@@ -89,7 +94,9 @@ class TextTowerForCausalLM(PreTrainedModel, GenerationMixin):
         logits = self.lm_head(hidden[:, keep, :])
         loss = None
         if labels is not None:
-            loss = self.loss_function(logits=logits, labels=labels, vocab_size=self.config.vocab_size)
+            loss = self.loss_function(
+                logits=logits, labels=labels, vocab_size=self.config.vocab_size
+            )
         return CausalLMOutputWithPast(
             loss=loss,
             logits=logits,
@@ -121,9 +128,9 @@ def extract_text_tower(full: nn.Module) -> nn.Module:
     try:
         with torch.device("meta"):
             candidate = AutoModelForCausalLM.from_config(text_config)
-        if type(candidate).__name__.endswith("ForCausalLM") and {n for n, _ in candidate.named_children()} == {
-            "model", "lm_head"
-        }:
+        if type(candidate).__name__.endswith("ForCausalLM") and {
+            n for n, _ in candidate.named_children()
+        } == {"model", "lm_head"}:
             candidate.model, candidate.lm_head = decoder, head
             lm = candidate
     except ValueError:  # no *ForCausalLM registered for this text config
@@ -131,7 +138,9 @@ def extract_text_tower(full: nn.Module) -> nn.Module:
     if lm is None:
         lm = TextTowerForCausalLM(text_config, decoder, head)
     if any(t.is_meta for t in (*lm.parameters(), *lm.buffers())):
-        raise RuntimeError(f"text tower of {type(full).__name__} still has uninitialised (meta) tensors")
+        raise RuntimeError(
+            f"text tower of {type(full).__name__} still has uninitialised (meta) tensors"
+        )
     if getattr(full, "generation_config", None) is not None:
         lm.generation_config = full.generation_config
     return lm

@@ -202,6 +202,7 @@ def instantiate_metrics(names: list[str], variant: str) -> list[Any]:
 
 # ── Block ─────────────────────────────────────────────────────────────────────
 
+
 def register_block(name: str) -> Callable[[type[T]], type[T]]:
     """Register a transformer block class under *name*.
 
@@ -210,9 +211,11 @@ def register_block(name: str) -> Callable[[type[T]], type[T]]:
         @register_block("transformer")
         class TransformerLayer(nn.Module): ...
     """
+
     def deco(cls: type[T]) -> type[T]:
         BLOCKS_REGISTRY.add(name, cls)
         return cls
+
     return deco
 
 
@@ -222,6 +225,7 @@ def get_block(name: str) -> type:
 
 # ── Norm ──────────────────────────────────────────────────────────────────────
 
+
 def register_norm(name: str) -> Callable[[type[T]], type[T]]:
     """Register a normalisation layer class under *name*.
 
@@ -230,9 +234,11 @@ def register_norm(name: str) -> Callable[[type[T]], type[T]]:
         @register_norm("rms")
         class RMSNorm(nn.Module): ...
     """
+
     def deco(cls: type[T]) -> type[T]:
         NORMS_REGISTRY.add(name, cls)
         return cls
+
     return deco
 
 
@@ -248,6 +254,7 @@ def build_norm(name: str, d_model: int, **kwargs: Any) -> Any:
 
 # ── Collator ──────────────────────────────────────────────────────────────────
 
+
 def register_collator(name: str) -> Callable[[T], T]:
     """Register a collate function.
 
@@ -256,9 +263,11 @@ def register_collator(name: str) -> Callable[[T], T]:
         @register_collator("pad_sequence")
         def pad_collate(batch): ...
     """
+
     def deco(fn: T) -> T:
         COLLATORS_REGISTRY.add(name, fn)
         return fn
+
     return deco
 
 
@@ -267,6 +276,7 @@ def get_collator(name: str) -> Callable[..., Any]:
 
 
 # ── Dataloader ────────────────────────────────────────────────────────────────
+
 
 def register_dataloader(name: str) -> Callable[[T], T]:
     """Register a DataLoader factory function.
@@ -278,9 +288,11 @@ def register_dataloader(name: str) -> Callable[[T], T]:
         @register_dataloader("default")
         def default_dataloader(dataset, cfg, batch_size): ...
     """
+
     def deco(fn: T) -> T:
         DATALOADERS_REGISTRY.add(name, fn)
         return fn
+
     return deco
 
 
@@ -289,6 +301,7 @@ def get_dataloader_factory(name: str) -> Callable[..., Any]:
 
 
 # ── Scheduler ─────────────────────────────────────────────────────────────────
+
 
 def register_scheduler(name: str) -> Callable[[type[T]], type[T]]:
     """Register an LR-scheduler class or factory under *name*.
@@ -301,9 +314,11 @@ def register_scheduler(name: str) -> Callable[[type[T]], type[T]]:
         @register_scheduler("cosine")
         def cosine_scheduler(optimizer, cfg, total_steps): ...
     """
+
     def deco(fn_or_cls: type[T]) -> type[T]:
         SCHEDULERS_REGISTRY.add(name, fn_or_cls)
         return fn_or_cls
+
     return deco
 
 

@@ -23,14 +23,18 @@ __all__ = ["ExportManager", "export_onnx", "export_tensorrt", "export_mlx"]
 def __getattr__(name: str):
     if name == "ExportManager":
         from hale_core.export.manager import ExportManager
+
         return ExportManager
     if name == "export_onnx":
         from hale_core.export.onnx import export_onnx
+
         return export_onnx
     if name == "export_tensorrt":
         from hale_core.export.tensorrt import export_tensorrt
+
         return export_tensorrt
     if name == "export_mlx":
         from hale_core.export.mlx import export_mlx
+
         return export_mlx
     raise AttributeError(f"module 'hale_core.export' has no attribute {name!r}")

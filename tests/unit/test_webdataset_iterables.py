@@ -97,7 +97,10 @@ def test_mixed_vlm_module_streams_shards_with_flag(tmp_path: Path, monkeypatch) 
         built.append(names)
         return _samples(6)
 
-    monkeypatch.setattr(vlm_loader, "build_vlm_dataloader", fake_build)
+    # MixedVLMDataModule looks the builder up in its own module (one class per file).
+    from hale_core.data.vlm.loader import mixed_vlm_data_module
+
+    monkeypatch.setattr(mixed_vlm_data_module, "build_vlm_dataloader", fake_build)
     plain = vlm_loader.MixedVLMDataModule(dataset_names=["toy"], samples_per_dataset=6, batch_size=3)
     cfg = WebDatasetConfig(enabled=True, root=str(tmp_path), samples_per_shard=2, shuffle=False)
     sharded = vlm_loader.MixedVLMDataModule(

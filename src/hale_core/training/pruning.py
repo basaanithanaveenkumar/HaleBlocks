@@ -81,11 +81,8 @@ Typical usage
 
 from __future__ import annotations
 
-import math
-import re
 from typing import TYPE_CHECKING
 
-import torch
 import torch.nn as nn
 import torch.nn.utils.prune as torch_prune
 from loguru import logger
@@ -292,6 +289,7 @@ class PruningManager:
 
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
+
 
 def _cubic_sparsity(
     step: int,

@@ -24,7 +24,9 @@ def get_llm_backbone_spec(name: str) -> LLMBackboneSpec:
 def list_llm_backbones(source: str | None = None) -> list[str]:
     """Registered names, optionally only ``hf`` or ``hale`` backbones."""
     _ensure_catalog()
-    return sorted(n for n in LLM_BACKBONES if source is None or LLM_BACKBONES.get(n).source == source)
+    return sorted(
+        n for n in LLM_BACKBONES if source is None or LLM_BACKBONES.get(n).source == source
+    )
 
 
 def is_registered(name: str) -> bool:

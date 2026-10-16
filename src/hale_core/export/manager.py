@@ -27,16 +27,15 @@ Typical integration in Trainer.fit():
 
 from __future__ import annotations
 
-from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 import torch
 import torch.nn as nn
 from loguru import logger
 
+from hale_core.export.mlx import export_mlx
 from hale_core.export.onnx import export_onnx
 from hale_core.export.tensorrt import export_tensorrt
-from hale_core.export.mlx import export_mlx
 
 if TYPE_CHECKING:
     from hale_core.config.sections.quant import ExportConfig
@@ -153,9 +152,7 @@ class ExportManager:
 
     # ── Per-target exports ────────────────────────────────────────────────────
 
-    def _export_onnx(
-        self, sample_input: dict[str, torch.Tensor] | torch.Tensor
-    ) -> str:
+    def _export_onnx(self, sample_input: dict[str, torch.Tensor] | torch.Tensor) -> str:
         return export_onnx(
             model=self.model,
             sample_input=sample_input,
@@ -193,12 +190,13 @@ class ExportManager:
         B = self.cfg.sample_batch_size
         S = self.cfg.sample_seq_len
         return {
-            "input_ids":      torch.zeros(B, S, dtype=torch.long),
+            "input_ids": torch.zeros(B, S, dtype=torch.long),
             "attention_mask": torch.ones(B, S, dtype=torch.long),
         }
 
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
+
 
 def _unwrap_model(model: nn.Module) -> nn.Module:
     """Strip DDP/FSDP/DataParallel wrappers so we get the raw module."""
@@ -220,8 +218,8 @@ def _build_trt_profiles(
         shape = tuple(sample_input.shape)
         return {
             "input": (
-                (1, max(1, shape[1] // 2)),    # min
-                shape,                          # opt
+                (1, max(1, shape[1] // 2)),  # min
+                shape,  # opt
                 (shape[0] * 2, shape[1] * 2),  # max
             )
         }

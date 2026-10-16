@@ -39,6 +39,7 @@ if TYPE_CHECKING:
 # Attention
 # ---------------------------------------------------------------------------
 
+
 def build_attention_from_cfg(
     cfg: AttentionConfig,
     *,
@@ -75,6 +76,7 @@ def build_attention_from_cfg(
 # FFN
 # ---------------------------------------------------------------------------
 
+
 def build_ffn_from_cfg(
     cfg: FFNConfig,
     *,
@@ -103,6 +105,7 @@ def build_ffn_from_cfg(
 # ---------------------------------------------------------------------------
 # Norm
 # ---------------------------------------------------------------------------
+
 
 def build_norm_from_cfg(cfg: NormConfig, *, d_model: int) -> nn.Module:
     """Build a registered norm layer from :class:`NormConfig`.
@@ -135,6 +138,7 @@ def build_norm(name: str, d_model: int, **kwargs: Any) -> nn.Module:
 # Block
 # ---------------------------------------------------------------------------
 
+
 def build_block_from_cfg(
     cfg: BlockConfig,
     *,
@@ -161,7 +165,7 @@ def build_block_from_cfg(
         )
     """
     attn = build_attention_from_cfg(cfg.attention, d_model=d_model, n_heads=n_heads)
-    ffn  = build_ffn_from_cfg(cfg.ffn, d_model=d_model, d_ff=d_ff)
+    ffn = build_ffn_from_cfg(cfg.ffn, d_model=d_model, d_ff=d_ff)
 
     block_name = "dit" if cfg.use_time_cond else "transformer"
 
@@ -182,6 +186,7 @@ def build_block_from_cfg(
 # Backbone (from full ModelConfig)
 # ---------------------------------------------------------------------------
 
+
 def build_backbone_from_cfg(vocab_size: int, cfg: ModelConfig) -> nn.Module:
     """Build a registered backbone from :class:`ModelConfig`.
 
@@ -198,12 +203,12 @@ def build_backbone_from_cfg(vocab_size: int, cfg: ModelConfig) -> nn.Module:
 
     # Apply nested block overrides
     if cfg.block is not None:
-        kwargs["attn_impl"]      = cfg.block.attention.impl
-        kwargs["n_kv_heads"]     = cfg.block.attention.n_kv_heads
-        kwargs["qk_norm"]        = cfg.block.attention.qk_norm
-        kwargs["ffn_type"]       = cfg.block.ffn.type
-        kwargs["moe_num_experts"]= cfg.block.ffn.moe_num_experts
-        kwargs["moe_top_k"]      = cfg.block.ffn.moe_top_k
+        kwargs["attn_impl"] = cfg.block.attention.impl
+        kwargs["n_kv_heads"] = cfg.block.attention.n_kv_heads
+        kwargs["qk_norm"] = cfg.block.attention.qk_norm
+        kwargs["ffn_type"] = cfg.block.ffn.type
+        kwargs["moe_num_experts"] = cfg.block.ffn.moe_num_experts
+        kwargs["moe_top_k"] = cfg.block.ffn.moe_top_k
         kwargs["moe_num_shared"] = cfg.block.ffn.moe_num_shared
 
     return build_backbone(vocab_size, **{k: v for k, v in kwargs.items() if k != "vocab_size"})
@@ -212,6 +217,7 @@ def build_backbone_from_cfg(vocab_size: int, cfg: ModelConfig) -> nn.Module:
 # ---------------------------------------------------------------------------
 # Scheduler
 # ---------------------------------------------------------------------------
+
 
 def build_scheduler(
     cfg: SchedulerConfig,
@@ -238,6 +244,7 @@ def build_scheduler(
 # ---------------------------------------------------------------------------
 # DataLoader
 # ---------------------------------------------------------------------------
+
 
 def build_dataloader(
     cfg: DataLoaderConfig,

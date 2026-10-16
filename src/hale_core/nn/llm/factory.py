@@ -77,8 +77,14 @@ def configure_finetuning(backbone: LanguageBackbone, cfg: LLMBackboneConfig) -> 
     if cfg.gradient_checkpointing and hasattr(backbone, "enable_gradient_checkpointing"):
         backbone.enable_gradient_checkpointing()
     trainable, total = backbone.parameter_counts()
-    logger.info("llm backbone {} finetune={} trainable {:,} / {:,} ({:.2%})", cfg.name, cfg.finetune,
-                trainable, total, trainable / max(total, 1))
+    logger.info(
+        "llm backbone {} finetune={} trainable {:,} / {:,} ({:.2%})",
+        cfg.name,
+        cfg.finetune,
+        trainable,
+        total,
+        trainable / max(total, 1),
+    )
     return backbone
 
 

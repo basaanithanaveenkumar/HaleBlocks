@@ -70,7 +70,6 @@ from contextlib import contextmanager
 from typing import TYPE_CHECKING, Generator
 
 import torch
-import torch.nn as nn
 
 if TYPE_CHECKING:
     from hale_core.config.sections.amp import AMPConfig
@@ -246,6 +245,7 @@ class AMPManager:
 
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
+
 
 def _resolve_device_type(device: str | torch.device) -> str:
     """Normalise a device to the 'cuda' / 'cpu' / 'mps' string AMP expects."""
