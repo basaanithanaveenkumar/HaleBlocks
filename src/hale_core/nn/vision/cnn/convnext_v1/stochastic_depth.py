@@ -1,4 +1,6 @@
-"""``StochasticDepth``: Randomly drops the entire block output during training (Huang et al. 2016)."""
+"""``StochasticDepth``: Randomly drops the entire block output during training (Huang et al.
+2016).
+"""
 
 from __future__ import annotations
 

@@ -1,4 +1,6 @@
-"""``FeatureIsotropyMetric``: Measures how isotropic (uniformly spread) the feature distribution is."""
+"""``FeatureIsotropyMetric``: Measures how isotropic (uniformly spread) the feature distribution
+is.
+"""
 
 from __future__ import annotations
 

@@ -50,7 +50,9 @@ class PipelineReport:
             )
 
     def write(self, path: Path | None = None) -> Path:
-        """Write the report as JSON (default: ``report.json`` in the work dir) and return the path."""
+        """Write the report as JSON (default: ``report.json`` in the work dir) and return the
+        path.
+        """
         path = path or self.work_dir / "report.json"
         path.write_text(
             json.dumps({"ok": self.ok, "stages": [r.to_dict() for r in self.results]}, indent=2)

@@ -1,4 +1,6 @@
-"""``LoopInputInjection``: Combine the recurrent state with the loop input ``e`` before each pass."""
+"""``LoopInputInjection``: Combine the recurrent state with the loop input ``e`` before each
+pass.
+"""
 
 from __future__ import annotations
 

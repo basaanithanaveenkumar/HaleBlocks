@@ -38,7 +38,9 @@ from hale_core.training.trainer.evaluator import Evaluator
 
 @register_trainer("default")
 class Trainer:
-    """Variant-agnostic training loop: model, loss, optimizer and schedule come from the registries."""
+    """Variant-agnostic training loop: model, loss, optimizer and schedule come from the
+    registries.
+    """
 
     def __init__(
         self,

@@ -10,7 +10,9 @@ from hale_core.nn.optim.base import BaseOptimizer
 
 
 class AdamWOptimizer(BaseOptimizer):
-    """``torch.optim.AdamW`` (decoupled weight decay) behind the :class:`BaseOptimizer` interface."""
+    """``torch.optim.AdamW`` (decoupled weight decay) behind the :class:`BaseOptimizer`
+    interface.
+    """
 
     def _make_optimizer(self, params: Any, config: dict[str, Any]):
         return torch.optim.AdamW(

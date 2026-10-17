@@ -24,7 +24,9 @@ def sliding_window_mask(
 
 
 def or_masks(*masks: torch.Tensor | None) -> torch.Tensor | None:
-    """Element-wise OR of the given boolean masks, ignoring ``None``; ``None`` if all are ``None``."""
+    """Element-wise OR of the given boolean masks, ignoring ``None``; ``None`` if all are
+    ``None``.
+    """
     out: torch.Tensor | None = None
     for mask in masks:
         if mask is None:
