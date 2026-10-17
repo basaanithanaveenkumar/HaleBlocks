@@ -14,6 +14,7 @@ from hale_core.nn.layers.norm import RMSNorm
 
 
 class GroupedQueryAttention(nn.Module):
+    """Grouped-query attention (GQA/MQA) with optional RoPE and QK-norm."""
     def __init__(
         self,
         d_model: int,

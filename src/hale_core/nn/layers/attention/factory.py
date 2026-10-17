@@ -1,3 +1,5 @@
+"""Attention registry: ``mha``, ``gqa`` and ``mqa`` implementations built by name."""
+
 from __future__ import annotations
 
 from hale_core.nn.layers.attention.grouped import GroupedQueryAttention
@@ -8,6 +10,7 @@ ATTENTION = NamedRegistry("attention")
 
 
 def register_attention(name: str):
+    """Decorator registering an attention implementation under ``name``."""
     def deco(cls):
         ATTENTION.add(name, cls)
         return cls
@@ -31,6 +34,16 @@ def build_attention(
     rotary_dim: int | None = None,
     qk_norm: bool = False,
 ) -> TorchMultiHeadAttention | GroupedQueryAttention:
+    """Build the attention module registered as ``impl``.
+
+    Args:
+        impl: registry key (``mha``, ``gqa``, ``mqa``).
+        d_model: model width.
+        n_heads: query heads.
+        dropout: attention dropout.
+        n_kv_heads: key/value heads for grouped-query attention.
+        rope_theta: RoPE base; ``None`` disables rotary embeddings.
+    """
     extra = {"rope_theta": rope_theta, "rotary_dim": rotary_dim, "qk_norm": qk_norm}
     if impl == "mha":
         return ATTENTION.get("mha")(d_model, n_heads, dropout)

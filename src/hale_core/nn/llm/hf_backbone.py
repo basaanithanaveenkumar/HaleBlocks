@@ -115,14 +115,17 @@ class HFCausalLMBackbone(LanguageBackbone):
 
     @property
     def hidden_size(self) -> int:
+        """Width of the hidden states."""
         return int(self.base.config.hidden_size)
 
     @property
     def vocab_size(self) -> int:
+        """Vocabulary size of the embedding table."""
         return int(self.base.get_input_embeddings().weight.size(0))
 
     # ------------------------------------------------------------------ compute
     def embed_tokens(self, input_ids: Tensor) -> Tensor:
+        """Token embeddings of ``input_ids``."""
         return self.base.get_input_embeddings()(input_ids)
 
     def forward(
@@ -179,14 +182,17 @@ class HFCausalLMBackbone(LanguageBackbone):
 
     # ------------------------------------------------------------------ vocabulary
     def resize_token_embeddings(self, num_tokens: int) -> None:
+        """Resize the embedding table and LM head to ``num_tokens``."""
         # mean_resizing initialises new rows from the old embeddings' distribution.
         self.base.resize_token_embeddings(num_tokens, mean_resizing=True)
 
     # ------------------------------------------------------------------ fine-tuning
     def default_lora_targets(self) -> list[str]:
+        """Module names LoRA adapts by default for this model family."""
         return list(self.spec.lora_targets)
 
     def apply_lora(self, r: int, alpha: int, dropout: float, targets: Sequence[str]) -> None:
+        """Wrap ``targets`` with PEFT LoRA adapters of rank ``r`` and freeze the base model."""
         from peft import LoraConfig, get_peft_model  # lazy: optional dependency
 
         self.model = get_peft_model(
@@ -202,6 +208,7 @@ class HFCausalLMBackbone(LanguageBackbone):
         )
 
     def embedding_parameters(self) -> list[nn.Parameter]:
+        """Input/output embedding parameters (kept trainable when new tokens are added)."""
         params = [self.base.get_input_embeddings().weight]
         head = self.base.get_output_embeddings()
         if head is not None and head.weight is not params[0]:
@@ -209,6 +216,7 @@ class HFCausalLMBackbone(LanguageBackbone):
         return params
 
     def enable_gradient_checkpointing(self) -> None:
+        """Enable activation checkpointing in the wrapped model (memory for compute)."""
         self.base.gradient_checkpointing_enable()
         # With frozen embeddings (LoRA), checkpointed blocks need an input that requires grad.
         self.base.enable_input_require_grads()

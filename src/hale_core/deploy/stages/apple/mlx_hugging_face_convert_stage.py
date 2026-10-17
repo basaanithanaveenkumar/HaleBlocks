@@ -54,9 +54,18 @@ class MLXHuggingFaceConvertStage(Stage):
         )
 
     def missing_dependencies(self):
+        """Optional packages or executables this stage needs that are not installed."""
         return [] if self.dependency.available else [self.dependency]
 
     def run(self, ctx: ExportContext) -> list[Artifact]:
+        """Execute this stage on the pipeline context (see the class docstring).
+
+        Args:
+            ctx: the export context (model, signature, artifacts, work dir).
+
+        Returns:
+            The artifacts produced, also recorded in ``ctx.artifacts``.
+        """
         convert = importlib.import_module(self.package).convert
         source = ctx.store.require("hf_checkpoint")
         out = ctx.stage_dir(self.name) / "mlx"

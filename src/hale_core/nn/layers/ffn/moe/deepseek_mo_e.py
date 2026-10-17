@@ -10,6 +10,7 @@ from hale_core.nn.layers.ffn.moe.swi_glu_expert import SwiGLUExpert
 
 
 class DeepseekMoE(nn.Module):
+    """DeepSeek-style mixture of experts: shared experts plus top-k routed SwiGLU experts."""
     def __init__(
         self,
         d_model: int,

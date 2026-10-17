@@ -51,6 +51,14 @@ class TorchTensorRTStage(Stage):
         self.filename = filename
 
     def run(self, ctx: ExportContext) -> list[Artifact]:
+        """Execute this stage on the pipeline context (see the class docstring).
+
+        Args:
+            ctx: the export context (model, signature, artifacts, work dir).
+
+        Returns:
+            The artifacts produced, also recorded in ``ctx.artifacts``.
+        """
         if not torch.cuda.is_available():
             raise MissingDependencyError("cuda", "Torch-TensorRT needs an NVIDIA GPU")
         torch_trt = TORCH_TENSORRT.load()

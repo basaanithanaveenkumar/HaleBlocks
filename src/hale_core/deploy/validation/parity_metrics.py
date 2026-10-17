@@ -25,6 +25,7 @@ class ParityMetrics:
 
     @classmethod
     def compute(cls, reference: np.ndarray, candidate: np.ndarray) -> ParityMetrics:
+        """Max/mean absolute error, cosine similarity and argmax agreement of two arrays."""
         ref = reference.astype(np.float64)
         cand = candidate.astype(np.float64).reshape(ref.shape)
         diff = np.abs(ref - cand)
@@ -43,4 +44,5 @@ class ParityMetrics:
         )
 
     def to_dict(self) -> dict:
+        """The metrics as a plain dict (for reports)."""
         return asdict(self)

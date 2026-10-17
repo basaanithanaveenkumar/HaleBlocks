@@ -27,4 +27,5 @@ class ACTState:
 
     @property
     def all_halted(self) -> bool:
+        """Whether every position has halted (the ACT loop can stop early)."""
         return not bool(self.running.any())

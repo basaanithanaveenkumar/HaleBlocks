@@ -60,6 +60,7 @@ class MIGraphXCompileStage(Stage):
         self.filename = filename
 
     def missing_dependencies(self):
+        """Optional packages or executables this stage needs that are not installed."""
         if MIGRAPHX.available:
             return []
         try:
@@ -69,6 +70,14 @@ class MIGraphXCompileStage(Stage):
             return [MIGRAPHX]
 
     def run(self, ctx: ExportContext) -> list[Artifact]:
+        """Execute this stage on the pipeline context (see the class docstring).
+
+        Args:
+            ctx: the export context (model, signature, artifacts, work dir).
+
+        Returns:
+            The artifacts produced, also recorded in ``ctx.artifacts``.
+        """
         source = ctx.store.require("onnx")
         out = ctx.stage_dir(self.name) / self.filename
         dims = {s.name: list(ctx.signature.shape(s, self.shape)) for s in ctx.signature.inputs}

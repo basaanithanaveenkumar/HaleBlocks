@@ -52,18 +52,23 @@ class TextTowerForCausalLM(PreTrainedModel, GenerationMixin):
         self.lm_head = lm_head
 
     def get_input_embeddings(self) -> nn.Module:
+        """The token embedding module (``PreTrainedModel`` API)."""
         return self.model.get_input_embeddings()
 
     def set_input_embeddings(self, value: nn.Module) -> None:
+        """Replace the token embedding module."""
         self.model.set_input_embeddings(value)
 
     def get_output_embeddings(self) -> nn.Module:
+        """The LM head (``PreTrainedModel`` API)."""
         return self.lm_head
 
     def set_output_embeddings(self, value: nn.Module) -> None:
+        """Replace the LM head."""
         self.lm_head = value
 
     def get_decoder(self) -> nn.Module:
+        """The decoder stack without the LM head."""
         return self.model
 
     def forward(

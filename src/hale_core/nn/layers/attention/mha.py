@@ -7,6 +7,7 @@ import torch.nn as nn
 
 
 class TorchMultiHeadAttention(nn.Module):
+    """Multi-head attention on ``torch.nn.functional.scaled_dot_product_attention``."""
     def __init__(self, d_model: int, n_heads: int, dropout: float = 0.0):
         super().__init__()
         self.attn = nn.MultiheadAttention(d_model, n_heads, dropout=dropout, batch_first=True)

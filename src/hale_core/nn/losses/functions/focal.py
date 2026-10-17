@@ -1,3 +1,5 @@
+"""Focal token loss (registered as ``focal``): down-weights easy tokens."""
+
 from __future__ import annotations
 
 import torch

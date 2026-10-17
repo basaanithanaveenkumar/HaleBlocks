@@ -94,6 +94,7 @@ class QAIHubCompileStage(Stage):
 
     # ------------------------------------------------------------------ options
     def compile_options(self, has_int64_io: bool) -> str:
+        """AI Hub ``--options`` string; adds ``--truncate_64bit_io`` when the model has int64 I/O."""
         opts = (
             []
             if self.target_runtime == "context_binary"
@@ -111,11 +112,20 @@ class QAIHubCompileStage(Stage):
         return " ".join(opts)
 
     def input_specs(self, ctx: ExportContext) -> dict[str, tuple[tuple[int, ...], str]]:
+        """AI Hub input specs: name -> (static shape at ``opt``, dtype name)."""
         sig = ctx.signature
         return {s.name: (sig.shape(s, "opt"), s.dtype) for s in sig.inputs}
 
     # ------------------------------------------------------------------ run
     def run(self, ctx: ExportContext) -> list[Artifact]:
+        """Execute this stage on the pipeline context (see the class docstring).
+
+        Args:
+            ctx: the export context (model, signature, artifacts, work dir).
+
+        Returns:
+            The artifacts produced, also recorded in ``ctx.artifacts``.
+        """
         hub = QAI_HUB.load()
         out = ctx.stage_dir(self.name)
         device = (

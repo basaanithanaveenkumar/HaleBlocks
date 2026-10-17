@@ -10,6 +10,15 @@ def apply_attn_masks(
     attn_mask: torch.Tensor | None = None,
     key_padding_mask: torch.Tensor | None = None,
 ) -> torch.Tensor:
+    """Apply an attention mask and a key-padding mask to raw attention scores.
+
+    Boolean masks set blocked scores to ``-inf``; float masks are added.
+
+    Args:
+        scores: ``(B, H, Lq, Lk)`` attention scores.
+        attn_mask: ``(Lq, Lk)`` mask.
+        key_padding_mask: ``(B, Lk)`` mask, ``True`` at padding.
+    """
     if attn_mask is not None:
         if attn_mask.dtype == torch.bool:
             scores = scores.masked_fill(attn_mask, float("-inf"))

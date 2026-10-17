@@ -42,6 +42,23 @@ class ParityChecker:
         candidate: Sequence[np.ndarray],
         label: str = "",
     ) -> dict[str, dict]:
+        """Compare candidate outputs with the PyTorch reference, output by output.
+
+        An output passes if it is within ``atol`` or above the cosine-similarity floor (and, if
+        configured, matches the argmax closely enough).
+
+        Args:
+            names: output names.
+            reference: PyTorch outputs.
+            candidate: runtime outputs, same order.
+            label: tag for log lines (e.g. the shape corner).
+
+        Returns:
+            name -> metrics of every output.
+
+        Raises:
+            ParityError: if the output counts differ or any output fails.
+        """
         if len(reference) != len(candidate):
             raise ParityError(
                 f"{label}: expected {len(reference)} outputs, backend returned {len(candidate)}"

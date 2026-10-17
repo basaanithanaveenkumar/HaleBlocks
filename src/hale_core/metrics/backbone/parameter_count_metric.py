@@ -30,6 +30,7 @@ class ParameterCountMetric(BaseMetric):
     metric_name = "parameter_count"
 
     def reset(self) -> None:
+        """Clear the accumulated state before a new evaluation pass."""
         self._total: int = 0
         self._trainable: int = 0
 

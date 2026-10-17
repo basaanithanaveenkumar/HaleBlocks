@@ -58,9 +58,18 @@ class RuntimeParityStage(Stage):
         self.cast_inputs = cast_inputs
 
     def missing_dependencies(self):
+        """Optional packages or executables this stage needs that are not installed."""
         return [d for d in RUNTIMES.get(self.runtime_cfg["type"]).dependencies if not d.available]
 
     def run(self, ctx: ExportContext) -> list[Artifact]:
+        """Execute this stage on the pipeline context (see the class docstring).
+
+        Args:
+            ctx: the export context (model, signature, artifacts, work dir).
+
+        Returns:
+            The artifacts produced, also recorded in ``ctx.artifacts``.
+        """
         artifact = ctx.store.require(self.artifact_kind)
         extra = {"path": str(artifact.path)}
         if self.runtime_cfg["type"] == "MLXFunctionSession":

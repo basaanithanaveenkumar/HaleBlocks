@@ -34,6 +34,7 @@ class LinearProbeMetric(BaseMetric):
     metric_name = "linear_probe"
 
     def reset(self) -> None:
+        """Clear the accumulated state before a new evaluation pass."""
         self._features: list[Tensor] = []
         self._labels: list[Tensor] = []
 

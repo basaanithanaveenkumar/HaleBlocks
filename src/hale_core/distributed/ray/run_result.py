@@ -29,4 +29,5 @@ class RayRunResult:
 
     @property
     def ok(self) -> bool:
+        """Whether the Ray run finished without an error."""
         return self.error is None

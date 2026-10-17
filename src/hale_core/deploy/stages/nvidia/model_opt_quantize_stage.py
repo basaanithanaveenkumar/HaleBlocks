@@ -56,6 +56,14 @@ class ModelOptQuantizeStage(Stage):
         self.extra_args = list(extra_args)
 
     def run(self, ctx: ExportContext) -> list[Artifact]:
+        """Execute this stage on the pipeline context (see the class docstring).
+
+        Args:
+            ctx: the export context (model, signature, artifacts, work dir).
+
+        Returns:
+            The artifacts produced, also recorded in ``ctx.artifacts``.
+        """
         source = ctx.store.require("onnx")
         stage_dir = ctx.stage_dir(self.name)
         calib = stage_dir / "calibration.npz"

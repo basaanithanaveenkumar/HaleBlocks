@@ -95,12 +95,14 @@ class MLXProgram:
 
     # ------------------------------------------------------------------ persistence
     def op_histogram(self) -> dict[str, int]:
+        """How many times each MLX op appears in the lowered graph."""
         counts: dict[str, int] = {}
         for node in self.nodes:
             counts[node.op] = counts.get(node.op, 0) + 1
         return dict(sorted(counts.items(), key=lambda kv: -kv[1]))
 
     def save_weights(self, path: Path) -> Path:
+        """Save the program's parameters as ``.safetensors`` at ``path`` and return it."""
         import mlx.core as mx
 
         mx.save_safetensors(str(path), {k: v for k, v in self.params.items()})
@@ -132,6 +134,7 @@ class MLXProgram:
         return path
 
     def write_manifest(self, path: Path, extra: dict[str, Any] | None = None) -> Path:
+        """Write a JSON manifest (inputs, node/parameter counts, op histogram, ``extra``) to ``path``."""
         manifest = {
             "inputs": self.input_names,
             "num_nodes": len(self.nodes),

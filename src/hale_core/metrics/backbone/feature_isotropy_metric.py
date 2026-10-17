@@ -53,6 +53,7 @@ class FeatureIsotropyMetric(BaseMetric):
         self.reset()
 
     def reset(self) -> None:
+        """Clear the accumulated state before a new evaluation pass."""
         self._buffer: list[Tensor] = []
         self._n_seen: int = 0
 

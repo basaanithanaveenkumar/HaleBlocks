@@ -48,6 +48,14 @@ class MLXConvertStage(Stage):
         self.shapeless = shapeless
 
     def run(self, ctx: ExportContext) -> list[Artifact]:
+        """Execute this stage on the pipeline context (see the class docstring).
+
+        Args:
+            ctx: the export context (model, signature, artifacts, work dir).
+
+        Returns:
+            The artifacts produced, also recorded in ``ctx.artifacts``.
+        """
         from hale_core.deploy.mlx_bridge import AtenToMLXConverter
         from hale_core.deploy.mlx_bridge.dtype_map import to_mlx
 

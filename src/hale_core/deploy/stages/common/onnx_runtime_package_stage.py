@@ -50,6 +50,14 @@ class OnnxRuntimePackageStage(Stage):
         self.session_options = dict(session_options or {})
 
     def run(self, ctx: ExportContext) -> list[Artifact]:
+        """Execute this stage on the pipeline context (see the class docstring).
+
+        Args:
+            ctx: the export context (model, signature, artifacts, work dir).
+
+        Returns:
+            The artifacts produced, also recorded in ``ctx.artifacts``.
+        """
         source = ctx.store.require("onnx")
         out = ctx.stage_dir(self.name)
         target = out / "model.onnx"

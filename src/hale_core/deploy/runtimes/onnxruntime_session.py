@@ -59,4 +59,12 @@ class OnnxRuntimeSession(InferenceSession):
         self.input_names = [i.name for i in self.session.get_inputs()]
 
     def run(self, inputs: Mapping[str, np.ndarray]) -> list[np.ndarray]:
+        """Run one inference.
+
+        Args:
+            inputs: input name -> array, matching the exported signature.
+
+        Returns:
+            Output arrays in signature order.
+        """
         return self.session.run(None, {name: inputs[name] for name in self.input_names})

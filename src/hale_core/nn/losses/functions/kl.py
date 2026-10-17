@@ -1,3 +1,5 @@
+"""KL-divergence token loss (registered as ``kl``) against a soft target distribution."""
+
 from __future__ import annotations
 
 import torch

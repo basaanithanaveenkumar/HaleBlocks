@@ -7,6 +7,7 @@ import torch.nn as nn
 
 
 class DiTFinalLayer(nn.Module):
+    """DiT output layer: time-modulated LayerNorm followed by the vocabulary projection."""
     def __init__(self, d_model: int, vocab_size: int):
         super().__init__()
         self.ln = nn.LayerNorm(d_model)

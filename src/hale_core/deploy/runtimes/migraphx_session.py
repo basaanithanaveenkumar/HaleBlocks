@@ -28,6 +28,14 @@ class MIGraphXSession(InferenceSession):
         self.program = self.migraphx.load(str(self.path), format="msgpack")
 
     def run(self, inputs: Mapping[str, np.ndarray]) -> list[np.ndarray]:
+        """Run one inference.
+
+        Args:
+            inputs: input name -> array, matching the exported signature.
+
+        Returns:
+            Output arrays in signature order.
+        """
         args = {
             name: self.migraphx.argument(np.ascontiguousarray(value))
             for name, value in inputs.items()

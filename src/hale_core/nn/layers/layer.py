@@ -9,6 +9,7 @@ from hale_core.nn.layers.norm import RMSNorm
 
 
 class TransformerLayer(nn.Module):
+    """Pre-norm transformer layer: attention and feed-forward, each with a residual."""
     def __init__(
         self,
         d_model: int,

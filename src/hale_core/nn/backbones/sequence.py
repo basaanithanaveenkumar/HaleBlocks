@@ -58,6 +58,11 @@ class SequenceBackbone(nn.Module):
             head.weight = self.token_emb.weight
 
     def embed(self, token_ids: torch.Tensor) -> torch.Tensor:
+        """Token embeddings plus learned positions.
+
+        Sequences longer than ``max_length`` (the two streams of block-causal training) reuse the
+        first half of the position table for each stream.
+        """
         _, seq_len = token_ids.shape
         hidden = self.token_emb(token_ids)
         if self.pos_emb is None:
@@ -69,11 +74,13 @@ class SequenceBackbone(nn.Module):
         return hidden + torch.cat([pe, pe], dim=1)
 
     def time_features(self, t: torch.Tensor | None) -> torch.Tensor | None:
+        """Time embedding of ``t``, or ``None`` when the backbone is not time-conditioned."""
         if not self.use_time_cond or t is None or self.time_embed is None:
             return None
         return self.time_embed(t)
 
     def positions(self, seq_len: int, device: torch.device) -> torch.Tensor:
+        """Position ids for a ``seq_len`` sequence (repeated per stream for block-causal input)."""
         if self.attn_type == "block_causal" and seq_len > self.max_length:
             n = seq_len // 2
             pos = torch.arange(n, device=device)
@@ -88,6 +95,11 @@ class SequenceBackbone(nn.Module):
         attn_mask: torch.Tensor | None,
         pos_ids_len: int | None,
     ) -> tuple[torch.Tensor | None, torch.Tensor | None]:
+        """Attention mask (built from ``attn_type`` unless given) and key-padding mask.
+
+        Raises:
+            ValueError: if the sequence is longer than ``max_length`` for a non block-causal model.
+        """
         _, seq_len = token_ids.shape
         pos_len = pos_ids_len or torch.sym_min(seq_len, self.max_length)
         if pos_len > self.max_length and self.attn_type != "block_causal":
@@ -111,6 +123,11 @@ class SequenceBackbone(nn.Module):
         key_padding_mask: torch.Tensor | None,
         positions: torch.Tensor,
     ) -> torch.Tensor:
+        """Run the transformer stack over embedded ``hidden`` states.
+
+        Raises:
+            RuntimeError: if the subclass did not set ``stack``.
+        """
         if self.stack is None:
             raise RuntimeError("SequenceBackbone.stack was not set")
         return self.stack(
@@ -122,6 +139,11 @@ class SequenceBackbone(nn.Module):
         )
 
     def logits(self, hidden: torch.Tensor, t_emb: torch.Tensor | None) -> torch.Tensor:
+        """Project hidden states to vocabulary logits.
+
+        Raises:
+            RuntimeError: if the subclass did not set ``lm_head``.
+        """
         if self.lm_head is None:
             raise RuntimeError("SequenceBackbone.lm_head was not set")
         return self.lm_head(hidden)
@@ -162,6 +184,7 @@ class SequenceBackbone(nn.Module):
 
     @classmethod
     def from_config(cls, vocab_size: int, model_cfg, **overrides):
+        """Build the backbone named by ``model_cfg`` (delegates to :func:`build_backbone`)."""
         from hale_core.nn.backbones.factory import build_backbone
 
         return build_backbone(vocab_size, model_cfg, **overrides)

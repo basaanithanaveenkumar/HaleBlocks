@@ -34,6 +34,7 @@ class WorkerContext:
 
     @property
     def is_distributed(self) -> bool:
+        """Whether more than one worker participates."""
         return self.world_size > 1
 
     @classmethod

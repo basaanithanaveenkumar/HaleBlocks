@@ -46,6 +46,7 @@ class StageActivationMetric(BaseMetric):
         self.reset()
 
     def reset(self) -> None:
+        """Clear the accumulated state before a new evaluation pass."""
         # Per-stage accumulators: lists of scalar stats per batch
         self._means: dict[int, list[float]] = {}
         self._stds: dict[int, list[float]] = {}

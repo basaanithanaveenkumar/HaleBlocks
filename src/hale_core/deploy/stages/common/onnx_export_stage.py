@@ -56,6 +56,14 @@ class OnnxExportStage(Stage):
         self.filename = filename
 
     def run(self, ctx: ExportContext) -> list[Artifact]:
+        """Execute this stage on the pipeline context (see the class docstring).
+
+        Args:
+            ctx: the export context (model, signature, artifacts, work dir).
+
+        Returns:
+            The artifacts produced, also recorded in ``ctx.artifacts``.
+        """
         path = ctx.stage_dir(self.name) / self.filename
         sig = ctx.signature
         module, args = ctx.export_module, ctx.example_args("trace")

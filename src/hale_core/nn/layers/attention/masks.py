@@ -15,6 +15,17 @@ def build_attn_mask(
     device: torch.device | str,
     block_size: int | None = None,
 ) -> torch.Tensor | None:
+    """Boolean attention mask (``True`` = blocked) for ``attn_type``.
+
+    Args:
+        attn_type: ``bidirectional`` (returns ``None``), ``causal`` or ``block_causal``.
+        seq_len: sequence length.
+        device: device of the mask.
+        block_size: block length, required for ``block_causal``.
+
+    Raises:
+        ValueError: if ``block_causal`` is requested without ``block_size``.
+    """
     if attn_type == "bidirectional":
         return None
     if attn_type == "causal":

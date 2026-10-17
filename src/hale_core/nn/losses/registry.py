@@ -10,6 +10,7 @@ TOKEN_LOSSES = NamedRegistry("token_loss")
 
 
 def register_token_loss(name: str):
+    """Decorator registering a token-loss function under ``name``."""
     def deco(fn: Callable) -> Callable:
         TOKEN_LOSSES.add(name, fn)
         return fn
@@ -18,4 +19,5 @@ def register_token_loss(name: str):
 
 
 def get_token_loss(name: str) -> Callable:
+    """The token-loss function registered as ``name``."""
     return TOKEN_LOSSES.get(name)

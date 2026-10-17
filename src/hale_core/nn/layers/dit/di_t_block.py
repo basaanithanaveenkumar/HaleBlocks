@@ -7,6 +7,7 @@ import torch.nn as nn
 
 
 class DiTBlock(nn.Module):
+    """DiT block: pre-norm attention + FFN modulated by AdaLN-Zero time conditioning."""
     def __init__(
         self,
         d_model: int,

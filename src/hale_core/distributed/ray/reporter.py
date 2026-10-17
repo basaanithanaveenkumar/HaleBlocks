@@ -24,6 +24,7 @@ class RayReporter:
 
     @property
     def active(self) -> bool:
+        """Whether this process runs inside a Ray Train worker (metrics are forwarded only then)."""
         return self.context.in_ray
 
     def report(self, metrics: Mapping[str, Any], checkpoint_dir: str | Path | None = None) -> None:

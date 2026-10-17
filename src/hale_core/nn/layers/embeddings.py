@@ -1,3 +1,5 @@
+"""Time embeddings for diffusion / flow-matching conditioning."""
+
 from __future__ import annotations
 
 import math

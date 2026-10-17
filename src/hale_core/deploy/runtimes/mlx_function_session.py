@@ -34,6 +34,14 @@ class MLXFunctionSession(InferenceSession):
         self.input_names = list(input_names)
 
     def run(self, inputs: Mapping[str, np.ndarray]) -> list[np.ndarray]:
+        """Run one inference.
+
+        Args:
+            inputs: input name -> array, matching the exported signature.
+
+        Returns:
+            Output arrays in signature order.
+        """
         outputs = self.fn(*(self.mx.array(inputs[n]) for n in self.input_names))
         return [
             np.array(o.astype(self.mx.float32) if o.dtype in (self.mx.bfloat16,) else o)

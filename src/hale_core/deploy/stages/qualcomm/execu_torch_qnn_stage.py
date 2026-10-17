@@ -59,6 +59,14 @@ class ExecuTorchQNNStage(Stage):
         self.filename = filename
 
     def run(self, ctx: ExportContext) -> list[Artifact]:
+        """Execute this stage on the pipeline context (see the class docstring).
+
+        Args:
+            ctx: the export context (model, signature, artifacts, work dir).
+
+        Returns:
+            The artifacts produced, also recorded in ``ctx.artifacts``.
+        """
         if not os.environ.get("QNN_SDK_ROOT"):
             raise MissingDependencyError(
                 "QNN_SDK_ROOT", "export QNN_SDK_ROOT=/path/to/qairt/<version>"

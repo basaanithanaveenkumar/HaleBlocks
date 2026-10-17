@@ -50,6 +50,14 @@ class TensorRTSession(InferenceSession):
         ]
 
     def run(self, inputs: Mapping[str, np.ndarray]) -> list[np.ndarray]:
+        """Run one inference.
+
+        Args:
+            inputs: input name -> array, matching the exported signature.
+
+        Returns:
+            Output arrays in signature order.
+        """
         import torch
 
         stream = torch.cuda.Stream()

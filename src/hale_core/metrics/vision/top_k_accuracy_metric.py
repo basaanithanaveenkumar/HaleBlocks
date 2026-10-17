@@ -34,6 +34,7 @@ class TopKAccuracyMetric(BaseMetric):
         self.reset()
 
     def reset(self) -> None:
+        """Clear the accumulated state before a new evaluation pass."""
         self._correct: dict[int, int] = {k: 0 for k in self.ks}
         self._total: int = 0
 

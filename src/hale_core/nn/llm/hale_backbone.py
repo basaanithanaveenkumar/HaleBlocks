@@ -99,10 +99,12 @@ class HaleSequenceLMBackbone(LanguageBackbone):
     # ------------------------------------------------------------------ geometry
     @property
     def hidden_size(self) -> int:
+        """Width of the hidden states."""
         return int(self.backbone.d_model)
 
     @property
     def vocab_size(self) -> int:
+        """Vocabulary size of the embedding table."""
         return int(self.backbone.token_emb.weight.size(0))
 
     @property
@@ -112,6 +114,7 @@ class HaleSequenceLMBackbone(LanguageBackbone):
 
     # ------------------------------------------------------------------ compute
     def embed_tokens(self, input_ids: Tensor) -> Tensor:
+        """Token embeddings of ``input_ids`` (no positions)."""
         return self.backbone.token_emb(input_ids)
 
     def forward(
@@ -156,6 +159,7 @@ class HaleSequenceLMBackbone(LanguageBackbone):
 
     # ------------------------------------------------------------------ vocabulary
     def resize_token_embeddings(self, num_tokens: int) -> None:
+        """Grow the embedding table and LM head to ``num_tokens`` (new rows are initialised)."""
         bb = self.backbone
         tied = bb.lm_head.weight is bb.token_emb.weight
         old = bb.token_emb.weight
@@ -176,6 +180,7 @@ class HaleSequenceLMBackbone(LanguageBackbone):
 
     # ------------------------------------------------------------------ fine-tuning
     def default_lora_targets(self) -> list[str]:
+        """Module names LoRA adapts by default (attention and FFN projections)."""
         names = []
         for name, module in self.backbone.named_modules():
             leaf = name.split(".")
@@ -188,6 +193,7 @@ class HaleSequenceLMBackbone(LanguageBackbone):
         return names
 
     def apply_lora(self, r: int, alpha: int, dropout: float, targets: Sequence[str]) -> None:
+        """Wrap ``targets`` with LoRA adapters of rank ``r`` (scale ``alpha / r``) and freeze the base."""
         from peft import LoraConfig, inject_adapter_in_model  # lazy: optional dependency
 
         self.requires_grad_(False)
@@ -205,6 +211,7 @@ class HaleSequenceLMBackbone(LanguageBackbone):
             param.requires_grad = "lora_" in name
 
     def embedding_parameters(self) -> list[nn.Parameter]:
+        """Embedding/LM-head parameters (kept trainable when new tokens are added)."""
         params = [self.backbone.token_emb.weight]
         if self.backbone.lm_head.weight is not params[0]:
             params.append(self.backbone.lm_head.weight)

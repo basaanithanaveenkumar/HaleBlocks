@@ -41,6 +41,7 @@ class RetrievalMetric(BaseMetric):
         self.reset()
 
     def reset(self) -> None:
+        """Clear the accumulated state before a new evaluation pass."""
         self._q_feats: list[Tensor] = []
         self._g_feats: list[Tensor] = []
         self._q_ids: list[Tensor] = []

@@ -1,3 +1,5 @@
+"""Feed-forward registry: ``mlp``, ``geglu`` and ``moe`` blocks built by name."""
+
 from __future__ import annotations
 
 from hale_core.nn.layers.ffn.mlp import DenseMLP, GeGLU
@@ -8,6 +10,7 @@ FFN = NamedRegistry("ffn")
 
 
 def register_ffn(name: str):
+    """Decorator registering a feed-forward implementation under ``name``."""
     def deco(cls):
         FFN.add(name, cls)
         return cls
@@ -30,6 +33,17 @@ def build_ffn(
     moe_top_k: int = 2,
     moe_num_shared: int = 1,
 ):
+    """Build the feed-forward block registered as ``kind``.
+
+    Args:
+        kind: registry key (``mlp``, ``geglu``, ``moe``).
+        d_model: model width.
+        d_ff: hidden width.
+        dropout: dropout probability.
+        moe_num_experts: routed experts (``moe`` only).
+        moe_top_k: experts per token (``moe`` only).
+        moe_num_shared: always-on shared experts (``moe`` only).
+    """
     if kind == "mlp":
         return FFN.get("mlp")(d_model, d_ff, dropout)
     if kind == "geglu":

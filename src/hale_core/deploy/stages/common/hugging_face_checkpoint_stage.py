@@ -44,6 +44,14 @@ class HuggingFaceCheckpointStage(Stage):
         self.dtype = dtype
 
     def run(self, ctx: ExportContext) -> list[Artifact]:
+        """Execute this stage on the pipeline context (see the class docstring).
+
+        Args:
+            ctx: the export context (model, signature, artifacts, work dir).
+
+        Returns:
+            The artifacts produced, also recorded in ``ctx.artifacts``.
+        """
         import torch
 
         pair = ctx.adapter.hf_checkpoint(ctx.model)

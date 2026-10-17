@@ -30,6 +30,7 @@ def list_llm_backbones(source: str | None = None) -> list[str]:
 
 
 def is_registered(name: str) -> bool:
+    """Whether ``name`` is a known LLM backbone spec."""
     _ensure_catalog()
     return _ALIASES.get(name, name) in LLM_BACKBONES
 

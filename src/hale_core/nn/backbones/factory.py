@@ -8,6 +8,7 @@ BACKBONES = NamedRegistry("backbone")
 
 
 def register_backbone(name: str):
+    """Decorator registering a backbone class under ``name`` in ``BACKBONES``."""
     def deco(cls):
         BACKBONES.add(name, cls)
         return cls
@@ -16,6 +17,7 @@ def register_backbone(name: str):
 
 
 def backbone_kwargs(vocab_size: int, model_cfg, **overrides) -> dict:
+    """Constructor kwargs of a backbone from a ``ModelConfig`` (``overrides`` win)."""
     kwargs = {
         "vocab_size": vocab_size,
         "d_model": model_cfg.d_model,
@@ -48,6 +50,13 @@ def backbone_kwargs(vocab_size: int, model_cfg, **overrides) -> dict:
 
 
 def build_backbone(vocab_size: int, model_cfg=None, **overrides):
+    """Build the backbone named by ``model_cfg.arch`` for a vocabulary of ``vocab_size``.
+
+    Args:
+        vocab_size: tokenizer vocabulary size.
+        model_cfg: the ``model:`` config section (defaults when ``None``).
+        **overrides: constructor arguments that replace config values.
+    """
     if model_cfg is not None:
         kwargs = backbone_kwargs(vocab_size, model_cfg, **overrides)
     else:

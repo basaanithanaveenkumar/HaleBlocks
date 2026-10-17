@@ -51,6 +51,7 @@ class ModelOptAutoCastStage(Stage):
         self.extra_args = list(extra_args)
 
     def command(self, source: str, output: str) -> list[str]:
+        """The ``python -m modelopt.onnx.autocast`` command converting ``source`` to ``output``."""
         cmd = [
             sys.executable,
             "-m",
@@ -69,6 +70,14 @@ class ModelOptAutoCastStage(Stage):
         return cmd + self.extra_args
 
     def run(self, ctx: ExportContext) -> list[Artifact]:
+        """Execute this stage on the pipeline context (see the class docstring).
+
+        Args:
+            ctx: the export context (model, signature, artifacts, work dir).
+
+        Returns:
+            The artifacts produced, also recorded in ``ctx.artifacts``.
+        """
         source = ctx.store.require("onnx")
         out = ctx.stage_dir(self.name) / f"model.{self.low_precision_type}.onnx"
         CommandRunner().run(self.command(str(source.path), str(out)))
