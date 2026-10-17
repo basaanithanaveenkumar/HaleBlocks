@@ -73,10 +73,23 @@ class HFCausalLMBackbone(LanguageBackbone):
             loader = load_text_tower
         else:
             loader = AutoModelForCausalLM.from_pretrained
-        try:  # transformers >= 4.56 renamed torch_dtype -> dtype
-            model = loader(repo, dtype=DTYPES[dtype], **kwargs)
-        except TypeError:
-            model = loader(repo, torch_dtype=DTYPES[dtype], **kwargs)
+        try:
+            model = cls._load(loader, repo, dtype, kwargs)
+        except ValueError as exc:
+            # Some checkpoints contain sub-models without an SDPA kernel (Gemma 4's audio tower
+            # in transformers >= 5.20); the text tower we keep runs fine with eager attention.
+            if (
+                "attention implementation" not in str(exc)
+                or kwargs.get("attn_implementation") == "eager"
+            ):
+                raise
+            logger.warning(
+                "{}: {!r} attention unsupported here ({}); falling back to eager",
+                spec.name,
+                kwargs.get("attn_implementation"),
+                exc,
+            )
+            model = cls._load(loader, repo, dtype, {**kwargs, "attn_implementation": "eager"})
         logger.info(
             "llm backbone {} loaded from {} ({}{})",
             spec.name,
@@ -85,6 +98,14 @@ class HFCausalLMBackbone(LanguageBackbone):
             ", text tower of a multimodal checkpoint" if spec.is_multimodal_checkpoint else "",
         )
         return cls(spec, model, tokenizer)
+
+    @staticmethod
+    def _load(loader: Any, repo: str, dtype: str, kwargs: dict[str, Any]) -> Any:
+        """Call ``loader`` with the dtype keyword this transformers version understands."""
+        try:  # transformers >= 4.56 renamed torch_dtype -> dtype
+            return loader(repo, dtype=DTYPES[dtype], **kwargs)
+        except TypeError:
+            return loader(repo, torch_dtype=DTYPES[dtype], **kwargs)
 
     # ------------------------------------------------------------------ geometry
     @property
