@@ -66,6 +66,8 @@ from typing import TYPE_CHECKING
 import torch
 from loguru import logger
 
+from hale_core.exceptions import ExportError
+
 if TYPE_CHECKING:
     from hale_core.config.sections.quant import ExportConfig
 
@@ -128,7 +130,7 @@ def export_tensorrt(
     if not parser.parse(raw):
         for i in range(parser.num_errors):
             logger.error("TRT ONNX parse error: {}", parser.get_error(i))
-        raise RuntimeError(f"TensorRT failed to parse ONNX: {onnx_path}")
+        raise ExportError(f"TensorRT failed to parse ONNX: {onnx_path}")
 
     logger.info(
         "TRT: parsed ONNX ({} inputs, {} layers)",
@@ -160,7 +162,7 @@ def export_tensorrt(
     logger.info("TRT: building engine (this may take several minutes)…")
     serialised = builder.build_serialized_network(network, build_config)
     if serialised is None:
-        raise RuntimeError("TensorRT engine build failed (check GPU memory and opset support)")
+        raise ExportError("TensorRT engine build failed (check GPU memory and opset support)")
 
     with open(engine_path, "wb") as f:
         f.write(serialised)
@@ -189,7 +191,10 @@ class TRTInferenceSession:
         try:
             import tensorrt as trt
         except ImportError:
-            raise RuntimeError("tensorrt package required for TRTInferenceSession")
+            raise ExportError(
+                "tensorrt package required for TRTInferenceSession; "
+                "install hale-blocks[deploy-nvidia]"
+            ) from None
 
         trt_logger = trt.Logger(trt.Logger.WARNING)
         runtime = trt.Runtime(trt_logger)

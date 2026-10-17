@@ -13,6 +13,8 @@ from typing import Any
 
 import torch
 
+from hale_core.exceptions import DataError
+
 #: Name of the entry describing the sample's structure (not a valid field path, see _field_name).
 META_ENTRY = "hale.meta.json"
 #: v2 adds ``enum`` and ``path`` nodes; v1 shards (a subset) still decode.
@@ -123,7 +125,7 @@ class SampleCodec:
             return "value"
         for part in path:
             if "." in part or "__" in part:
-                raise ValueError(f"field name {part!r} may not contain '.' or '__'")
+                raise DataError(f"field name {part!r} may not contain '.' or '__'")
         return "__".join(path)
 
     def _encode_leaf(self, value: Any) -> tuple[str, bytes]:
@@ -175,7 +177,7 @@ class SampleCodec:
         """Inverse of :meth:`encode` (accepts the raw dict yielded by ``webdataset``)."""
         meta = json.loads(entries[META_ENTRY])
         if meta.get("version") not in SUPPORTED_VERSIONS:
-            raise ValueError(
+            raise DataError(
                 f"shards were written with codec v{meta.get('version')}, this reads "
                 f"v{SUPPORTED_VERSIONS}"
             )
@@ -197,7 +199,7 @@ class SampleCodec:
             return self._import_class(node["class"])[node["name"]]
         if kind == "path":
             return self._import_class(node["class"])(node["value"])
-        raise ValueError(f"unknown node kind {kind!r}")
+        raise DataError(f"unknown node kind {kind!r}")
 
     @staticmethod
     def _import_class(reference: str) -> Any:

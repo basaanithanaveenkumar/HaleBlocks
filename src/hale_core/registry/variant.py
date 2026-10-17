@@ -6,6 +6,8 @@ from typing import Any
 
 from loguru import logger
 
+from hale_core.exceptions import RegistryError
+
 VariantKey = frozenset[str] | None
 
 
@@ -34,7 +36,9 @@ class VariantRegistry:
         entries = self.items.setdefault(name, [])
         for existing, _ in entries:
             if existing == key:
-                raise ValueError(f"{self.kind} {name!r} already registered for variants={variants}")
+                raise RegistryError(
+                    f"{self.kind} {name!r} already registered for variants={variants}"
+                )
         entries.append((key, cls))
         if attr is not None:
             setattr(cls, attr, name)
@@ -45,7 +49,7 @@ class VariantRegistry:
         entries = self.items.get(name)
         if entries is None:
             logger.error("unknown {} {!r}; registered={}", self.kind, name, sorted(self.items))
-            raise KeyError(f"unknown {self.kind} {name!r}; registered={sorted(self.items)}")
+            raise RegistryError(f"unknown {self.kind} {name!r}; registered={sorted(self.items)}")
         specific = [
             cls for variants, cls in entries if variants is not None and variant in variants
         ]

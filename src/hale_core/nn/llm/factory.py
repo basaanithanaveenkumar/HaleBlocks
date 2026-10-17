@@ -9,6 +9,7 @@ import torch
 from loguru import logger
 
 from hale_core.config.sections.llm_backbone import LLMBackboneConfig
+from hale_core.exceptions import ConfigError
 from hale_core.nn.llm.base import LanguageBackbone
 from hale_core.nn.llm.registry import get_llm_backbone_spec
 from hale_core.nn.llm.spec import LLMBackboneSpec
@@ -52,7 +53,7 @@ def load_language_backbone(cfg: LLMBackboneConfig) -> LanguageBackbone:
     from hale_core.nn.llm.hale_backbone import HaleSequenceLMBackbone
 
     if cfg.checkpoint is None:
-        raise ValueError(f"{cfg.name} needs a HaloDiffusionLLM checkpoint")
+        raise ConfigError(f"{cfg.name} needs a HaloDiffusionLLM checkpoint")
     return HaleSequenceLMBackbone.from_checkpoint(spec, cfg.checkpoint, cfg.dtype)
 
 
@@ -69,7 +70,7 @@ def configure_finetuning(backbone: LanguageBackbone, cfg: LLMBackboneConfig) -> 
     else:
         targets = cfg.lora.target_modules or backbone.default_lora_targets()
         if not targets:
-            raise ValueError(f"{cfg.name}: no LoRA target modules found; set lora.target_modules")
+            raise ConfigError(f"{cfg.name}: no LoRA target modules found; set lora.target_modules")
         backbone.apply_lora(cfg.lora.r, cfg.lora.alpha, cfg.lora.dropout, targets)
     if cfg.finetune != "frozen" and cfg.lora.train_embeddings:
         for param in backbone.embedding_parameters():

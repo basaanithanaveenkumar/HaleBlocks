@@ -40,10 +40,12 @@ List all registered backbones:
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from typing import Any, TypeVar
 
 from loguru import logger
 
+from hale_core.exceptions import RegistryError
 from hale_core.nn.vision.base import BaseVisionBackbone
 
 T = TypeVar("T", bound=type[BaseVisionBackbone])
@@ -54,7 +56,7 @@ T = TypeVar("T", bound=type[BaseVisionBackbone])
 _VISION_BACKBONES: dict[str, type[BaseVisionBackbone]] = {}
 
 
-def register_vision_backbone(name: str) -> "Callable[[T], T]":
+def register_vision_backbone(name: str) -> Callable[[T], T]:
     """Class decorator that registers a backbone under the given name.
 
     Args:
@@ -79,7 +81,7 @@ def register_vision_backbone(name: str) -> "Callable[[T], T]":
     def decorator(cls: T) -> T:
         key = name.lower()
         if key in _VISION_BACKBONES:
-            raise ValueError(
+            raise RegistryError(
                 f"Vision backbone '{key}' is already registered "
                 f"(existing: {_VISION_BACKBONES[key].__name__})"
             )
@@ -114,7 +116,7 @@ def build_vision_backbone(name: str, **kwargs: Any) -> BaseVisionBackbone:
     key = name.lower()
     if key not in _VISION_BACKBONES:
         available = sorted(_VISION_BACKBONES.keys())
-        raise KeyError(f"Unknown vision backbone '{name}'. Available: {available}")
+        raise RegistryError(f"Unknown vision backbone '{name}'. Available: {available}")
     cls = _VISION_BACKBONES[key]
     return cls(**kwargs)
 
@@ -124,7 +126,7 @@ def get_vision_backbone_cls(name: str) -> type[BaseVisionBackbone]:
     _ensure_backbones_imported()
     key = name.lower()
     if key not in _VISION_BACKBONES:
-        raise KeyError(f"Unknown vision backbone '{name}'")
+        raise RegistryError(f"Unknown vision backbone '{name}'")
     return _VISION_BACKBONES[key]
 
 

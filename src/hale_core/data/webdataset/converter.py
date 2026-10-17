@@ -17,6 +17,7 @@ from hale_core.data.webdataset.dependency import require_webdataset
 from hale_core.data.webdataset.manifest import ShardManifest
 from hale_core.data.webdataset.sample_codec import SampleCodec
 from hale_core.distributed.ray.worker_context import WorkerContext
+from hale_core.exceptions import DataError
 
 SHARD_PATTERN = "shard-%06d.tar"
 
@@ -85,7 +86,7 @@ class WebDatasetConverter:
         directory = self.directory(name)
         is_factory = callable(source) and not isinstance(source, Dataset)
         if is_factory and fingerprint is None:
-            raise ValueError("a dataset factory needs an explicit fingerprint")
+            raise DataError("a dataset factory needs an explicit fingerprint")
         fp = fingerprint if is_factory else self.fingerprint(source, fingerprint)
         if context.is_main:
             self._convert_if_needed(source, name, directory, fp)
@@ -131,7 +132,7 @@ class WebDatasetConverter:
                 written += 1
         if written == 0:
             shutil.rmtree(tmp, ignore_errors=True)
-            raise ValueError(f"dataset {name!r} produced no samples; nothing to convert")
+            raise DataError(f"dataset {name!r} produced no samples; nothing to convert")
         shards = sorted(p.name for p in tmp.glob("shard-*.tar"))
         ShardManifest(
             name=name,
