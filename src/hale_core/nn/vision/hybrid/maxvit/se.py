@@ -17,6 +17,14 @@ class SE(nn.Module):
         self.fc2 = nn.Linear(rd, ch)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
+        """Forward pass of :class:`SE`.
+
+        Args:
+            x: input (``torch.Tensor``).
+
+        Returns:
+            ``torch.Tensor``.
+        """
         s = x.mean(dim=(2, 3))
         s = F.silu(self.fc1(s))
         s = self.fc2(s).sigmoid()

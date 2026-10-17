@@ -72,6 +72,14 @@ class VGG(BaseVisionBackbone):
                     nn.init.zeros_(m.bias)
 
     def forward(self, x: torch.Tensor) -> BackboneOutput:
+        """Forward pass of :class:`VGG`.
+
+        Args:
+            x: input (``torch.Tensor``).
+
+        Returns:
+            ``BackboneOutput``.
+        """
         s0 = self.stage0(x)  # [B, 64,  H/2,  W/2]
         s1 = self.stage1(s0)  # [B, 128, H/4,  W/4]
         s2 = self.stage2(s1)  # [B, 256, H/8,  W/8]

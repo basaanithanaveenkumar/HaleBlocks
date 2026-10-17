@@ -162,6 +162,14 @@ class EfficientNetV2Backbone(BaseVisionBackbone):
                     nn.init.zeros_(m.bias)
 
     def forward(self, x: torch.Tensor) -> BackboneOutput:
+        """Forward pass of :class:`EfficientNetV2Backbone`.
+
+        Args:
+            x: input (``torch.Tensor``).
+
+        Returns:
+            ``BackboneOutput``.
+        """
         x = self.stem(x)
         feature_maps: list[torch.Tensor] = []
 

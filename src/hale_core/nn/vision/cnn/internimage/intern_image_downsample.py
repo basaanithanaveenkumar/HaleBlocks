@@ -15,6 +15,14 @@ class InternImageDownsample(nn.Module):
         self.conv = nn.Conv2d(in_ch, out_ch, kernel_size=3, stride=2, padding=1, bias=False)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
+        """Forward pass of :class:`InternImageDownsample`.
+
+        Args:
+            x: input (``torch.Tensor``).
+
+        Returns:
+            ``torch.Tensor``.
+        """
         # x: [B, C, H, W]
         x = x.permute(0, 2, 3, 1)  # → [B, H, W, C]
         x = self.norm(x).permute(0, 3, 1, 2)  # → [B, C, H, W]

@@ -29,6 +29,14 @@ class DeepseekMoE(nn.Module):
         )
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
+        """Forward pass of :class:`DeepseekMoE`.
+
+        Args:
+            x: input (``torch.Tensor``).
+
+        Returns:
+            ``torch.Tensor``.
+        """
         b, s, d = x.shape
         flat = x.reshape(-1, d)
         shared = sum((expert(flat) for expert in self.shared), start=torch.zeros_like(flat))

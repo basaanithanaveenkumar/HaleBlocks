@@ -18,6 +18,14 @@ class RMSNorm(nn.Module):
         self.weight = nn.Parameter(torch.ones(dim))
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
+        """Forward pass of :class:`RMSNorm`.
+
+        Args:
+            x: input (``torch.Tensor``).
+
+        Returns:
+            ``torch.Tensor``.
+        """
         rms = x.float().pow(2).mean(-1, keepdim=True).add(self.eps).rsqrt()
         return (x.float() * rms).type_as(x) * self.weight
 

@@ -32,6 +32,15 @@ class LoopInputInjection(nn.Module):
         return self.kind != "none"
 
     def forward(self, state: torch.Tensor, inputs: torch.Tensor) -> torch.Tensor:
+        """Forward pass of :class:`LoopInputInjection`.
+
+        Args:
+            state: input (``torch.Tensor``).
+            inputs: input (``torch.Tensor``).
+
+        Returns:
+            ``torch.Tensor``.
+        """
         if self.kind == "none":
             return state
         if self.kind == "add":

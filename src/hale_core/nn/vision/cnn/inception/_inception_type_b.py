@@ -34,4 +34,12 @@ class _InceptionTypeB(nn.Module):
         # Total: 192 * 4 = 768
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
+        """Forward pass of :class:`_InceptionTypeB`.
+
+        Args:
+            x: input (``torch.Tensor``).
+
+        Returns:
+            ``torch.Tensor``.
+        """
         return torch.cat([self.br1(x), self.br2(x), self.br3(x), self.br4(x)], dim=1)

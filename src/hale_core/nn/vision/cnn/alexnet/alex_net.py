@@ -92,6 +92,14 @@ class AlexNet(BaseVisionBackbone):
                     nn.init.zeros_(m.bias)
 
     def forward(self, x: torch.Tensor) -> BackboneOutput:
+        """Forward pass of :class:`AlexNet`.
+
+        Args:
+            x: input (``torch.Tensor``).
+
+        Returns:
+            ``BackboneOutput``.
+        """
         s0 = self.stage0(x)  # [B, 64,  H/8,  W/8]
         s1 = self.stage1(s0)  # [B, 192, H/16, W/16]
         s2 = self.stage2(s1)  # [B, 384, H/16, W/16]

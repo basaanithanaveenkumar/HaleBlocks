@@ -44,6 +44,18 @@ class DiTBlock(nn.Module):
         key_padding_mask: torch.Tensor | None = None,
         positions: torch.Tensor | None = None,
     ) -> torch.Tensor:
+        """Forward pass of :class:`DiTBlock`.
+
+        Args:
+            x: input (``torch.Tensor``).
+            t_emb: input (``torch.Tensor | None``).
+            attn_mask: input (``torch.Tensor | None``).
+            key_padding_mask: input (``torch.Tensor | None``).
+            positions: input (``torch.Tensor | None``).
+
+        Returns:
+            ``torch.Tensor``.
+        """
         if t_emb is None:
             t_emb = torch.zeros(x.size(0), x.size(-1), device=x.device, dtype=x.dtype)
         shift_msa, scale_msa, gate_msa, shift_mlp, scale_mlp, gate_mlp = self._mod(t_emb)

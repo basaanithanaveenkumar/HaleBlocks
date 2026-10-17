@@ -45,6 +45,18 @@ class TransformerLayer(nn.Module):
         key_padding_mask: torch.Tensor | None = None,
         positions: torch.Tensor | None = None,
     ) -> torch.Tensor:
+        """Forward pass of :class:`TransformerLayer`.
+
+        Args:
+            x: input (``torch.Tensor``).
+            t_emb: input (``torch.Tensor | None``).
+            attn_mask: input (``torch.Tensor | None``).
+            key_padding_mask: input (``torch.Tensor | None``).
+            positions: input (``torch.Tensor | None``).
+
+        Returns:
+            ``torch.Tensor``.
+        """
         s1 = sh1 = s2 = sh2 = None
         if self.use_time_cond and t_emb is not None:
             s1, sh1, s2, sh2 = self.time_proj(t_emb).chunk(4, dim=-1)

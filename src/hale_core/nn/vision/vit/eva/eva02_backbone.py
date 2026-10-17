@@ -83,6 +83,14 @@ class EVA02Backbone(BaseVisionBackbone):
             self.blocks[i].requires_grad_(False)
 
     def forward(self, x: torch.Tensor) -> BackboneOutput:
+        """Forward pass of :class:`EVA02Backbone`.
+
+        Args:
+            x: input (``torch.Tensor``).
+
+        Returns:
+            ``BackboneOutput``.
+        """
         B = x.shape[0]
 
         # Patch embedding — no positional embedding added (RoPE handles positions)

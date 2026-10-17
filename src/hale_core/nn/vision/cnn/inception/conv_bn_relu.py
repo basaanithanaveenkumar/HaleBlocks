@@ -16,4 +16,12 @@ class ConvBnRelu(nn.Module):
         self.bn = nn.BatchNorm2d(out_ch, eps=0.001)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
+        """Forward pass of :class:`ConvBnRelu`.
+
+        Args:
+            x: input (``torch.Tensor``).
+
+        Returns:
+            ``torch.Tensor``.
+        """
         return F.relu(self.bn(self.conv(x)), inplace=True)

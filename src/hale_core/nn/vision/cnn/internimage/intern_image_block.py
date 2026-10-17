@@ -46,6 +46,14 @@ class InternImageBlock(nn.Module):
         self.drop_path = _DropPath(drop_path) if drop_path > 0.0 else nn.Identity()
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
+        """Forward pass of :class:`InternImageBlock`.
+
+        Args:
+            x: input (``torch.Tensor``).
+
+        Returns:
+            ``torch.Tensor``.
+        """
         # x: [B, C, H, W] channels-first
         B, C, H, W = x.shape
 

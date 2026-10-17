@@ -47,6 +47,14 @@ class MaxViTStage(nn.Module):
         )
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
+        """Forward pass of :class:`MaxViTStage`.
+
+        Args:
+            x: input (``torch.Tensor``).
+
+        Returns:
+            ``torch.Tensor``.
+        """
         x = self.downsample(x)
         for blk in self.blocks:
             x = blk(x)

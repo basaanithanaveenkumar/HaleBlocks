@@ -16,4 +16,9 @@ class DenseMLP(nn.Module):
         )
 
     def forward(self, x):
+        """Forward pass of :class:`DenseMLP`.
+
+        Args:
+            x: input.
+        """
         return self.net(x)

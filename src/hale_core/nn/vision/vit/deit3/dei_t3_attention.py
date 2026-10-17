@@ -45,6 +45,15 @@ class DeiT3Attention(nn.Module):
     def forward(
         self, x: torch.Tensor, return_attn: bool = False
     ) -> tuple[torch.Tensor, Optional[torch.Tensor]]:
+        """Forward pass of :class:`DeiT3Attention`.
+
+        Args:
+            x: input (``torch.Tensor``).
+            return_attn: input (``bool``).
+
+        Returns:
+            ``tuple[torch.Tensor, Optional[torch.Tensor]]``.
+        """
         B, N, D = x.shape
         H = self.num_heads
 

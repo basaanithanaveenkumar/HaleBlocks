@@ -21,6 +21,14 @@ class DropPath(nn.Module):
         self.drop_prob = drop_prob
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
+        """Forward pass of :class:`DropPath`.
+
+        Args:
+            x: input (``torch.Tensor``).
+
+        Returns:
+            ``torch.Tensor``.
+        """
         if not self.training or self.drop_prob == 0.0:
             return x
         keep_prob = 1.0 - self.drop_prob

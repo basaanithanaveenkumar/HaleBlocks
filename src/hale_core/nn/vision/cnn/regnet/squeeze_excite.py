@@ -17,6 +17,14 @@ class SqueezeExcite(nn.Module):
         self.fc2 = nn.Linear(mid, in_channels)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
+        """Forward pass of :class:`SqueezeExcite`.
+
+        Args:
+            x: input (``torch.Tensor``).
+
+        Returns:
+            ``torch.Tensor``.
+        """
         scale = x.mean(dim=[2, 3])  # [B, C]
         scale = F.relu(self.fc1(scale))
         scale = torch.sigmoid(self.fc2(scale))

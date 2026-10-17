@@ -25,4 +25,12 @@ class LayerScale(nn.Module):
         self.gamma = nn.Parameter(init_value * torch.ones(dim))
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
+        """Forward pass of :class:`LayerScale`.
+
+        Args:
+            x: input (``torch.Tensor``).
+
+        Returns:
+            ``torch.Tensor``.
+        """
         return x * self.gamma

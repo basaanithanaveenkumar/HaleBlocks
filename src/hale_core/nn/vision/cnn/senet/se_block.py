@@ -27,6 +27,14 @@ class SEBlock(nn.Module):
         self.fc2 = nn.Conv2d(squeezed, channels, kernel_size=1, bias=True)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
+        """Forward pass of :class:`SEBlock`.
+
+        Args:
+            x: input (``torch.Tensor``).
+
+        Returns:
+            ``torch.Tensor``.
+        """
         # Squeeze: global spatial average
         s = self.pool(x)  # [B, C, 1, 1]
         # Excitation: FC → ReLU → FC → Sigmoid

@@ -84,6 +84,14 @@ class MBConvB(nn.Module):
         self.has_skip = has_skip
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
+        """Forward pass of :class:`MBConvB`.
+
+        Args:
+            x: input (``torch.Tensor``).
+
+        Returns:
+            ``torch.Tensor``.
+        """
         if self.has_skip:
             return x + self.drop_path(self.conv(x))
         return self.conv(x)

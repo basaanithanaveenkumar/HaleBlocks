@@ -25,6 +25,14 @@ class WSConv2d(nn.Conv2d):
         self.gain = nn.Parameter(torch.ones(self.out_channels, 1, 1, 1))
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
+        """Forward pass of :class:`WSConv2d`.
+
+        Args:
+            x: input (``torch.Tensor``).
+
+        Returns:
+            ``torch.Tensor``.
+        """
         w = self.weight
         # Subtract per-filter mean (dims: in_C, kH, kW)
         w = w - w.mean(dim=[1, 2, 3], keepdim=True)

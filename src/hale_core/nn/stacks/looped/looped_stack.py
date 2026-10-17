@@ -146,6 +146,18 @@ class LoopedStack(nn.Module):
         key_padding_mask: torch.Tensor | None = None,
         positions: torch.Tensor | None = None,
     ) -> torch.Tensor:
+        """Forward pass of :class:`LoopedStack`.
+
+        Args:
+            h: input (``torch.Tensor``).
+            t_emb: input (``torch.Tensor | None``).
+            attn_mask: input (``torch.Tensor | None``).
+            key_padding_mask: input (``torch.Tensor | None``).
+            positions: input (``torch.Tensor | None``).
+
+        Returns:
+            ``torch.Tensor``.
+        """
         kw = {
             "t_emb": t_emb,
             "attn_mask": attn_mask,

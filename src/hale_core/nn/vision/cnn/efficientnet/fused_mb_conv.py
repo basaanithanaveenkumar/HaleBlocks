@@ -67,6 +67,14 @@ class FusedMBConv(nn.Module):
         self.has_skip = has_skip
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
+        """Forward pass of :class:`FusedMBConv`.
+
+        Args:
+            x: input (``torch.Tensor``).
+
+        Returns:
+            ``torch.Tensor``.
+        """
         if self.has_skip:
             return x + self.stochastic_depth(self.conv(x))
         return self.conv(x)

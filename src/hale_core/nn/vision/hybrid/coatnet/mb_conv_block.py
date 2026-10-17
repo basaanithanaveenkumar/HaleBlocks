@@ -64,6 +64,14 @@ class MBConvBlock(nn.Module):
         self.drop_path = DropPath(drop_path) if drop_path > 0 else nn.Identity()
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
+        """Forward pass of :class:`MBConvBlock`.
+
+        Args:
+            x: input (``torch.Tensor``).
+
+        Returns:
+            ``torch.Tensor``.
+        """
         residual = x
         x = self.pre_norm(x)
         x = self.expand_act(self.expand(x))

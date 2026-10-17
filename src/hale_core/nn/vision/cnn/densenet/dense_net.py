@@ -92,6 +92,14 @@ class DenseNet(BaseVisionBackbone):
                 nn.init.zeros_(m.bias)
 
     def forward(self, x: torch.Tensor) -> BackboneOutput:
+        """Forward pass of :class:`DenseNet`.
+
+        Args:
+            x: input (``torch.Tensor``).
+
+        Returns:
+            ``BackboneOutput``.
+        """
         x = self.initial(x)  # [B, init_features, H/4, W/4]
 
         feature_maps = []

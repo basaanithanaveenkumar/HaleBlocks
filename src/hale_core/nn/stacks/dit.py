@@ -57,6 +57,18 @@ class DiTStack(nn.Module):
         key_padding_mask: torch.Tensor | None = None,
         positions: torch.Tensor | None = None,
     ) -> torch.Tensor:
+        """Forward pass of :class:`DiTStack`.
+
+        Args:
+            h: input (``torch.Tensor``).
+            t_emb: input (``torch.Tensor | None``).
+            attn_mask: input (``torch.Tensor | None``).
+            key_padding_mask: input (``torch.Tensor | None``).
+            positions: input (``torch.Tensor | None``).
+
+        Returns:
+            ``torch.Tensor``.
+        """
         for block in self.blocks:
             h = block(
                 h,

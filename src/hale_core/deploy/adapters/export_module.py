@@ -42,6 +42,11 @@ class ExportModule(nn.Module):
         self.output_names = list(output_names)
 
     def forward(self, *args: torch.Tensor) -> tuple[torch.Tensor, ...]:
+        """Forward pass of :class:`ExportModule`.
+
+        Returns:
+            ``tuple[torch.Tensor, ...]``.
+        """
         if len(args) != len(self.input_names):
             raise DeployError(
                 f"expected {len(self.input_names)} inputs {self.input_names}, got {len(args)}"

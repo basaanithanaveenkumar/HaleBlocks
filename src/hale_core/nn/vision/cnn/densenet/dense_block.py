@@ -35,6 +35,14 @@ class DenseBlock(nn.Module):
         self.out_channels = num_input_features + num_layers * growth_rate
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
+        """Forward pass of :class:`DenseBlock`.
+
+        Args:
+            x: input (``torch.Tensor``).
+
+        Returns:
+            ``torch.Tensor``.
+        """
         # Accumulate all feature maps in a list and concat for each new layer
         features = [x]
         for layer in self.layers:

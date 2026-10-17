@@ -134,6 +134,18 @@ class SequenceBackbone(nn.Module):
         attn_mask: torch.Tensor | None = None,
         pos_ids_len: int | None = None,
     ) -> torch.Tensor:
+        """Forward pass of :class:`SequenceBackbone`.
+
+        Args:
+            token_ids: input (``torch.Tensor``).
+            attention_mask: input (``torch.Tensor | None``).
+            t: input (``torch.Tensor | None``).
+            attn_mask: input (``torch.Tensor | None``).
+            pos_ids_len: input (``int | None``).
+
+        Returns:
+            ``torch.Tensor``.
+        """
         hidden = self.embed(token_ids)
         t_emb = self.time_features(t)
         attn_mask, key_padding = self.attention_inputs(

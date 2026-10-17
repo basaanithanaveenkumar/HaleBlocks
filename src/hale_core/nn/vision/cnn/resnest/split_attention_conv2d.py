@@ -63,6 +63,14 @@ class SplitAttentionConv2d(nn.Module):
         )
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
+        """Forward pass of :class:`SplitAttentionConv2d`.
+
+        Args:
+            x: input (``torch.Tensor``).
+
+        Returns:
+            ``torch.Tensor``.
+        """
         # Produce all radix feature maps
         x = F.relu(self.bn0(self.conv(x)), inplace=True)  # [B, C*radix, H, W]
         B, CR, H, W = x.shape

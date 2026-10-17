@@ -19,4 +19,12 @@ class InternImageFFN(nn.Module):
         self.drop2 = nn.Dropout(drop)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
+        """Forward pass of :class:`InternImageFFN`.
+
+        Args:
+            x: input (``torch.Tensor``).
+
+        Returns:
+            ``torch.Tensor``.
+        """
         return self.drop2(self.fc2(self.drop1(self.act(self.fc1(x)))))

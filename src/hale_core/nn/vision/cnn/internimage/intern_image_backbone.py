@@ -106,6 +106,14 @@ class InternImageBackbone(BaseVisionBackbone):
                     nn.init.zeros_(m.bias)
 
     def forward(self, x: torch.Tensor) -> BackboneOutput:
+        """Forward pass of :class:`InternImageBackbone`.
+
+        Args:
+            x: input (``torch.Tensor``).
+
+        Returns:
+            ``BackboneOutput``.
+        """
         # Stem
         x = self.stem_conv(x)  # [B, C, H/4, W/4]
         B, C, H, W = x.shape

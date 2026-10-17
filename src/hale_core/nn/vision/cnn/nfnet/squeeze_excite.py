@@ -17,6 +17,14 @@ class SqueezeExcite(nn.Module):
         self.excite = nn.Linear(mid, in_channels)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
+        """Forward pass of :class:`SqueezeExcite`.
+
+        Args:
+            x: input (``torch.Tensor``).
+
+        Returns:
+            ``torch.Tensor``.
+        """
         # x: [B, C, H, W]
         scale = x.mean(dim=[2, 3])  # [B, C] global average pool
         scale = F.gelu(self.squeeze(scale))  # [B, mid]

@@ -33,6 +33,14 @@ class GRN(nn.Module):
         self.beta = nn.Parameter(torch.zeros(1, 1, 1, dim))
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
+        """Forward pass of :class:`GRN`.
+
+        Args:
+            x: input (``torch.Tensor``).
+
+        Returns:
+            ``torch.Tensor``.
+        """
         # Global spatial L2 norm per channel: [B, 1, 1, C]
         gx = x.norm(p=2, dim=(1, 2), keepdim=True)
         # Normalise across the channel dimension

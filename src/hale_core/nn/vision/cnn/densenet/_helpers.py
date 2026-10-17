@@ -32,6 +32,14 @@ class _DenseLayer(nn.Module):
         self.conv2 = nn.Conv2d(inter_ch, growth_rate, kernel_size=3, padding=1, bias=False)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
+        """Forward pass of :class:`_DenseLayer`.
+
+        Args:
+            x: input (``torch.Tensor``).
+
+        Returns:
+            ``torch.Tensor``.
+        """
         # Typical implementation receives a list of all previous outputs which
         # are concatenated inside forward — this matches DenseNet paper appendix.
         out = self.conv1(F.relu(self.norm1(x), inplace=True))
@@ -57,4 +65,12 @@ class _Transition(nn.Module):
         self.pool = nn.AvgPool2d(kernel_size=2, stride=2)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
+        """Forward pass of :class:`_Transition`.
+
+        Args:
+            x: input (``torch.Tensor``).
+
+        Returns:
+            ``torch.Tensor``.
+        """
         return self.pool(self.conv(F.relu(self.norm(x), inplace=True)))

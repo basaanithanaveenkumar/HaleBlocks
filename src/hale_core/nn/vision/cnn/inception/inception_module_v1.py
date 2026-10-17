@@ -50,6 +50,14 @@ class InceptionModuleV1(nn.Module):
         )
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
+        """Forward pass of :class:`InceptionModuleV1`.
+
+        Args:
+            x: input (``torch.Tensor``).
+
+        Returns:
+            ``torch.Tensor``.
+        """
         return torch.cat(
             [self.branch1(x), self.branch2(x), self.branch3(x), self.branch4(x)], dim=1
         )

@@ -23,6 +23,14 @@ class SqueezeExciteB(nn.Module):
         self.fc2 = nn.Conv2d(squeezed, in_chs, kernel_size=1, bias=True)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
+        """Forward pass of :class:`SqueezeExciteB`.
+
+        Args:
+            x: input (``torch.Tensor``).
+
+        Returns:
+            ``torch.Tensor``.
+        """
         s = self.pool(x)
         s = F.silu(self.fc1(s))
         s = torch.sigmoid(self.fc2(s))

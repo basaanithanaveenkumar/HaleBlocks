@@ -29,5 +29,13 @@ class ViTMLP(nn.Module):
         nn.init.zeros_(self.fc2.bias)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
+        """Forward pass of :class:`ViTMLP`.
+
+        Args:
+            x: input (``torch.Tensor``).
+
+        Returns:
+            ``torch.Tensor``.
+        """
         x = self.drop1(self.act(self.fc1(x)))
         return self.drop2(self.fc2(x))

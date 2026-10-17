@@ -43,6 +43,15 @@ class DINOBlock(nn.Module):
     def forward(
         self, x: torch.Tensor, return_attn: bool = False
     ) -> tuple[torch.Tensor, Optional[torch.Tensor]]:
+        """Forward pass of :class:`DINOBlock`.
+
+        Args:
+            x: input (``torch.Tensor``).
+            return_attn: input (``bool``).
+
+        Returns:
+            ``tuple[torch.Tensor, Optional[torch.Tensor]]``.
+        """
         attn_out, attn_weights = self.attn(self.norm1(x), return_attn=return_attn)
         x = x + self.ls1(attn_out)
         x = x + self.ls2(self.mlp(self.norm2(x)))

@@ -27,4 +27,12 @@ class _ReductionB(nn.Module):
         # Total: 320 + 192 + 768 = 1280
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
+        """Forward pass of :class:`_ReductionB`.
+
+        Args:
+            x: input (``torch.Tensor``).
+
+        Returns:
+            ``torch.Tensor``.
+        """
         return torch.cat([self.br1(x), self.br2(x), self.br3(x)], dim=1)

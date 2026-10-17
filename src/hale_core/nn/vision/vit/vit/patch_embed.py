@@ -41,6 +41,14 @@ class PatchEmbed(nn.Module):
         nn.init.zeros_(self.proj.bias)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
+        """Forward pass of :class:`PatchEmbed`.
+
+        Args:
+            x: input (``torch.Tensor``).
+
+        Returns:
+            ``torch.Tensor``.
+        """
         # x: [B, C, H, W] → [B, D, H/p, W/p] → [B, N, D]
         x = self.proj(x)  # [B, D, G, G]
         x = x.flatten(2).transpose(1, 2)  # [B, N, D]

@@ -61,6 +61,14 @@ class ResBottleneckBlock(nn.Module):
             )
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
+        """Forward pass of :class:`ResBottleneckBlock`.
+
+        Args:
+            x: input (``torch.Tensor``).
+
+        Returns:
+            ``torch.Tensor``.
+        """
         skip = x if self.shortcut is None else self.shortcut(x)
 
         out = F.relu(self.bn1(self.conv1(x)), inplace=True)

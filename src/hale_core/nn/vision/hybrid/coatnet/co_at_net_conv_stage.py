@@ -38,4 +38,12 @@ class CoAtNetConvStage(nn.Module):
         self.blocks = nn.Sequential(*blocks)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
+        """Forward pass of :class:`CoAtNetConvStage`.
+
+        Args:
+            x: input (``torch.Tensor``).
+
+        Returns:
+            ``torch.Tensor``.
+        """
         return self.blocks(x)

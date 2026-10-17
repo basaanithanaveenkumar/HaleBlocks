@@ -37,6 +37,14 @@ class SwiGLUFFN(nn.Module):
         _trunc_normal_(self.w3.weight)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
+        """Forward pass of :class:`SwiGLUFFN`.
+
+        Args:
+            x: input (``torch.Tensor``).
+
+        Returns:
+            ``torch.Tensor``.
+        """
         # SiLU gate applied element-wise to the value branch
         gate = F.silu(self.w1(x))
         value = self.w2(x)

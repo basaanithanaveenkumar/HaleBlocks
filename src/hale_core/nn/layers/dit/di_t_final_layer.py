@@ -16,6 +16,15 @@ class DiTFinalLayer(nn.Module):
         nn.init.zeros_(self.adaLN_modulation[-1].bias)
 
     def forward(self, x: torch.Tensor, t_emb: torch.Tensor | None) -> torch.Tensor:
+        """Forward pass of :class:`DiTFinalLayer`.
+
+        Args:
+            x: input (``torch.Tensor``).
+            t_emb: input (``torch.Tensor | None``).
+
+        Returns:
+            ``torch.Tensor``.
+        """
         if t_emb is None:
             t_emb = torch.zeros(x.size(0), x.size(-1), device=x.device, dtype=x.dtype)
         shift, scale = self.adaLN_modulation(t_emb).chunk(2, dim=-1)

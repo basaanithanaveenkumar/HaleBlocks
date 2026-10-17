@@ -104,6 +104,14 @@ class ViTBackbone(BaseVisionBackbone):
             self.blocks[i].requires_grad_(False)
 
     def forward(self, x: torch.Tensor) -> BackboneOutput:
+        """Forward pass of :class:`ViTBackbone`.
+
+        Args:
+            x: input (``torch.Tensor``).
+
+        Returns:
+            ``BackboneOutput``.
+        """
         B = x.shape[0]
 
         # 1. Patch embedding

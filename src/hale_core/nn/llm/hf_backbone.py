@@ -134,6 +134,18 @@ class HFCausalLMBackbone(LanguageBackbone):
         labels: Tensor | None = None,
         token_ids: Tensor | None = None,
     ) -> LanguageBackboneOutput:
+        """Forward pass of :class:`HFCausalLMBackbone`.
+
+        Args:
+            inputs_embeds: input (``Tensor | None``).
+            input_ids: input (``Tensor | None``).
+            attention_mask: input (``Tensor | None``).
+            labels: input (``Tensor | None``).
+            token_ids: input (``Tensor | None``).
+
+        Returns:
+            ``LanguageBackboneOutput``.
+        """
         extra: dict[str, Any] = {}
         if self.per_layer_vocab is not None and inputs_embeds is not None and token_ids is not None:
             extra["per_layer_inputs"] = self.per_layer_inputs(token_ids)

@@ -79,6 +79,22 @@ class TextTowerForCausalLM(PreTrainedModel, GenerationMixin):
         logits_to_keep: int | torch.Tensor = 0,
         **kwargs: Any,
     ) -> CausalLMOutputWithPast:
+        """Forward pass of :class:`TextTowerForCausalLM`.
+
+        Args:
+            input_ids: input (``torch.LongTensor | None``).
+            attention_mask: input (``torch.Tensor | None``).
+            position_ids: input (``torch.LongTensor | None``).
+            past_key_values: input (``Any``).
+            inputs_embeds: input (``torch.Tensor | None``).
+            labels: input (``torch.LongTensor | None``).
+            use_cache: input (``bool | None``).
+            cache_position: input (``torch.LongTensor | None``).
+            logits_to_keep: input (``int | torch.Tensor``).
+
+        Returns:
+            ``CausalLMOutputWithPast``.
+        """
         out = self.model(
             input_ids=input_ids,
             attention_mask=attention_mask,

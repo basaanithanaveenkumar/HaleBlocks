@@ -16,4 +16,12 @@ class SwiGLUExpert(nn.Module):
         self.dropout = nn.Dropout(dropout)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
+        """Forward pass of :class:`SwiGLUExpert`.
+
+        Args:
+            x: input (``torch.Tensor``).
+
+        Returns:
+            ``torch.Tensor``.
+        """
         return self.dropout(self.w2(F.silu(self.w1(x)) * self.w3(x)))

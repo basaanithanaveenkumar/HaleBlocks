@@ -50,6 +50,17 @@ class GroupedQueryAttention(nn.Module):
         key_padding_mask: torch.Tensor | None = None,
         positions: torch.Tensor | None = None,
     ) -> torch.Tensor:
+        """Forward pass of :class:`GroupedQueryAttention`.
+
+        Args:
+            x: input (``torch.Tensor``).
+            attn_mask: input (``torch.Tensor | None``).
+            key_padding_mask: input (``torch.Tensor | None``).
+            positions: input (``torch.Tensor | None``).
+
+        Returns:
+            ``torch.Tensor``.
+        """
         b, s, _ = x.shape
         q = self.wq(x).view(b, s, self.n_heads, self.head_dim).transpose(1, 2)
         k = self.wk(x).view(b, s, self.n_kv_heads, self.head_dim).transpose(1, 2)

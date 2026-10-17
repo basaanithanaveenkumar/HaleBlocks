@@ -13,6 +13,14 @@ class LayerNorm2d(nn.LayerNorm):
     """
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
+        """Forward pass of :class:`LayerNorm2d`.
+
+        Args:
+            x: input (``torch.Tensor``).
+
+        Returns:
+            ``torch.Tensor``.
+        """
         x = x.permute(0, 2, 3, 1)  # → [B, H, W, C]
         x = super().forward(x)
         return x.permute(0, 3, 1, 2)  # → [B, C, H, W]

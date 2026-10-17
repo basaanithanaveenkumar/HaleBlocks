@@ -15,6 +15,14 @@ class SinusoidalTimeEmbedding(nn.Module):
         self.dim = dim
 
     def forward(self, t: torch.Tensor) -> torch.Tensor:
+        """Forward pass of :class:`SinusoidalTimeEmbedding`.
+
+        Args:
+            t: input (``torch.Tensor``).
+
+        Returns:
+            ``torch.Tensor``.
+        """
         orig = t.shape
         t_flat = t.reshape(-1).float()
         half = self.dim // 2

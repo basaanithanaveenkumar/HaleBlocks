@@ -87,6 +87,14 @@ class InceptionV3(BaseVisionBackbone):
                 nn.init.zeros_(m.bias)
 
     def forward(self, x: torch.Tensor) -> BackboneOutput:
+        """Forward pass of :class:`InceptionV3`.
+
+        Args:
+            x: input (``torch.Tensor``).
+
+        Returns:
+            ``BackboneOutput``.
+        """
         s0 = self.stem(x)  # [B, 192, ~H/32, ~W/32]
         s1 = self.reduction_a(self.stage1(s0))  # [B, 768, ...]
         s2 = self.reduction_b(self.stage2(s1))  # [B, 1280, ...]

@@ -91,6 +91,14 @@ class MobileOneBlock(nn.Module):
         self.reparam_pw: Optional[nn.Conv2d] = None
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
+        """Forward pass of :class:`MobileOneBlock`.
+
+        Args:
+            x: input (``torch.Tensor``).
+
+        Returns:
+            ``torch.Tensor``.
+        """
         if self._is_reparam:
             # Fast inference path: single fused conv
             return self.act(self.reparam_pw(self.act(self.reparam_dw(x))))

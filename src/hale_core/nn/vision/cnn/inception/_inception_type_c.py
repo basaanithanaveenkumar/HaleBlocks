@@ -29,6 +29,14 @@ class _InceptionTypeC(nn.Module):
         # Total: 320 + 384+384 + 384+384 + 192 = 2048
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
+        """Forward pass of :class:`_InceptionTypeC`.
+
+        Args:
+            x: input (``torch.Tensor``).
+
+        Returns:
+            ``torch.Tensor``.
+        """
         b1 = self.br1(x)
         b2_r = self.br2_r(x)
         b2 = torch.cat([self.br2_1x3(b2_r), self.br2_3x1(b2_r)], dim=1)  # 768

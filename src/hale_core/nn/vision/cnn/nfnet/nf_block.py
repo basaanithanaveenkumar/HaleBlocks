@@ -64,6 +64,14 @@ class NFBlock(nn.Module):
             self.shortcut = WSConv2d(in_channels, out_channels, 1, stride=stride, bias=False)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
+        """Forward pass of :class:`NFBlock`.
+
+        Args:
+            x: input (``torch.Tensor``).
+
+        Returns:
+            ``torch.Tensor``.
+        """
         # Normalise input variance before the residual branch
         x_norm = x / self.beta
 

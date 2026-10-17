@@ -21,31 +21,37 @@ _INT64_MAX = 2**63 - 1
     ]
 )
 def reshape(x, shape):
+    """Lower ``aten.view.default``, ``aten._unsafe_view.default``, ``aten.reshape.default``, ``aten.view_copy.default`` to MLX: ``mx.reshape(x, [int(s) for s in shape])``."""
     return mx.reshape(x, [int(s) for s in shape])
 
 
 @register(name=["aten.flatten.using_ints"])
 def flatten(x, start_dim=0, end_dim=-1):
+    """Lower ``aten.flatten.using_ints`` to MLX: ``mx.flatten(x, start_axis=start_dim, end_axis=end_dim)``."""
     return mx.flatten(x, start_axis=start_dim, end_axis=end_dim)
 
 
 @register(name=["aten.permute.default", "aten.permute_copy.default"])
 def permute(x, dims):
+    """Lower ``aten.permute.default``, ``aten.permute_copy.default`` to MLX: ``mx.transpose(x, [int(d) for d in dims])``."""
     return mx.transpose(x, [int(d) for d in dims])
 
 
 @register(name=["aten.transpose.int"])
 def transpose(x, dim0, dim1):
+    """Lower ``aten.transpose.int`` to MLX: ``mx.swapaxes(x, dim0, dim1)``."""
     return mx.swapaxes(x, dim0, dim1)
 
 
 @register(name=["aten.unsqueeze.default", "aten.unsqueeze_copy.default"])
 def unsqueeze(x, dim):
+    """Lower ``aten.unsqueeze.default``, ``aten.unsqueeze_copy.default`` to MLX: ``mx.expand_dims(x, dim if dim >= 0 else dim + x.ndim + 1)``."""
     return mx.expand_dims(x, dim if dim >= 0 else dim + x.ndim + 1)
 
 
 @register(name=["aten.squeeze.dim", "aten.squeeze.dims", "aten.squeeze.default"])
 def squeeze(x, dim=None):
+    """Lower ``aten.squeeze.dim``, ``aten.squeeze.dims``, ``aten.squeeze.default`` to MLX."""
     if dim is None:
         return mx.squeeze(x)
     dims = [d % x.ndim for d in (dim if isinstance(dim, (list, tuple)) else [dim])]
@@ -55,6 +61,7 @@ def squeeze(x, dim=None):
 
 @register(name=["aten.expand.default", "aten.expand_copy.default"])
 def expand(x, size, implicit=False):
+    """Lower ``aten.expand.default``, ``aten.expand_copy.default`` to MLX."""
     size = [int(s) for s in size]
     lead = len(size) - x.ndim
     target = [s if s != -1 else x.shape[i - lead] for i, s in enumerate(size)]
@@ -63,6 +70,7 @@ def expand(x, size, implicit=False):
 
 @register(name=["aten.repeat.default"])
 def repeat(x, repeats):
+    """Lower ``aten.repeat.default`` to MLX."""
     reps = [int(r) for r in repeats]
     if len(reps) > x.ndim:
         x = mx.reshape(x, [1] * (len(reps) - x.ndim) + list(x.shape))
@@ -71,16 +79,19 @@ def repeat(x, repeats):
 
 @register(name=["aten.cat.default", "aten.concat.default"])
 def cat(tensors, dim=0):
+    """Lower ``aten.cat.default``, ``aten.concat.default`` to MLX."""
     return mx.concatenate([t for t in tensors if t.size > 0 or len(tensors) == 1], axis=dim)
 
 
 @register(name=["aten.stack.default"])
 def stack(tensors, dim=0):
+    """Lower ``aten.stack.default`` to MLX: ``mx.stack(list(tensors), axis=dim)``."""
     return mx.stack(list(tensors), axis=dim)
 
 
 @register(name=["aten.split.Tensor", "aten.split_copy.Tensor"])
 def split(x, split_size, dim=0):
+    """Lower ``aten.split.Tensor``, ``aten.split_copy.Tensor`` to MLX."""
     n = x.shape[dim]
     bounds = list(range(split_size, n, split_size))
     return mx.split(x, bounds, axis=dim)
@@ -88,6 +99,7 @@ def split(x, split_size, dim=0):
 
 @register(name=["aten.split_with_sizes.default", "aten.split_with_sizes_copy.default"])
 def split_with_sizes(x, split_sizes, dim=0):
+    """Lower ``aten.split_with_sizes.default``, ``aten.split_with_sizes_copy.default`` to MLX."""
     bounds, total = [], 0
     for s in split_sizes[:-1]:
         total += int(s)
@@ -97,11 +109,13 @@ def split_with_sizes(x, split_sizes, dim=0):
 
 @register(name=["aten.unbind.int"])
 def unbind(x, dim=0):
+    """Lower ``aten.unbind.int`` to MLX: ``[mx.take(x, i, axis=dim) for i in range(x.shape[dim])]``."""
     return [mx.take(x, i, axis=dim) for i in range(x.shape[dim])]
 
 
 @register(name=["aten.slice.Tensor", "aten.slice_copy.Tensor"])
 def slice_(x, dim=0, start=None, end=None, step=1):
+    """Lower ``aten.slice.Tensor``, ``aten.slice_copy.Tensor`` to MLX."""
     dim = dim % x.ndim
     size = x.shape[dim]
     end = size if end is None or end >= _INT64_MAX else end
@@ -112,32 +126,38 @@ def slice_(x, dim=0, start=None, end=None, step=1):
 
 @register(name=["aten.select.int", "aten.select_copy.int"])
 def select(x, dim, index):
+    """Lower ``aten.select.int``, ``aten.select_copy.int`` to MLX."""
     dim = dim % x.ndim
     return mx.take(x, index % x.shape[dim], axis=dim)
 
 
 @register(name=["aten.index_select.default"])
 def index_select(x, dim, index):
+    """Lower ``aten.index_select.default`` to MLX: ``mx.take(x, index, axis=dim)``."""
     return mx.take(x, index, axis=dim)
 
 
 @register(name=["aten.index.Tensor"])
 def index(x, indices):
+    """Lower ``aten.index.Tensor`` to MLX: ``x[tuple((slice(None) if i is None else i for i in indices))]``."""
     return x[tuple(slice(None) if i is None else i for i in indices)]
 
 
 @register(name=["aten.gather.default"])
 def gather(x, dim, index, sparse_grad=False):
+    """Lower ``aten.gather.default`` to MLX: ``mx.take_along_axis(x, index, axis=dim)``."""
     return mx.take_along_axis(x, index, axis=dim)
 
 
 @register(name=["aten.embedding.default"])
 def embedding(weight, indices, padding_idx=-1, scale_grad_by_freq=False, sparse=False):
+    """Lower ``aten.embedding.default`` to MLX: ``mx.take(weight, indices, axis=0)``."""
     return mx.take(weight, indices, axis=0)
 
 
 @register(name=["aten.constant_pad_nd.default", "aten.pad.default"])
 def constant_pad(x, pad, value=0.0, mode="constant"):
+    """Lower ``aten.constant_pad_nd.default``, ``aten.pad.default`` to MLX."""
     pairs = [(0, 0)] * x.ndim
     for i in range(len(pad) // 2):  # torch pads from the last dim backwards
         pairs[x.ndim - 1 - i] = (int(pad[2 * i]), int(pad[2 * i + 1]))
@@ -146,6 +166,7 @@ def constant_pad(x, pad, value=0.0, mode="constant"):
 
 @register(name=["aten.triu.default"])
 def triu(x, diagonal=0):
+    """Lower ``aten.triu.default`` to MLX."""
     return (
         mx.triu(x, k=diagonal)
         if x.dtype != mx.bool_
@@ -155,6 +176,7 @@ def triu(x, diagonal=0):
 
 @register(name=["aten.tril.default"])
 def tril(x, diagonal=0):
+    """Lower ``aten.tril.default`` to MLX."""
     return (
         mx.tril(x, k=diagonal)
         if x.dtype != mx.bool_
@@ -164,11 +186,13 @@ def tril(x, diagonal=0):
 
 @register(name=["aten.roll.default"])
 def roll(x, shifts, dims=()):
+    """Lower ``aten.roll.default`` to MLX: ``mx.roll(x, list(shifts), axis=list(dims) if dims else None)``."""
     return mx.roll(x, list(shifts), axis=list(dims) if dims else None)
 
 
 @register(name=["aten.flip.default"])
 def flip(x, dims):
+    """Lower ``aten.flip.default`` to MLX."""
     index = [slice(None)] * x.ndim
     for d in dims:
         index[d % x.ndim] = slice(None, None, -1)

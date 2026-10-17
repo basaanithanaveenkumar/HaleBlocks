@@ -49,6 +49,14 @@ class Bottleneck(nn.Module):
         self.downsample = downsample
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
+        """Forward pass of :class:`Bottleneck`.
+
+        Args:
+            x: input (``torch.Tensor``).
+
+        Returns:
+            ``torch.Tensor``.
+        """
         identity = x
 
         out = F.relu(self.bn1(self.conv1(x)), inplace=True)

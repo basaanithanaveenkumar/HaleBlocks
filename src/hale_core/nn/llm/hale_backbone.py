@@ -123,6 +123,18 @@ class HaleSequenceLMBackbone(LanguageBackbone):
         labels: Tensor | None = None,
         token_ids: Tensor | None = None,  # unused: Hale backbones read only the embeddings
     ) -> LanguageBackboneOutput:
+        """Forward pass of :class:`HaleSequenceLMBackbone`.
+
+        Args:
+            inputs_embeds: input (``Tensor | None``).
+            input_ids: input (``Tensor | None``).
+            attention_mask: input (``Tensor | None``).
+            labels: input (``Tensor | None``).
+            token_ids: input (``Tensor | None``).
+
+        Returns:
+            ``LanguageBackboneOutput``.
+        """
         if inputs_embeds is None:
             if input_ids is None:
                 raise ValueError("pass inputs_embeds or input_ids")

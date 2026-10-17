@@ -13,6 +13,7 @@ register = MLX_OPS.register_module
 
 @register(name=["aten.linear.default"])
 def linear(x, weight, bias=None):
+    """Lower ``aten.linear.default`` to MLX."""
     y = x @ weight.T
     return y + bias if bias is not None else y
 
@@ -28,11 +29,13 @@ def quantized_linear(x, w_q, scales, biases, bias=None, *, group_size: int, bits
 
 @register(name=["aten.mm.default", "aten.bmm.default", "aten.matmul.default"])
 def matmul(a, b):
+    """Lower ``aten.mm.default``, ``aten.bmm.default``, ``aten.matmul.default`` to MLX: ``a @ b``."""
     return a @ b
 
 
 @register(name=["aten.addmm.default"])
 def addmm(bias, a, b, beta=1, alpha=1):
+    """Lower ``aten.addmm.default`` to MLX."""
     out = a @ b
     if alpha != 1:
         out = out * alpha
@@ -41,11 +44,13 @@ def addmm(bias, a, b, beta=1, alpha=1):
 
 @register(name=["aten.baddbmm.default"])
 def baddbmm(bias, a, b, beta=1, alpha=1):
+    """Lower ``aten.baddbmm.default`` to MLX: ``addmm(bias, a, b, beta, alpha)``."""
     return addmm(bias, a, b, beta, alpha)
 
 
 @register(name=["aten.t.default", "aten.numpy_T.default"])
 def t(x):
+    """Lower ``aten.t.default``, ``aten.numpy_T.default`` to MLX: ``x.T if x.ndim == 2 else x``."""
     return x.T if x.ndim == 2 else x
 
 

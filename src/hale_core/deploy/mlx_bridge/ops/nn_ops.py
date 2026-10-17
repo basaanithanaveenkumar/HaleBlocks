@@ -27,6 +27,7 @@ def _norm_axes(x, normalized_shape):
 
 @register(name=["aten.layer_norm.default"])
 def layer_norm(x, normalized_shape, weight=None, bias=None, eps=1e-5, cudnn_enable=True):
+    """Lower ``aten.layer_norm.default`` to MLX."""
     if len(normalized_shape) == 1:
         return mx.fast.layer_norm(x, weight, bias, eps)
     axes = _norm_axes(x, normalized_shape)
@@ -38,6 +39,7 @@ def layer_norm(x, normalized_shape, weight=None, bias=None, eps=1e-5, cudnn_enab
 
 @register(name=["aten.native_layer_norm.default"])
 def native_layer_norm(x, normalized_shape, weight, bias, eps):
+    """Lower ``aten.native_layer_norm.default`` to MLX."""
     axes = _norm_axes(x, normalized_shape)
     mean = mx.mean(x, axis=axes, keepdims=True)
     rstd = mx.rsqrt(mx.var(x, axis=axes, keepdims=True) + eps)
@@ -46,6 +48,7 @@ def native_layer_norm(x, normalized_shape, weight, bias, eps):
 
 @register(name=["aten.rms_norm.default"])
 def rms_norm(x, normalized_shape, weight=None, eps=None):
+    """Lower ``aten.rms_norm.default`` to MLX."""
     eps = eps if eps is not None else 1.1920928955078125e-07  # torch.finfo(float32).eps
     if len(normalized_shape) == 1:
         w = weight if weight is not None else mx.ones((x.shape[-1],), dtype=x.dtype)
@@ -57,6 +60,7 @@ def rms_norm(x, normalized_shape, weight=None, eps=None):
 
 @register(name=["aten.native_group_norm.default"])
 def native_group_norm(x, weight, bias, n, c, hxw, group, eps):
+    """Lower ``aten.native_group_norm.default`` to MLX."""
     shape = x.shape
     g = mx.reshape(x, (shape[0], group, -1))
     mean = mx.mean(g, axis=-1, keepdims=True)
@@ -72,6 +76,7 @@ def native_group_norm(x, weight, bias, n, c, hxw, group, eps):
 
 @register(name=["aten._native_batch_norm_legit_no_training.default"])
 def batch_norm_eval(x, weight, bias, running_mean, running_var, momentum, eps):
+    """Lower ``aten._native_batch_norm_legit_no_training.default`` to MLX."""
     affine = (1, -1) + (1,) * (x.ndim - 2)
     y = (x - mx.reshape(running_mean, affine)) * mx.reshape(mx.rsqrt(running_var + eps), affine)
     if weight is not None:
@@ -84,6 +89,7 @@ def batch_norm_eval(x, weight, bias, running_mean, running_var, momentum, eps):
 
 @register(name=["aten.convolution.default"])
 def convolution(x, weight, bias, stride, padding, dilation, transposed, output_padding, groups):
+    """Lower ``aten.convolution.default`` to MLX."""
     if transposed:
         from hale_core.deploy.exceptions import ConversionError
 
@@ -127,6 +133,7 @@ def convolution(x, weight, bias, stride, padding, dilation, transposed, output_p
 
 @register(name=["aten.conv2d.default"])
 def conv2d(x, weight, bias=None, stride=(1, 1), padding=(0, 0), dilation=(1, 1), groups=1):
+    """Lower ``aten.conv2d.default`` to MLX."""
     pair = lambda v: list(v) if isinstance(v, (list, tuple)) else [v, v]  # noqa: E731
     return convolution(
         x, weight, bias, pair(stride), pair(padding), pair(dilation), False, [0, 0], groups
@@ -135,6 +142,7 @@ def conv2d(x, weight, bias=None, stride=(1, 1), padding=(0, 0), dilation=(1, 1),
 
 @register(name=["aten.adaptive_avg_pool2d.default", "aten._adaptive_avg_pool2d.default"])
 def adaptive_avg_pool2d(x, output_size):
+    """Lower ``aten.adaptive_avg_pool2d.default``, ``aten._adaptive_avg_pool2d.default`` to MLX."""
     oh, ow = (output_size, output_size) if isinstance(output_size, int) else output_size
     n, c, h, w = x.shape
     if h % oh or w % ow:
@@ -157,6 +165,7 @@ def avg_pool2d(
     count_include_pad=True,
     divisor_override=None,
 ):
+    """Lower ``aten.avg_pool2d.default`` to MLX."""
     import mlx.nn as nn
 
     pool = nn.AvgPool2d(tuple(kernel_size), tuple(stride or kernel_size), tuple(padding))
@@ -165,6 +174,7 @@ def avg_pool2d(
 
 @register(name=["aten.max_pool2d.default"])
 def max_pool2d(x, kernel_size, stride=None, padding=(0, 0), dilation=(1, 1), ceil_mode=False):
+    """Lower ``aten.max_pool2d.default`` to MLX."""
     import mlx.nn as nn
 
     pool = nn.MaxPool2d(tuple(kernel_size), tuple(stride or kernel_size), tuple(padding))

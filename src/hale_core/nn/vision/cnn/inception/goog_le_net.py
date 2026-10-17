@@ -76,6 +76,14 @@ class GoogLeNet(BaseVisionBackbone):
                 nn.init.zeros_(m.bias)
 
     def forward(self, x: torch.Tensor) -> BackboneOutput:
+        """Forward pass of :class:`GoogLeNet`.
+
+        Args:
+            x: input (``torch.Tensor``).
+
+        Returns:
+            ``BackboneOutput``.
+        """
         s0 = self.stem(x)  # [B, 192, H/8, W/8]
         s1 = self.stage1(s0)  # [B, 480, H/16, W/16]
         s2 = self.stage2(s1)  # [B, 832, H/32, W/32]

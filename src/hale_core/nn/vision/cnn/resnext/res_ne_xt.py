@@ -106,6 +106,14 @@ class ResNeXt(BaseVisionBackbone):
                 nn.init.zeros_(m.bn3.weight)
 
     def forward(self, x: torch.Tensor) -> BackboneOutput:
+        """Forward pass of :class:`ResNeXt`.
+
+        Args:
+            x: input (``torch.Tensor``).
+
+        Returns:
+            ``BackboneOutput``.
+        """
         x = self.stem(x)
 
         s0 = self.stage0(x)  # [B, 256,  H/4,  W/4]

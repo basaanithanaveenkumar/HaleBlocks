@@ -112,6 +112,18 @@ class LGTStack(nn.Module):
         key_padding_mask: torch.Tensor | None = None,
         positions: torch.Tensor | None = None,
     ) -> torch.Tensor:
+        """Forward pass of :class:`LGTStack`.
+
+        Args:
+            h: input (``torch.Tensor``).
+            t_emb: input (``torch.Tensor | None``).
+            attn_mask: input (``torch.Tensor | None``).
+            key_padding_mask: input (``torch.Tensor | None``).
+            positions: input (``torch.Tensor | None``).
+
+        Returns:
+            ``torch.Tensor``.
+        """
         seq_len = h.size(1)
         device = h.device
         for layer, is_global in zip(self.layers, self.layer_is_global, strict=True):

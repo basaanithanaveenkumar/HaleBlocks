@@ -42,6 +42,14 @@ class ConvNeXtV1Block(nn.Module):
         self.drop_path = StochasticDepth(drop_path) if drop_path > 0.0 else nn.Identity()
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
+        """Forward pass of :class:`ConvNeXtV1Block`.
+
+        Args:
+            x: input (``torch.Tensor``).
+
+        Returns:
+            ``torch.Tensor``.
+        """
         residual = x
 
         x = self.dwconv(x)  # [B, C, H, W]

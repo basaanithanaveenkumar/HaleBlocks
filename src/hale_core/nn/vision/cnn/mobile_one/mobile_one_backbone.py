@@ -88,6 +88,14 @@ class MobileOneBackbone(BaseVisionBackbone):
                 nn.init.zeros_(m.bias)
 
     def forward(self, x: torch.Tensor) -> BackboneOutput:
+        """Forward pass of :class:`MobileOneBackbone`.
+
+        Args:
+            x: input (``torch.Tensor``).
+
+        Returns:
+            ``BackboneOutput``.
+        """
         # Stage 0 output from stem
         x = self.stem(x)
         all_features: list[torch.Tensor] = [x]

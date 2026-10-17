@@ -15,6 +15,14 @@ class NoiseBestKRouter(nn.Module):
         self.noise = nn.Linear(d_model, n_experts)
 
     def forward(self, x: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor]:
+        """Forward pass of :class:`NoiseBestKRouter`.
+
+        Args:
+            x: input (``torch.Tensor``).
+
+        Returns:
+            ``tuple[torch.Tensor, torch.Tensor]``.
+        """
         logits = self.gate(x)
         if self.training:
             logits = logits + torch.randn_like(logits) * F.softplus(self.noise(x))

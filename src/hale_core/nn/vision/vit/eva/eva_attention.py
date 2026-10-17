@@ -60,6 +60,17 @@ class EVAAttention(nn.Module):
         rope_sin: torch.Tensor,
         return_attn: bool = False,
     ) -> tuple[torch.Tensor, Optional[torch.Tensor]]:
+        """Forward pass of :class:`EVAAttention`.
+
+        Args:
+            x: input (``torch.Tensor``).
+            rope_cos: input (``torch.Tensor``).
+            rope_sin: input (``torch.Tensor``).
+            return_attn: input (``bool``).
+
+        Returns:
+            ``tuple[torch.Tensor, Optional[torch.Tensor]]``.
+        """
         B, N, D = x.shape
         H = self.num_heads
 

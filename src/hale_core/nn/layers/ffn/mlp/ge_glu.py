@@ -16,5 +16,10 @@ class GeGLU(nn.Module):
         self.drop = nn.Dropout(dropout)
 
     def forward(self, x):
+        """Forward pass of :class:`GeGLU`.
+
+        Args:
+            x: input.
+        """
         gate, up = self.w_in(x).chunk(2, dim=-1)
         return self.w_out(self.drop(F.gelu(gate) * up))
