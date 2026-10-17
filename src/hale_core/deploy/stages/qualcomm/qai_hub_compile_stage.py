@@ -94,8 +94,7 @@ class QAIHubCompileStage(Stage):
 
     # ------------------------------------------------------------------ options
     def compile_options(self, has_int64_io: bool) -> str:
-        """AI Hub ``--options`` string; adds ``--truncate_64bit_io`` when the model has int64 I/O.
-        """
+        """AI Hub ``--options`` string; adds ``--truncate_64bit_io`` when the model has int64 I/O."""
         opts = (
             []
             if self.target_runtime == "context_binary"

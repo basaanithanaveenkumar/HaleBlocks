@@ -29,8 +29,7 @@ def quantized_linear(x, w_q, scales, biases, bias=None, *, group_size: int, bits
 
 @register(name=["aten.mm.default", "aten.bmm.default", "aten.matmul.default"])
 def matmul(a, b):
-    """Lower ``aten.mm.default``, ``aten.bmm.default``, ``aten.matmul.default`` to MLX: ``a @ b``.
-    """
+    """Lower ``aten.mm.default``, ``aten.bmm.default``, ``aten.matmul.default`` to MLX: ``a @ b``."""
     return a @ b
 
 

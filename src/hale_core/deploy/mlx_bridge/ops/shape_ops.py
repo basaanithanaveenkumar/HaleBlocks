@@ -118,8 +118,7 @@ def split_with_sizes(x, split_sizes, dim=0):
 
 @register(name=["aten.unbind.int"])
 def unbind(x, dim=0):
-    """Lower ``aten.unbind.int`` to MLX: ``[mx.take(x, i, axis=dim) for i in range(x.shape[dim])]``.
-    """
+    """Lower ``aten.unbind.int`` to MLX: ``[mx.take(x, i, axis=dim) for i in range(x.shape[dim])]``."""
     return [mx.take(x, i, axis=dim) for i in range(x.shape[dim])]
 
 

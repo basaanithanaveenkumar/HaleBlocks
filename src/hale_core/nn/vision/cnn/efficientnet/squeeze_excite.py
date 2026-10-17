@@ -1,5 +1,4 @@
-"""``SqueezeExcite``: Channel attention via global pooling followed by two fully-connected layers.
-"""
+"""``SqueezeExcite``: Channel attention via global pooling followed by two fully-connected layers."""
 
 from __future__ import annotations
 

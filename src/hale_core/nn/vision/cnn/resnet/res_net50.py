@@ -1,5 +1,4 @@
-"""``ResNet50``: ResNet-50: Bottleneck × [3,4,6,3] — standard production backbone, embed_dim=2048.
-"""
+"""``ResNet50``: ResNet-50: Bottleneck × [3,4,6,3] — standard production backbone, embed_dim=2048."""
 
 from __future__ import annotations
 

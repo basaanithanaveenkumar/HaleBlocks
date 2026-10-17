@@ -1,5 +1,4 @@
-"""A HaloDiffusionLLM causal checkpoint (``hale_core.nn.backbones``) as a :class:`LanguageBackbone`.
-"""
+"""A HaloDiffusionLLM causal checkpoint (``hale_core.nn.backbones``) as a :class:`LanguageBackbone`."""
 
 from __future__ import annotations
 

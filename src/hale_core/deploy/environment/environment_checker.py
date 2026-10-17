@@ -61,8 +61,7 @@ class EnvironmentChecker:
 
     @staticmethod
     def accelerators() -> dict[str, str]:
-        """Platform, torch version and detected accelerators (CUDA, MPS, ROCm …) as display strings.
-        """
+        """Platform, torch version and detected accelerators (CUDA, MPS, ROCm …) as display strings."""
         import torch
 
         info = {
