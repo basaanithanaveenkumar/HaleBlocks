@@ -103,6 +103,11 @@ class GoogLeNet(BaseVisionBackbone):
         )
 
     def freeze_up_to_stage(self, stage: int) -> None:
+        """Freeze the parameters of stages ``0 … stage`` (stem first) for staged fine-tuning.
+
+        Raises:
+            ValueError: if ``stage`` is outside this backbone's stage range.
+        """
         if stage < 0 or stage > 3:
             raise ValueError(f"stage must be in [0, 3], got {stage}")
         stages = [self.stem, self.stage1, self.stage2, self.stage3]

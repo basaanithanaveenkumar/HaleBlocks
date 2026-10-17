@@ -32,6 +32,7 @@ from hale_core.nn import GPTBackbone, LGTBackbone, DiTBackbone
 # ---------------------------------------------------------------------------
 
 def build_gpt(args) -> tuple[torch.nn.Module, torch.Tensor]:
+    """Build a GPT backbone and a random token batch from the CLI arguments."""
     model = GPTBackbone(
         vocab_size=args.vocab_size,
         d_model=args.d_model,
@@ -49,6 +50,7 @@ def build_gpt(args) -> tuple[torch.nn.Module, torch.Tensor]:
 
 
 def build_lgt(args) -> tuple[torch.nn.Module, torch.Tensor]:
+    """Build an LGT backbone and a random token batch from the CLI arguments."""
     model = LGTBackbone(
         vocab_size=args.vocab_size,
         d_model=args.d_model,
@@ -63,6 +65,7 @@ def build_lgt(args) -> tuple[torch.nn.Module, torch.Tensor]:
 
 
 def build_dit(args) -> tuple[torch.nn.Module, torch.Tensor]:
+    """Build a time-conditioned DiT backbone and a random token batch from the CLI arguments."""
     model = DiTBackbone(
         vocab_size=args.vocab_size,
         d_model=args.d_model,
@@ -85,6 +88,7 @@ _BUILDERS = {"gpt": build_gpt, "lgt": build_lgt, "dit": build_dit}
 # ---------------------------------------------------------------------------
 
 def parse_args() -> argparse.Namespace:
+    """Command-line arguments of the profiler script."""
     p = argparse.ArgumentParser(description="HaleBlocks model profiler")
     p.add_argument("--variant",      default="gpt", choices=list(_BUILDERS))
     p.add_argument("--device",       default="cpu")
@@ -105,6 +109,7 @@ def parse_args() -> argparse.Namespace:
 
 
 def main() -> None:
+    """Profile the chosen backbone and print the per-layer report."""
     args = parse_args()
     device = torch.device(args.device)
 

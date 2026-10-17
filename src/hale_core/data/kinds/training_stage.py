@@ -1,4 +1,4 @@
-"""``TrainingStage``: TrainingStage (Shared dataset kind and stage enums)."""
+"""``TrainingStage``: Training stage a dataset belongs to (pre-training, SFT, preference …)."""
 
 from __future__ import annotations
 

@@ -1,4 +1,4 @@
-"""``StageMixture``: StageMixture (LLM dataset sample skeleton (SmolLM2 paper))."""
+"""``StageMixture``: A training stage's dataset mixture: ``(dataset name, weight)`` pairs."""
 
 from __future__ import annotations
 

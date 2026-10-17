@@ -16,10 +16,12 @@ from hale_core.nn.layers import (
 
 
 def is_global_layer(index: int, ratio: int) -> bool:
+    """Whether layer ``index`` uses global attention: every ``ratio + 1``-th layer is global."""
     return (index + 1) % (ratio + 1) == 0
 
 
 class LGTStack(nn.Module):
+    """Local-global stack: sliding-window attention layers with a global layer every ``ratio + 1``."""
     def __init__(
         self,
         d_model: int,

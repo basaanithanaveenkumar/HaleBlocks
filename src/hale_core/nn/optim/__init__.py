@@ -14,6 +14,7 @@ register_optimizer("muon")(MuonOptimizer)
 
 
 def build_optimizer(name: str, params, config: dict):
+    """Build the optimizer registered as ``name`` over ``params`` with ``config``."""
     return get_optimizer(name)(params, config)
 
 

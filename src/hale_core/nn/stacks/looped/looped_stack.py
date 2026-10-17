@@ -100,15 +100,18 @@ class LoopedStack(nn.Module):
     # ------------------------------------------------------------------ structure
     @property
     def prelude(self) -> nn.ModuleList:
+        """Layers run once before the loop."""
         return self.layers[: self.spec.prelude_layers]
 
     @property
     def core(self) -> nn.ModuleList:
+        """Weight-tied layers iterated by the loop."""
         p = self.spec.prelude_layers
         return self.layers[p : p + self.n_core_layers]
 
     @property
     def coda(self) -> nn.ModuleList:
+        """Layers run once after the loop."""
         return self.layers[self.spec.prelude_layers + self.n_core_layers :]
 
     @property

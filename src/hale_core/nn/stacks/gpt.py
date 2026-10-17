@@ -9,6 +9,7 @@ from hale_core.nn.layers import TransformerLayer, build_attention, build_ffn
 
 
 class GPTStack(nn.Module):
+    """Stack of pre-norm :class:`TransformerLayer` blocks with a final norm."""
     def __init__(
         self,
         d_model: int,

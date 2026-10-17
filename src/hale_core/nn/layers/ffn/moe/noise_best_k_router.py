@@ -1,4 +1,4 @@
-"""``NoiseBestKRouter``: NoiseBestKRouter (DeepSeek-style MoE: noisy top-k router + shared experts (HaloBlocks / HALO-WAM))."""
+"""``NoiseBestKRouter``: Top-k expert router with optional noisy gating during training."""
 
 from __future__ import annotations
 

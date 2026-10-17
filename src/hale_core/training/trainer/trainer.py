@@ -1,4 +1,7 @@
-"""``Trainer``: Trainer (Variant-agnostic training loop resolved from registries)."""
+"""``Trainer``.
+
+Variant-agnostic training loop: model, loss, optimizer and schedule come from the registries.
+"""
 
 from __future__ import annotations
 
@@ -35,6 +38,7 @@ from hale_core.training.trainer.evaluator import Evaluator
 
 @register_trainer("default")
 class Trainer:
+    """Variant-agnostic training loop: model, loss, optimizer and schedule come from the registries."""
     def __init__(
         self,
         cfg: RunConfig,
@@ -88,6 +92,11 @@ class Trainer:
         return torch.device(get_device(device_str))
 
     def fit(self) -> tuple:
+        """Train for the configured schedule, with checkpoints, logging and evaluation.
+
+        Returns:
+            ``(model, tokenizer, losses)`` after training.
+        """
         cfg = self.cfg
         apply_experiment_layout(cfg, create=True)
         setup_logging(level=cfg.logging.level, log_file=cfg.logging.log_file, force=True)

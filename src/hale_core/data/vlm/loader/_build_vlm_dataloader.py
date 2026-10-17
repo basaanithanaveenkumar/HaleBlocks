@@ -1,4 +1,4 @@
-"""``build_vlm_dataloader``: build_vlm_dataloader (Sequential VLM dataloader with on-demand media caching)."""
+"""``build_vlm_dataloader``: Build a :class:`SequentialVLMDataLoader` over named VLM datasets."""
 
 from __future__ import annotations
 

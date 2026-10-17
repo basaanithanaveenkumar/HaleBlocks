@@ -1,4 +1,7 @@
-"""``VLMDatasetSpec``: VLMDatasetSpec (VLM dataset sample skeleton)."""
+"""``VLMDatasetSpec``.
+
+Where a VLM dataset lives on the Hub, its modality, and which fields hold media/text.
+"""
 
 from __future__ import annotations
 

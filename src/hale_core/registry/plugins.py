@@ -55,6 +55,7 @@ SCHEDULERS: dict[str, type] = SCHEDULERS_REGISTRY.items
 
 
 def register_model(name: str) -> Callable[[type[T]], type[T]]:
+    """Decorator registering a model class under ``name`` (duplicate names raise :class:`RegistryError`)."""
     def deco(cls: type[T]) -> type[T]:
         MODELS_REGISTRY.add(name, cls)
         cls.variant_name = name  # type: ignore[attr-defined]
@@ -67,6 +68,7 @@ register_variant = register_model
 
 
 def register_loss(name: str) -> Callable[[T], T]:
+    """Decorator registering a loss function under ``name`` (duplicate names raise :class:`RegistryError`)."""
     def deco(fn: T) -> T:
         LOSSES_REGISTRY.add(name, fn)
         return fn
@@ -75,6 +77,7 @@ def register_loss(name: str) -> Callable[[T], T]:
 
 
 def register_sampler(name: str) -> Callable[[T], T]:
+    """Decorator registering a sampler function under ``name`` (duplicate names raise :class:`RegistryError`)."""
     def deco(fn: T) -> T:
         SAMPLERS_REGISTRY.add(name, fn)
         return fn
@@ -83,6 +86,7 @@ def register_sampler(name: str) -> Callable[[T], T]:
 
 
 def register_optimizer(name: str) -> Callable[[type[T]], type[T]]:
+    """Decorator registering a optimizer class under ``name`` (duplicate names raise :class:`RegistryError`)."""
     def deco(cls: type[T]) -> type[T]:
         OPTIMIZERS_REGISTRY.add(name.lower(), cls)
         return cls
@@ -93,6 +97,7 @@ def register_optimizer(name: str) -> Callable[[type[T]], type[T]]:
 def register_metric(
     name: str, *, variants: tuple[str, ...] | None = None
 ) -> Callable[[type[T]], type[T]]:
+    """Decorator registering a metric class under ``name``, optionally only for ``variants``."""
     def deco(cls: type[T]) -> type[T]:
         return METRICS_REGISTRY.add(name, cls, variants=variants)
 
@@ -100,6 +105,11 @@ def register_metric(
 
 
 def get_model(name: str) -> type:
+    """The model class registered as ``name``.
+
+    Raises:
+        RegistryError: for an unknown name (the message lists the registered ones).
+    """
     return MODELS_REGISTRY.get(name)
 
 
@@ -107,18 +117,34 @@ get_variant = get_model
 
 
 def get_loss(name: str) -> Callable[..., Any]:
+    """The loss function registered as ``name``.
+
+    Raises:
+        RegistryError: for an unknown name (the message lists the registered ones).
+    """
     return LOSSES_REGISTRY.get(name)
 
 
 def get_sampler(name: str) -> Callable[..., Any]:
+    """The sampler registered as ``name``.
+
+    Raises:
+        RegistryError: for an unknown name (the message lists the registered ones).
+    """
     return SAMPLERS_REGISTRY.get(name)
 
 
 def get_optimizer(name: str) -> type:
+    """The optimizer class registered as ``name``.
+
+    Raises:
+        RegistryError: for an unknown name (the message lists the registered ones).
+    """
     return OPTIMIZERS_REGISTRY.get(name.lower())
 
 
 def register_config(name: str) -> Callable[[type[T]], type[T]]:
+    """Decorator registering a config schema under ``name`` (duplicate names raise :class:`RegistryError`)."""
     def deco(cls: type[T]) -> type[T]:
         CONFIGS_REGISTRY.add(name, cls)
         return cls
@@ -127,10 +153,16 @@ def register_config(name: str) -> Callable[[type[T]], type[T]]:
 
 
 def get_config_schema(name: str = "llm") -> type:
+    """The config schema (``"llm"`` = RunConfig) registered as ``name``.
+
+    Raises:
+        RegistryError: for an unknown name (the message lists the registered ones).
+    """
     return CONFIGS_REGISTRY.get(name)
 
 
 def register_logger(name: str) -> Callable[[T], T]:
+    """Decorator registering a experiment-logger factory under ``name`` (duplicate names raise :class:`RegistryError`)."""
     def deco(factory: T) -> T:
         LOGGERS_REGISTRY.add(name, factory)
         return factory
@@ -139,10 +171,12 @@ def register_logger(name: str) -> Callable[[T], T]:
 
 
 def build_logger(name: str, *, cfg: Any = None, **kwargs: Any) -> Any:
+    """Build the experiment logger registered as ``name`` (``cfg`` and ``kwargs`` go to its factory)."""
     return LOGGERS_REGISTRY.get(name)(cfg=cfg, **kwargs)
 
 
 def register_trainer(name: str) -> Callable[[type[T]], type[T]]:
+    """Decorator registering a trainer class under ``name`` (duplicate names raise :class:`RegistryError`)."""
     def deco(cls: type[T]) -> type[T]:
         TRAINERS_REGISTRY.add(name, cls)
         return cls
@@ -151,10 +185,16 @@ def register_trainer(name: str) -> Callable[[type[T]], type[T]]:
 
 
 def get_trainer(name: str = "default") -> type:
+    """The trainer class registered as ``name``.
+
+    Raises:
+        RegistryError: for an unknown name (the message lists the registered ones).
+    """
     return TRAINERS_REGISTRY.get(name)
 
 
 def register_dataset(name: str) -> Callable[[T], T]:
+    """Decorator registering a dataset spec under ``name`` (duplicate names raise :class:`RegistryError`)."""
     def deco(factory: T) -> T:
         DATASETS_REGISTRY.add(name, factory)
         return factory
@@ -163,6 +203,11 @@ def register_dataset(name: str) -> Callable[[T], T]:
 
 
 def get_dataset(name: str) -> Any:
+    """The dataset spec registered as ``name``.
+
+    Raises:
+        RegistryError: for an unknown name (the message lists the registered ones).
+    """
     factory = DATASETS_REGISTRY.get(name)
     return factory()
 
@@ -180,6 +225,7 @@ def list_datasets(
     stage: str | None = None,
     domain: str | None = None,
 ) -> list[str]:
+    """Names of registered datasets, optionally filtered by kind, training stage and domain."""
     names = sorted(DATASETS_REGISTRY.items)
     if not kind and not stage and not domain:
         return names
@@ -197,6 +243,7 @@ def list_datasets(
 
 
 def instantiate_metrics(names: list[str], variant: str) -> list[Any]:
+    """Instantiate the named metrics that apply to ``variant`` (others are skipped)."""
     return METRICS_REGISTRY.instantiate(names, variant)
 
 
@@ -220,6 +267,11 @@ def register_block(name: str) -> Callable[[type[T]], type[T]]:
 
 
 def get_block(name: str) -> type:
+    """The block class registered as ``name``.
+
+    Raises:
+        RegistryError: for an unknown name (the message lists the registered ones).
+    """
     return BLOCKS_REGISTRY.get(name)
 
 
@@ -243,6 +295,11 @@ def register_norm(name: str) -> Callable[[type[T]], type[T]]:
 
 
 def get_norm(name: str) -> type:
+    """The normalisation class registered as ``name``.
+
+    Raises:
+        RegistryError: for an unknown name (the message lists the registered ones).
+    """
     return NORMS_REGISTRY.get(name)
 
 
@@ -272,6 +329,11 @@ def register_collator(name: str) -> Callable[[T], T]:
 
 
 def get_collator(name: str) -> Callable[..., Any]:
+    """The collate function registered as ``name``.
+
+    Raises:
+        RegistryError: for an unknown name (the message lists the registered ones).
+    """
     return COLLATORS_REGISTRY.get(name)
 
 
@@ -297,6 +359,11 @@ def register_dataloader(name: str) -> Callable[[T], T]:
 
 
 def get_dataloader_factory(name: str) -> Callable[..., Any]:
+    """The dataloader factory registered as ``name``.
+
+    Raises:
+        RegistryError: for an unknown name (the message lists the registered ones).
+    """
     return DATALOADERS_REGISTRY.get(name)
 
 
@@ -323,4 +390,9 @@ def register_scheduler(name: str) -> Callable[[type[T]], type[T]]:
 
 
 def get_scheduler_factory(name: str) -> Callable[..., Any]:
+    """The learning-rate scheduler factory registered as ``name``.
+
+    Raises:
+        RegistryError: for an unknown name (the message lists the registered ones).
+    """
     return SCHEDULERS_REGISTRY.get(name)

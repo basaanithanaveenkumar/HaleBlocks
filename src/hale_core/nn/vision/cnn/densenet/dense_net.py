@@ -126,6 +126,11 @@ class DenseNet(BaseVisionBackbone):
         )
 
     def freeze_up_to_stage(self, stage: int) -> None:
+        """Freeze the parameters of stages ``0 … stage`` (stem first) for staged fine-tuning.
+
+        Raises:
+            ValueError: if ``stage`` is outside this backbone's stage range.
+        """
         if stage < 0 or stage >= len(self.dense_blocks):
             raise ValueError(f"stage must be in [0, {len(self.dense_blocks) - 1}], got {stage}")
         # Freeze initial stem

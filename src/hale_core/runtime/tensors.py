@@ -1,3 +1,5 @@
+"""Tensor and model utilities: device moves, parameter counts and summaries."""
+
 from __future__ import annotations
 
 from typing import Any
@@ -9,10 +11,12 @@ _UNWRAP = {"backbone", "model", "module"}
 
 
 def move_batch_to_device(batch: dict[str, Any], device: str | torch.device) -> dict[str, Any]:
+    """Move every tensor value of ``batch`` to ``device`` (other values unchanged)."""
     return {k: v.to(device) if torch.is_tensor(v) else v for k, v in batch.items()}
 
 
 def count_parameters(model: nn.Module, *, trainable_only: bool = False) -> int:
+    """Number of parameters of ``model`` (only trainable ones when ``trainable_only``)."""
     params = model.parameters()
     if trainable_only:
         return sum(p.numel() for p in params if p.requires_grad)
@@ -48,6 +52,7 @@ def _rows_for(model: nn.Module) -> list[tuple[str, int, int]]:
 
 
 def format_model_summary(model: nn.Module, *, title: str | None = None) -> str:
+    """Text table of the model's top-level modules with parameter counts and totals."""
     rows = _rows_for(model)
     total = count_parameters(model)
     trainable = count_parameters(model, trainable_only=True)
@@ -70,6 +75,7 @@ def format_model_summary(model: nn.Module, *, title: str | None = None) -> str:
 
 
 def log_model_summary(model: nn.Module, *, title: str | None = None) -> str:
+    """Log :func:`format_model_summary` at INFO level and return the text."""
     from loguru import logger
 
     text = format_model_summary(model, title=title)

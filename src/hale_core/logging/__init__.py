@@ -10,27 +10,35 @@ from hale_core.registry import register_logger
 
 class _NoOpExperimentLogger:
     def log_scalars(self, step: int, metrics: dict[str, float]) -> None:
+        """No-op (experiment logging is disabled)."""
         return None
 
     def log_hparams(self, hparams: dict[str, Any], metrics: dict[str, float] | None = None) -> None:
+        """No-op (experiment logging is disabled)."""
         return None
 
     def log_text(self, tag: str, text: str, step: int = 0) -> None:
+        """No-op (experiment logging is disabled)."""
         return None
 
     def log_image(self, tag: str, image, step: int = 0) -> None:
+        """No-op (experiment logging is disabled)."""
         return None
 
     def log_histogram(self, tag: str, values, step: int = 0) -> None:
+        """No-op (experiment logging is disabled)."""
         return None
 
     def watch_model(self, model, log_freq: int = 100) -> None:
+        """No-op (experiment logging is disabled)."""
         return None
 
     def flush(self) -> None:
+        """No-op (experiment logging is disabled)."""
         return None
 
     def close(self) -> None:
+        """No-op (experiment logging is disabled)."""
         return None
 
 

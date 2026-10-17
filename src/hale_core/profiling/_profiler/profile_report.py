@@ -27,16 +27,20 @@ class ProfileReport:
 
     @property
     def total_flops(self) -> int:
+        """FLOPs summed over all profiled layers."""
         return sum(p.flops for p in self.profiles.values())
 
     @property
     def total_matmuls(self) -> int:
+        """Matrix multiplications summed over all profiled layers."""
         return sum(p.matmul_count for p in self.profiles.values())
 
     def top_by_latency(self, k: int = 20) -> list[LayerProfile]:
+        """The ``k`` slowest layers."""
         return sorted(self.profiles.values(), key=lambda p: p.latency_ms, reverse=True)[:k]
 
     def top_by_flops(self, k: int = 20) -> list[LayerProfile]:
+        """The ``k`` layers with the most FLOPs."""
         return sorted(self.profiles.values(), key=lambda p: p.flops, reverse=True)[:k]
 
     # ------------------------------------------------------------------
@@ -127,6 +131,7 @@ class ProfileReport:
     # ------------------------------------------------------------------
 
     def to_dict(self) -> dict[str, dict]:
+        """layer name -> measurements, JSON-serialisable."""
         return {
             name: {
                 "module_type": p.module_type,

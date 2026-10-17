@@ -1,4 +1,4 @@
-"""``FeedForwardBlock``: FeedForwardBlock (Structural types so training/eval depend on interfaces, not concrete variants)."""
+"""``FeedForwardBlock``: Structural type of a feed-forward module: ``forward(x) -> x``."""
 
 from __future__ import annotations
 
@@ -9,4 +9,7 @@ import torch
 
 @runtime_checkable
 class FeedForwardBlock(Protocol):
-    def forward(self, x: torch.Tensor) -> torch.Tensor: ...
+    """Structural type of a feed-forward module: ``forward(x) -> x``."""
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        """Apply the block to ``x`` (same shape in and out)."""
+        ...

@@ -1,4 +1,7 @@
-"""``VLMSample``: VLMSample (VLM dataset sample skeleton)."""
+"""``VLMSample``.
+
+One parsed VLM training sample: text and/or conversation plus local media paths.
+"""
 
 from __future__ import annotations
 

@@ -1,4 +1,7 @@
-"""``AttentionBlock``: AttentionBlock (Structural types so training/eval depend on interfaces, not concrete variants)."""
+"""``AttentionBlock``.
+
+Structural type of an attention module: ``forward(x, attn_mask, key_padding_mask)``.
+"""
 
 from __future__ import annotations
 
@@ -9,6 +12,7 @@ import torch
 
 @runtime_checkable
 class AttentionBlock(Protocol):
+    """Structural type of an attention module: ``forward(x, attn_mask, key_padding_mask)``."""
     def forward(
         self,
         x: torch.Tensor,

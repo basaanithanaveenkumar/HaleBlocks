@@ -1,4 +1,7 @@
-"""``build_llm_dataloader``: build_llm_dataloader (Sequential LLM dataloader with streaming and prefetch)."""
+"""``build_llm_dataloader``.
+
+Build a :class:`SequentialLLMDataLoader` over named datasets or a training stage.
+"""
 
 from __future__ import annotations
 

@@ -1,4 +1,7 @@
-"""``DatasetKind``: DatasetKind (Shared dataset kind and stage enums)."""
+"""``DatasetKind``.
+
+Top-level dataset family (LLM text, VLM, locomotion …), used to route specs to loaders.
+"""
 
 from __future__ import annotations
 

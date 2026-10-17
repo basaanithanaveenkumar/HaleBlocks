@@ -1,4 +1,7 @@
-"""``DiTFinalLayer``: DiTFinalLayer (DiT block (Peebles & Xie): pre-norm attention + FFN with AdaLN-Zero)."""
+"""``DiTFinalLayer``.
+
+DiT output layer: time-modulated LayerNorm followed by the vocabulary projection.
+"""
 
 from __future__ import annotations
 

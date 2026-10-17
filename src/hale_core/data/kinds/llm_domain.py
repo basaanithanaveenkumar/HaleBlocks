@@ -1,4 +1,4 @@
-"""``LLMDomain``: LLMDomain (Shared dataset kind and stage enums)."""
+"""``LLMDomain``: Content domain of an LLM dataset (web, code, math, chat …), used for mixtures."""
 
 from __future__ import annotations
 

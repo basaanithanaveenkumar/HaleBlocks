@@ -1,4 +1,4 @@
-"""``LLMDatasetSpec``: LLMDatasetSpec (LLM dataset sample skeleton (SmolLM2 paper))."""
+"""``LLMDatasetSpec``: Where an LLM dataset lives on the Hub and which row fields hold its text."""
 
 from __future__ import annotations
 

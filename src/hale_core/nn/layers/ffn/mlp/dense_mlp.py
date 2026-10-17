@@ -1,4 +1,4 @@
-"""``DenseMLP``: DenseMLP (hale_core.nn.layers.ffn.mlp)."""
+"""``DenseMLP``: Two-layer feed-forward block (Linear → GELU → dropout → Linear)."""
 
 from __future__ import annotations
 

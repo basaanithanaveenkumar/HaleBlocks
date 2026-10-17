@@ -12,11 +12,19 @@ from hale_core.config.run import RunConfig
 
 @dataclass(frozen=True)
 class TrainSchedule:
+    """Resolved training length: number of epochs and total optimisation steps."""
     n_epochs: int
     total_steps: int
 
     @classmethod
     def from_config(cls, cfg: RunConfig, n_batches: int) -> TrainSchedule:
+        """Resolve the schedule from ``train.epochs``/``train.steps`` and the batches per epoch.
+
+        ``epochs`` wins when both are set (a warning is logged).
+
+        Raises:
+            RuntimeError: if the dataloader is empty.
+        """
         if n_batches < 1:
             raise RuntimeError("empty dataloader")
         if cfg.train.epochs is not None:
@@ -35,5 +43,6 @@ class TrainSchedule:
 
 
 def resolve_schedule(cfg: RunConfig, n_batches: int) -> tuple[int, int]:
+    """``(n_epochs, total_steps)`` for ``cfg`` and ``n_batches`` per epoch."""
     schedule = TrainSchedule.from_config(cfg, n_batches)
     return schedule.n_epochs, schedule.total_steps

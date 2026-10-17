@@ -32,6 +32,17 @@ class VariantRegistry:
         variants: tuple[str, ...] | None = None,
         attr: str | None = "metric_name",
     ) -> type:
+        """Register ``cls`` under ``name`` for ``variants`` (``None`` = generic fallback).
+
+        Args:
+            name: metric/component name.
+            cls: the implementation.
+            variants: training variants it applies to.
+            attr: attribute set on ``cls`` to the registered name (``None`` to skip).
+
+        Raises:
+            RegistryError: if ``name`` is already registered for the same variants.
+        """
         key: VariantKey = frozenset(variants) if variants is not None else None
         entries = self.items.setdefault(name, [])
         for existing, _ in entries:
@@ -46,6 +57,11 @@ class VariantRegistry:
         return cls
 
     def resolve(self, name: str, variant: str) -> type | None:
+        """The implementation of ``name`` for ``variant`` (specific, else generic, else ``None``).
+
+        Raises:
+            RegistryError: if ``name`` is not registered at all.
+        """
         entries = self.items.get(name)
         if entries is None:
             logger.error("unknown {} {!r}; registered={}", self.kind, name, sorted(self.items))
@@ -57,6 +73,7 @@ class VariantRegistry:
         return (specific or generic or [None])[0]
 
     def instantiate(self, names: list[str], variant: str) -> list[Any]:
+        """Instantiate every name that has an implementation for ``variant``; others are skipped."""
         built: list[Any] = []
         for name in names:
             cls = self.resolve(name, variant)

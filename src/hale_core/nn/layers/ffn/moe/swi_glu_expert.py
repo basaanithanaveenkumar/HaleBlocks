@@ -1,4 +1,4 @@
-"""``SwiGLUExpert``: SwiGLUExpert (DeepSeek-style MoE: noisy top-k router + shared experts (HaloBlocks / HALO-WAM))."""
+"""``SwiGLUExpert``: One SwiGLU feed-forward expert."""
 
 from __future__ import annotations
 

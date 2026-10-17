@@ -1,3 +1,5 @@
+"""AdamW optimizer wrapper (registered as ``adamw``)."""
+
 from __future__ import annotations
 
 from typing import Any
@@ -8,6 +10,7 @@ from hale_core.nn.optim.base import BaseOptimizer
 
 
 class AdamWOptimizer(BaseOptimizer):
+    """``torch.optim.AdamW`` (decoupled weight decay) behind the :class:`BaseOptimizer` interface."""
     def _make_optimizer(self, params: Any, config: dict[str, Any]):
         return torch.optim.AdamW(
             params,

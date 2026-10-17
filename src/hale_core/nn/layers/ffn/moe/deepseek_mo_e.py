@@ -1,4 +1,7 @@
-"""``DeepseekMoE``: DeepseekMoE (DeepSeek-style MoE: noisy top-k router + shared experts (HaloBlocks / HALO-WAM))."""
+"""``DeepseekMoE``.
+
+DeepSeek-style mixture of experts: shared experts plus top-k routed SwiGLU experts.
+"""
 
 from __future__ import annotations
 

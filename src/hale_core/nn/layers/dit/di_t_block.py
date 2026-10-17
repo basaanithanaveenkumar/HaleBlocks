@@ -1,4 +1,4 @@
-"""``DiTBlock``: DiTBlock (DiT block (Peebles & Xie): pre-norm attention + FFN with AdaLN-Zero)."""
+"""``DiTBlock``: DiT block: pre-norm attention + FFN modulated by AdaLN-Zero time conditioning."""
 
 from __future__ import annotations
 

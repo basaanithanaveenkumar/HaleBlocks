@@ -1,4 +1,4 @@
-"""``Evaluator``: Evaluator (Variant-agnostic training loop resolved from registries)."""
+"""``Evaluator``: Structural type of the trainer's evaluator."""
 
 from __future__ import annotations
 
@@ -6,4 +6,7 @@ from typing import Protocol
 
 
 class Evaluator(Protocol):
-    def run(self, model, loader) -> dict[str, float]: ...
+    """Structural type of the trainer's evaluator."""
+    def run(self, model, loader) -> dict[str, float]:
+        """Evaluate ``model`` on ``loader`` and return metric name -> value."""
+        ...

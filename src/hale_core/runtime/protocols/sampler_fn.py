@@ -1,4 +1,4 @@
-"""``SamplerFn``: SamplerFn (Structural types so training/eval depend on interfaces, not concrete variants)."""
+"""``SamplerFn``: Structural type of a registered sampler: generates token ids from a prompt."""
 
 from __future__ import annotations
 
@@ -10,6 +10,7 @@ from torch import nn
 
 @runtime_checkable
 class SamplerFn(Protocol):
+    """Structural type of a registered sampler: generates token ids from a prompt."""
     def __call__(
         self, model: nn.Module, tokenizer: Any, prompt_ids: torch.Tensor, **kwargs: Any
     ) -> Any: ...

@@ -89,4 +89,5 @@ class LoopSpec:
         return cls(**value)
 
     def to_dict(self) -> dict[str, Any]:
+        """The spec as a plain dict (for logs and checkpoints)."""
         return asdict(self)

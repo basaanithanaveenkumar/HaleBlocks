@@ -1,4 +1,4 @@
-"""``VLMModality``: VLMModality (Shared dataset kind and stage enums)."""
+"""``VLMModality``: What a VLM sample contains (image-text, video-text, interleaved …)."""
 
 from __future__ import annotations
 
