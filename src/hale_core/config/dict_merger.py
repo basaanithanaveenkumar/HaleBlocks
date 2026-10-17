@@ -26,7 +26,8 @@ class DictMerger:
 
         Args:
             base: parent mapping.
-            child: overriding mapping; ``_delete_: true`` in a sub-mapping replaces instead of merging.
+            child: overriding mapping; ``_delete_: true`` in a sub-mapping replaces instead of
+                merging.
 
         Returns:
             A new deep-copied dict; neither input is mutated.

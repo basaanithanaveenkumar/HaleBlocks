@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from typing import Optional
-
 import torch
 import torch.nn as nn
 
@@ -30,7 +28,7 @@ class MaxViTStage(nn.Module):
         depth: int,
         num_heads: int,
         block_size: int = 8,
-        drop_path_rates: Optional[list] = None,
+        drop_path_rates: list | None = None,
     ) -> None:
         super().__init__()
         rates = drop_path_rates or [0.0] * depth

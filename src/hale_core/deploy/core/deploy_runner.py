@@ -72,7 +72,8 @@ class DeployRunner:
             logger.debug("imported plugin {}", module)
 
     def build(self) -> tuple[Pipeline, ExportContext]:
-        """Import custom modules, build the adapter and stages, and return the pipeline and context."""
+        """Import custom modules, build the adapter and stages, and return the pipeline and context.
+        """
         torch.manual_seed(self.spec.seed)
         random.seed(self.spec.seed)
         adapter = ADAPTERS.build(self.spec.adapter)

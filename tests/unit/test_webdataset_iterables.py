@@ -46,24 +46,34 @@ def test_codec_round_trips_enums_and_paths() -> None:
 def test_codec_round_trips_vlm_sample_dataclass() -> None:
     codec = SampleCodec()
     sample = VLMSample(
-        dataset="toy", modality=VLMModality.MULTI_IMAGE, text="two cats",
-        images=[Path("/cache/1.jpg"), Path("/cache/2.jpg")], video=None,
-        conversations=[{"from": "human", "value": "hi"}], metadata={"row": 3},
+        dataset="toy",
+        modality=VLMModality.MULTI_IMAGE,
+        text="two cats",
+        images=[Path("/cache/1.jpg"), Path("/cache/2.jpg")],
+        video=None,
+        conversations=[{"from": "human", "value": "hi"}],
+        metadata={"row": 3},
     )
     assert codec.decode(codec.encode(sample, key="000000002")) == sample
 
 
 def _samples(n: int) -> list[VLMSample]:
     return [
-        VLMSample(dataset="toy", modality=VLMModality.IMAGE, text=f"caption {i}",
-                  images=[Path(f"/cache/{i}.jpg")])
+        VLMSample(
+            dataset="toy",
+            modality=VLMModality.IMAGE,
+            text=f"caption {i}",
+            images=[Path(f"/cache/{i}.jpg")],
+        )
         for i in range(n)
     ]
 
 
 def test_prepare_iterable_flag_off_returns_the_iterable() -> None:
     items = _samples(3)
-    out = WebDatasetAdapter(WebDatasetConfig()).prepare_iterable(lambda: items, "x", fingerprint="f")
+    out = WebDatasetAdapter(WebDatasetConfig()).prepare_iterable(
+        lambda: items, "x", fingerprint="f"
+    )
     assert out is items
 
 
@@ -101,7 +111,9 @@ def test_mixed_vlm_module_streams_shards_with_flag(tmp_path: Path, monkeypatch) 
     from hale_core.data.vlm.loader import mixed_vlm_data_module
 
     monkeypatch.setattr(mixed_vlm_data_module, "build_vlm_dataloader", fake_build)
-    plain = vlm_loader.MixedVLMDataModule(dataset_names=["toy"], samples_per_dataset=6, batch_size=3)
+    plain = vlm_loader.MixedVLMDataModule(
+        dataset_names=["toy"], samples_per_dataset=6, batch_size=3
+    )
     cfg = WebDatasetConfig(enabled=True, root=str(tmp_path), samples_per_shard=2, shuffle=False)
     sharded = vlm_loader.MixedVLMDataModule(
         dataset_names=["toy"], samples_per_dataset=6, batch_size=3, webdataset=cfg

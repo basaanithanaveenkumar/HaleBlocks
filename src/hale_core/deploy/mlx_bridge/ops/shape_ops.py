@@ -21,19 +21,26 @@ _INT64_MAX = 2**63 - 1
     ]
 )
 def reshape(x, shape):
-    """Lower ``aten.view.default``, ``aten._unsafe_view.default``, ``aten.reshape.default``, ``aten.view_copy.default`` to MLX: ``mx.reshape(x, [int(s) for s in shape])``."""
+    """Lower ``aten.view.default``, ``aten._unsafe_view.default``, ``aten.reshape.default``,
+    ``aten.view_copy.default`` to MLX: ``mx.reshape(x, [int(s) for s in shape])``.
+    """
     return mx.reshape(x, [int(s) for s in shape])
 
 
 @register(name=["aten.flatten.using_ints"])
 def flatten(x, start_dim=0, end_dim=-1):
-    """Lower ``aten.flatten.using_ints`` to MLX: ``mx.flatten(x, start_axis=start_dim, end_axis=end_dim)``."""
+    """Lower ``aten.flatten.using_ints`` to MLX: ``mx.flatten(x, start_axis=start_dim,
+    end_axis=end_dim)``.
+    """
     return mx.flatten(x, start_axis=start_dim, end_axis=end_dim)
 
 
 @register(name=["aten.permute.default", "aten.permute_copy.default"])
 def permute(x, dims):
-    """Lower ``aten.permute.default``, ``aten.permute_copy.default`` to MLX: ``mx.transpose(x, [int(d) for d in dims])``."""
+    """Lower ``aten.permute.default``, ``aten.permute_copy.default`` to MLX: ``mx.transpose(x,
+    [int(d)
+    for d in dims])``.
+    """
     return mx.transpose(x, [int(d) for d in dims])
 
 
@@ -45,7 +52,9 @@ def transpose(x, dim0, dim1):
 
 @register(name=["aten.unsqueeze.default", "aten.unsqueeze_copy.default"])
 def unsqueeze(x, dim):
-    """Lower ``aten.unsqueeze.default``, ``aten.unsqueeze_copy.default`` to MLX: ``mx.expand_dims(x, dim if dim >= 0 else dim + x.ndim + 1)``."""
+    """Lower ``aten.unsqueeze.default``, ``aten.unsqueeze_copy.default`` to MLX: ``mx.expand_dims(x,
+    dim if dim >= 0 else dim + x.ndim + 1)``.
+    """
     return mx.expand_dims(x, dim if dim >= 0 else dim + x.ndim + 1)
 
 
@@ -109,7 +118,8 @@ def split_with_sizes(x, split_sizes, dim=0):
 
 @register(name=["aten.unbind.int"])
 def unbind(x, dim=0):
-    """Lower ``aten.unbind.int`` to MLX: ``[mx.take(x, i, axis=dim) for i in range(x.shape[dim])]``."""
+    """Lower ``aten.unbind.int`` to MLX: ``[mx.take(x, i, axis=dim) for i in range(x.shape[dim])]``.
+    """
     return [mx.take(x, i, axis=dim) for i in range(x.shape[dim])]
 
 
@@ -139,7 +149,9 @@ def index_select(x, dim, index):
 
 @register(name=["aten.index.Tensor"])
 def index(x, indices):
-    """Lower ``aten.index.Tensor`` to MLX: ``x[tuple((slice(None) if i is None else i for i in indices))]``."""
+    """Lower ``aten.index.Tensor`` to MLX: ``x[tuple((slice(None) if i is None else i for i in
+    indices))]``.
+    """
     return x[tuple(slice(None) if i is None else i for i in indices)]
 
 
@@ -186,7 +198,9 @@ def tril(x, diagonal=0):
 
 @register(name=["aten.roll.default"])
 def roll(x, shifts, dims=()):
-    """Lower ``aten.roll.default`` to MLX: ``mx.roll(x, list(shifts), axis=list(dims) if dims else None)``."""
+    """Lower ``aten.roll.default`` to MLX: ``mx.roll(x, list(shifts), axis=list(dims) if dims else
+    None)``.
+    """
     return mx.roll(x, list(shifts), axis=list(dims) if dims else None)
 
 

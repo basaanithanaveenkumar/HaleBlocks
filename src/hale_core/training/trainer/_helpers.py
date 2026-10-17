@@ -1,4 +1,6 @@
-"""Shared helpers of :mod:`hale_core.training.trainer` (Variant-agnostic training loop resolved from registries)."""
+"""Shared helpers of :mod:`hale_core.training.trainer` (Variant-agnostic training loop resolved from
+registries).
+"""
 
 from __future__ import annotations
 

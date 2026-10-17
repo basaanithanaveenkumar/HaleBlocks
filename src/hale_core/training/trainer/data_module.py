@@ -7,6 +7,7 @@ from typing import Any, Protocol
 
 class DataModule(Protocol):
     """Structural type of the trainer's data source."""
+
     tokenizer: Any
 
     def train_loader(self):

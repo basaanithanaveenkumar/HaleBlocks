@@ -1,4 +1,6 @@
-"""``ConvNeXtV1XLarge``: ConvNeXt V1 XLarge: depths=[3,3,27,3], dim=256, layer_scale=1e-6 — 350M params, 87.0%."""
+"""``ConvNeXtV1XLarge``: ConvNeXt V1 XLarge: depths=[3,3,27,3], dim=256, layer_scale=1e-6 — 350M
+params, 87.0%.
+"""
 
 from __future__ import annotations
 

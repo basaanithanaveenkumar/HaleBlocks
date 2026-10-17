@@ -10,6 +10,7 @@ from enum import StrEnum
 
 class DatasetKind(StrEnum):
     """Top-level dataset family (LLM text, VLM, locomotion …), used to route specs to loaders."""
+
     LLM = "llm"
     VLM = "vlm"
     LOCOMOTION = "locomotion"

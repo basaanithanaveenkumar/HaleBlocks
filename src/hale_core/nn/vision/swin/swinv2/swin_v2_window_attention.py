@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import math
-from typing import Optional
 
 import torch
 import torch.nn as nn
@@ -52,7 +51,7 @@ class SwinV2WindowAttention(nn.Module):
         # tau = exp(logit_scale.clip(max=log(100))) to prevent collapse
         self.logit_scale = nn.Parameter(torch.full((num_heads, 1, 1), math.log(10.0)))
 
-    def forward(self, x: torch.Tensor, mask: Optional[torch.Tensor] = None) -> torch.Tensor:
+    def forward(self, x: torch.Tensor, mask: torch.Tensor | None = None) -> torch.Tensor:
         """
         Args:
             x:    [B*num_windows, win*win, C]

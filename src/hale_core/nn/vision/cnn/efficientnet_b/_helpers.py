@@ -1,4 +1,6 @@
-"""Shared helpers of :mod:`hale_core.nn.vision.cnn.efficientnet_b` (EfficientNet B0-B7 Vision Backbones)."""
+"""Shared helpers of :mod:`hale_core.nn.vision.cnn.efficientnet_b` (EfficientNet B0-B7 Vision
+Backbones).
+"""
 
 from __future__ import annotations
 

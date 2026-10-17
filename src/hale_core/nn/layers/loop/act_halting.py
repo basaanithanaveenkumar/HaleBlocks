@@ -1,4 +1,6 @@
-"""``ACTHalting``: Per-token halting unit ``p_t^i = sigmoid(w . h_t^i + b)`` and its ACT bookkeeping."""
+"""``ACTHalting``: Per-token halting unit ``p_t^i = sigmoid(w . h_t^i + b)`` and its ACT
+bookkeeping.
+"""
 
 from __future__ import annotations
 

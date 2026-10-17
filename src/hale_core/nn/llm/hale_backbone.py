@@ -1,4 +1,5 @@
-"""A HaloDiffusionLLM causal checkpoint (``hale_core.nn.backbones``) as a :class:`LanguageBackbone`."""
+"""A HaloDiffusionLLM causal checkpoint (``hale_core.nn.backbones``) as a :class:`LanguageBackbone`.
+"""
 
 from __future__ import annotations
 
@@ -193,7 +194,9 @@ class HaleSequenceLMBackbone(LanguageBackbone):
         return names
 
     def apply_lora(self, r: int, alpha: int, dropout: float, targets: Sequence[str]) -> None:
-        """Wrap ``targets`` with LoRA adapters of rank ``r`` (scale ``alpha / r``) and freeze the base."""
+        """Wrap ``targets`` with LoRA adapters of rank ``r`` (scale ``alpha / r``) and freeze the
+        base.
+        """
         from peft import LoraConfig, inject_adapter_in_model  # lazy: optional dependency
 
         self.requires_grad_(False)

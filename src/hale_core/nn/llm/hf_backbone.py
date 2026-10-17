@@ -1,4 +1,6 @@
-"""Hugging Face causal LMs (or the text tower of a multimodal checkpoint) as a :class:`LanguageBackbone`."""
+"""Hugging Face causal LMs (or the text tower of a multimodal checkpoint) as a
+:class:`LanguageBackbone`.
+"""
 
 from __future__ import annotations
 

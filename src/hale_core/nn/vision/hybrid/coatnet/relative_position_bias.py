@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from typing import Optional
-
 import torch
 import torch.nn as nn
 
@@ -31,8 +29,8 @@ class RelativePositionBias(nn.Module):
         _trunc_normal_(self.table, std=0.02)
 
         # Cache the index lookup for a given H×W grid
-        self._cached_hw: Optional[tuple] = None
-        self._cached_idx: Optional[torch.Tensor] = None
+        self._cached_hw: tuple | None = None
+        self._cached_idx: torch.Tensor | None = None
 
     def _build_index(self, H: int, W: int) -> torch.Tensor:
         """Precompute flat indices into the bias table for an H×W grid."""

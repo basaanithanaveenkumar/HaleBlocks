@@ -1,4 +1,6 @@
-"""Shared helpers of :mod:`hale_core.nn.vision.cnn.internimage` (InternImage — DCNv3-based Vision Backbone (Wang et al. 2022))."""
+"""Shared helpers of :mod:`hale_core.nn.vision.cnn.internimage` (InternImage — DCNv3-based Vision
+Backbone (Wang et al. 2022)).
+"""
 
 from __future__ import annotations
 

@@ -1,4 +1,6 @@
-"""Variants and registrations of :mod:`hale_core.data.llm.loader` (Sequential LLM dataloader with streaming and prefetch)."""
+"""Variants and registrations of :mod:`hale_core.data.llm.loader` (Sequential LLM dataloader with
+streaming and prefetch).
+"""
 
 from __future__ import annotations
 

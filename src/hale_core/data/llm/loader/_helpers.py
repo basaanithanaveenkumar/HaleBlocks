@@ -1,4 +1,6 @@
-"""Shared helpers of :mod:`hale_core.data.llm.loader` (Sequential LLM dataloader with streaming and prefetch)."""
+"""Shared helpers of :mod:`hale_core.data.llm.loader` (Sequential LLM dataloader with streaming and
+prefetch).
+"""
 
 from __future__ import annotations
 

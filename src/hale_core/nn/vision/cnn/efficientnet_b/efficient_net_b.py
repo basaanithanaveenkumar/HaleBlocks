@@ -75,9 +75,6 @@ class EfficientNetB(BaseVisionBackbone):
         # Groups: [stem→s1], [s2], [s3], [s4+s5+s6+s7+head]
         # stride-2 stages: 2 (24ch), 3 (40ch), 4 (80ch), 6 (192ch)
         # We track stride to assign blocks to feature pyramid levels.
-        stride_groups: list[list[nn.Module]] = [[] for _ in range(4)]
-        current_group = 0
-        stride_counts = [0]  # cumulative stride-doublings seen so far
 
         in_chs = stem_chs
         stride_2_seen = 0

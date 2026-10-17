@@ -12,7 +12,9 @@ def sliding_window_mask(
     *,
     causal: bool,
 ) -> torch.Tensor:
-    """Boolean mask blocking keys further than ``window`` from the query (and future keys when causal)."""
+    """Boolean mask blocking keys further than ``window`` from the query (and future keys when
+    causal).
+    """
     q = torch.arange(seq_len, device=device).unsqueeze(1)
     k = torch.arange(seq_len, device=device).unsqueeze(0)
     dist = q - k
@@ -22,7 +24,8 @@ def sliding_window_mask(
 
 
 def or_masks(*masks: torch.Tensor | None) -> torch.Tensor | None:
-    """Element-wise OR of the given boolean masks, ignoring ``None``; ``None`` if all are ``None``."""
+    """Element-wise OR of the given boolean masks, ignoring ``None``; ``None`` if all are ``None``.
+    """
     out: torch.Tensor | None = None
     for mask in masks:
         if mask is None:

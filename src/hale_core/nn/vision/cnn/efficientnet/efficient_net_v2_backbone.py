@@ -63,10 +63,6 @@ class EfficientNetV2Backbone(BaseVisionBackbone):
         # We group stages by their STRIDE to build a 4-scale feature pyramid.
         # stride-2 transitions mark new pyramid levels.
         self.stage_groups: nn.ModuleList = nn.ModuleList()
-        stride_4_chs = None  # filled on first stride-2 stage
-        stride_8_chs = None
-        stride_16_chs = None
-        stride_32_chs = None
         current_stride = 2
 
         groups: list[list[nn.Module]] = []

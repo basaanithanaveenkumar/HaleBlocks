@@ -34,10 +34,10 @@ def test_named_registry_is_a_registry_with_the_legacy_interface():
     assert isinstance(reg, Registry)
     reg.add("b", _Widget)
     reg.add("a", int)
-    assert list(reg) == ["b", "a"]                       # registration order, not sorted
+    assert list(reg) == ["b", "a"]  # registration order, not sorted
     live = reg.items
     reg.add("c", str)
-    assert "c" in live                                    # live mapping
+    assert "c" in live  # live mapping
     with pytest.raises(ValueError, match="already registered"):
         reg.add("a", float)
     with pytest.raises(KeyError, match="unknown widget"):

@@ -1,4 +1,6 @@
-"""``EfficientNetV2XL``: EfficientNetV2-XL: ~208M params, largest variant with extended training data."""
+"""``EfficientNetV2XL``: EfficientNetV2-XL: ~208M params, largest variant with extended training
+data.
+"""
 
 from __future__ import annotations
 

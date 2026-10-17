@@ -21,7 +21,9 @@ _BOOTSTRAPPED = False
 
 
 def register_builtins() -> None:
-    """Import the built-in modules whose import registers models, datasets, losses, loggers and trainers."""
+    """Import the built-in modules whose import registers models, datasets, losses, loggers and
+    trainers.
+    """
     global _BOOTSTRAPPED
     if _BOOTSTRAPPED:
         return

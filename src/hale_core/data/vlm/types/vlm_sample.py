@@ -15,6 +15,7 @@ from hale_core.data.kinds import VLMModality
 @dataclass
 class VLMSample:
     """One parsed VLM training sample: text and/or conversation plus local media paths."""
+
     dataset: str
     modality: VLMModality
     text: str | None = None

@@ -1,4 +1,6 @@
-"""``LoRASettings``: Low-rank adapters (Hu et al., 2021, arXiv:2106.09685) on the backbone's linear layers."""
+"""``LoRASettings``: Low-rank adapters (Hu et al., 2021, arXiv:2106.09685) on the backbone's linear
+layers.
+"""
 
 from __future__ import annotations
 

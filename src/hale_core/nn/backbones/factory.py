@@ -9,6 +9,7 @@ BACKBONES = NamedRegistry("backbone")
 
 def register_backbone(name: str):
     """Decorator registering a backbone class under ``name`` in ``BACKBONES``."""
+
     def deco(cls):
         BACKBONES.add(name, cls)
         return cls

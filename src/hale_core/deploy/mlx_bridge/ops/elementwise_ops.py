@@ -21,19 +21,25 @@ def _is_array(x) -> bool:
 
 @register(name=["aten.add.Tensor", "aten.add.Scalar"])
 def add(a, b, alpha=1):
-    """Lower ``aten.add.Tensor``, ``aten.add.Scalar`` to MLX: ``a + (b * alpha if alpha != 1 else b)``."""
+    """Lower ``aten.add.Tensor``, ``aten.add.Scalar`` to MLX: ``a + (b * alpha if alpha != 1 else
+    b)``.
+    """
     return a + (b * alpha if alpha != 1 else b)
 
 
 @register(name=["aten.sub.Tensor", "aten.sub.Scalar"])
 def sub(a, b, alpha=1):
-    """Lower ``aten.sub.Tensor``, ``aten.sub.Scalar`` to MLX: ``a - (b * alpha if alpha != 1 else b)``."""
+    """Lower ``aten.sub.Tensor``, ``aten.sub.Scalar`` to MLX: ``a - (b * alpha if alpha != 1 else
+    b)``.
+    """
     return a - (b * alpha if alpha != 1 else b)
 
 
 @register(name=["aten.rsub.Scalar", "aten.rsub.Tensor"])
 def rsub(a, b, alpha=1):
-    """Lower ``aten.rsub.Scalar``, ``aten.rsub.Tensor`` to MLX: ``b - (a * alpha if alpha != 1 else a)``."""
+    """Lower ``aten.rsub.Scalar``, ``aten.rsub.Tensor`` to MLX: ``b - (a * alpha if alpha != 1 else
+    a)``.
+    """
     return b - (a * alpha if alpha != 1 else a)
 
 
@@ -254,13 +260,17 @@ def minimum(a, b):
     name=["aten.where.self", "aten.where.ScalarSelf", "aten.where.ScalarOther", "aten.where.Scalar"]
 )
 def where(cond, a, b):
-    """Lower ``aten.where.self``, ``aten.where.ScalarSelf``, ``aten.where.ScalarOther``, ``aten.where.Scalar`` to MLX: ``mx.where(cond, a, b)``."""
+    """Lower ``aten.where.self``, ``aten.where.ScalarSelf``, ``aten.where.ScalarOther``,
+    ``aten.where.Scalar`` to MLX: ``mx.where(cond, a, b)``.
+    """
     return mx.where(cond, a, b)
 
 
 @register(name=["aten.masked_fill.Scalar", "aten.masked_fill.Tensor"])
 def masked_fill(x, mask, value):
-    """Lower ``aten.masked_fill.Scalar``, ``aten.masked_fill.Tensor`` to MLX: ``mx.where(mask, mx.array(value, dtype=x.dtype), x)``."""
+    """Lower ``aten.masked_fill.Scalar``, ``aten.masked_fill.Tensor`` to MLX: ``mx.where(mask,
+    mx.array(value, dtype=x.dtype), x)``.
+    """
     return mx.where(mask, mx.array(value, dtype=x.dtype), x)
 
 
@@ -302,19 +312,25 @@ def ge(a, b):
 
 @register(name=["aten.logical_not.default", "aten.bitwise_not.default"])
 def logical_not(x):
-    """Lower ``aten.logical_not.default``, ``aten.bitwise_not.default`` to MLX: ``mx.logical_not(x)``."""
+    """Lower ``aten.logical_not.default``, ``aten.bitwise_not.default`` to MLX:
+    ``mx.logical_not(x)``.
+    """
     return mx.logical_not(x)
 
 
 @register(name=["aten.logical_and.default", "aten.bitwise_and.Tensor"])
 def logical_and(a, b):
-    """Lower ``aten.logical_and.default``, ``aten.bitwise_and.Tensor`` to MLX: ``mx.logical_and(a, b)``."""
+    """Lower ``aten.logical_and.default``, ``aten.bitwise_and.Tensor`` to MLX: ``mx.logical_and(a,
+    b)``.
+    """
     return mx.logical_and(a, b)
 
 
 @register(name=["aten.logical_or.default", "aten.bitwise_or.Tensor"])
 def logical_or(a, b):
-    """Lower ``aten.logical_or.default``, ``aten.bitwise_or.Tensor`` to MLX: ``mx.logical_or(a, b)``."""
+    """Lower ``aten.logical_or.default``, ``aten.bitwise_or.Tensor`` to MLX: ``mx.logical_or(a,
+    b)``.
+    """
     return mx.logical_or(a, b)
 
 

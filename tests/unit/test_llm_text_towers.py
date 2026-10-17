@@ -18,19 +18,28 @@ transformers = pytest.importorskip("transformers")
 pytest.importorskip("peft")
 
 from hale_core.config.sections import LLMBackboneConfig  # noqa: E402
-from hale_core.nn.llm import configure_finetuning, get_llm_backbone_spec, list_llm_backbones  # noqa: E402
+from hale_core.nn.llm import (  # noqa: E402
+    configure_finetuning,
+    get_llm_backbone_spec,
+    list_llm_backbones,
+)
 from hale_core.nn.llm.hf_backbone import HFCausalLMBackbone  # noqa: E402
 from hale_core.nn.llm.hf_text_tower import TextTowerForCausalLM, extract_text_tower  # noqa: E402
-
 from tests.unit.test_llm_backbones import tiny_tokenizer  # noqa: E402
 
 FIXTURES = Path(__file__).resolve().parents[1] / "fixtures" / "llm_multimodal"
 #: Registry family -> fixture architecture.
 FAMILY_FIXTURE = {
-    "qwen3.5": "qwen3_5", "gemma4": "gemma4", "ministral3": "mistral3", "cosmos-reason2": "qwen3_vl",
-    "lfm2.5-vl": "lfm2_vl", "smolvlm2": "smolvlm",
+    "qwen3.5": "qwen3_5",
+    "gemma4": "gemma4",
+    "ministral3": "mistral3",
+    "cosmos-reason2": "qwen3_vl",
+    "lfm2.5-vl": "lfm2_vl",
+    "smolvlm2": "smolvlm",
 }
-MULTIMODAL = [n for n in list_llm_backbones("hf") if get_llm_backbone_spec(n).is_multimodal_checkpoint]
+MULTIMODAL = [
+    n for n in list_llm_backbones("hf") if get_llm_backbone_spec(n).is_multimodal_checkpoint
+]
 #: One registered backbone per architecture.
 ONE_PER_FAMILY = {get_llm_backbone_spec(n).family: n for n in sorted(MULTIMODAL)}
 
@@ -67,7 +76,9 @@ def test_text_tower_reproduces_the_multimodal_model_on_text(family: str) -> None
         tower = extract_text_tower(full)
         got = tower(input_ids=ids).logits
     torch.testing.assert_close(got, expected)
-    assert not any(k in n for n, _ in tower.named_parameters() for k in ("vision", "visual", "audio"))
+    assert not any(
+        k in n for n, _ in tower.named_parameters() for k in ("vision", "visual", "audio")
+    )
     if family == "cosmos-reason2":  # qwen3_vl_text has no *ForCausalLM in transformers
         assert isinstance(tower, TextTowerForCausalLM)
     else:
@@ -82,8 +93,11 @@ def test_lora_targets_cover_every_decoder_layer(family: str) -> None:
     linears = [n for n, m in tower.named_modules() if isinstance(m, torch.nn.Linear)]
     assert targets <= {n.rsplit(".", 1)[-1] for n in linears}
     layers = {int(m.group(1)) for n in linears if (m := re.search(r"layers\.(\d+)\.", n))}
-    adapted = {int(m.group(1)) for n in linears
-               if n.rsplit(".", 1)[-1] in targets and (m := re.search(r"layers\.(\d+)\.", n))}
+    adapted = {
+        int(m.group(1))
+        for n in linears
+        if n.rsplit(".", 1)[-1] in targets and (m := re.search(r"layers\.(\d+)\.", n))
+    }
     assert adapted == layers
 
 
@@ -91,11 +105,17 @@ def test_lora_targets_cover_every_decoder_layer(family: str) -> None:
 def test_backbone_loads_text_tower_adds_tokens_and_finetunes(tmp_path: Path, family: str) -> None:
     name = ONE_PER_FAMILY[family]
     spec = get_llm_backbone_spec(name)
-    llm = HFCausalLMBackbone.from_pretrained(spec, str(saved_checkpoint(tmp_path, FAMILY_FIXTURE[family])),
-                                             dtype="float32", attn_implementation="eager")
+    llm = HFCausalLMBackbone.from_pretrained(
+        spec,
+        str(saved_checkpoint(tmp_path, FAMILY_FIXTURE[family])),
+        dtype="float32",
+        attn_implementation="eager",
+    )
     assert not any(k in n for n, _ in llm.named_parameters() for k in ("vision", "visual", "audio"))
     special = llm.add_special_tokens(["<image>", "<halo_action>"])
-    configure_finetuning(llm, LLMBackboneConfig(name=name, finetune="lora", lora={"r": 4, "alpha": 8}))
+    configure_finetuning(
+        llm, LLMBackboneConfig(name=name, finetune="lora", lora={"r": 4, "alpha": 8})
+    )
     assert any("lora_" in n for n, p in llm.named_parameters() if p.requires_grad)
 
     ids = torch.randint(3, 60, (2, 8))
@@ -109,9 +129,14 @@ def test_backbone_loads_text_tower_adds_tokens_and_finetunes(tmp_path: Path, fam
     assert all(p.grad is not None for n, p in llm.named_parameters() if "lora_B" in n)
 
 
-def test_gemma4_per_layer_embeddings_need_token_ids_once_embeddings_are_spliced(tmp_path: Path) -> None:
-    llm = HFCausalLMBackbone.from_pretrained(get_llm_backbone_spec("gemma4-e2b"),
-                                             str(saved_checkpoint(tmp_path, "gemma4")), dtype="float32").eval()
+def test_gemma4_per_layer_embeddings_need_token_ids_once_embeddings_are_spliced(
+    tmp_path: Path,
+) -> None:
+    llm = HFCausalLMBackbone.from_pretrained(
+        get_llm_backbone_spec("gemma4-e2b"),
+        str(saved_checkpoint(tmp_path, "gemma4")),
+        dtype="float32",
+    ).eval()
     assert llm.per_layer_vocab == 128
     ids = torch.randint(3, 60, (1, 6))
     with torch.no_grad():
@@ -129,8 +154,11 @@ def test_gemma4_per_layer_embeddings_need_token_ids_once_embeddings_are_spliced(
 
 
 def test_generic_text_tower_generates(tmp_path: Path) -> None:
-    llm = HFCausalLMBackbone.from_pretrained(get_llm_backbone_spec("cosmos-reason2-2b"),
-                                             str(saved_checkpoint(tmp_path, "qwen3_vl")), dtype="float32").eval()
+    llm = HFCausalLMBackbone.from_pretrained(
+        get_llm_backbone_spec("cosmos-reason2-2b"),
+        str(saved_checkpoint(tmp_path, "qwen3_vl")),
+        dtype="float32",
+    ).eval()
     prompt = torch.randint(3, 60, (1, 5))
     out = llm.generate(input_ids=prompt, max_new_tokens=4, do_sample=False, pad_token_id=0)
     assert out.shape == (1, 9) and torch.equal(out[:, :5], prompt)

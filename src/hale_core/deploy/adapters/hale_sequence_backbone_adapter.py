@@ -53,7 +53,10 @@ class HaleSequenceBackboneAdapter(ModelAdapter):
         return bool(self.backbone_kwargs.get("use_time_cond"))
 
     def default_signature(self) -> IOSignature:
-        """Inputs ``input_ids`` (and ``t`` when time-conditioned) with dynamic batch/sequence; output ``logits``."""
+        """Inputs ``input_ids`` (and ``t`` when time-conditioned) with dynamic batch/sequence;
+        output
+        ``logits``.
+        """
         max_len = int(self.backbone_kwargs.get("max_length", 512))
         inputs = [
             {

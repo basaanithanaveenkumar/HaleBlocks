@@ -11,6 +11,7 @@ from hale_core.nn.optim.base import BaseOptimizer
 
 class AdamOptimizer(BaseOptimizer):
     """``torch.optim.Adam`` behind the :class:`BaseOptimizer` interface."""
+
     def _make_optimizer(self, params: Any, config: dict[str, Any]):
         return torch.optim.Adam(
             params,

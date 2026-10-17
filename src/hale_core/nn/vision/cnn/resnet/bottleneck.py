@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from typing import Optional
-
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -29,7 +27,7 @@ class Bottleneck(nn.Module):
         in_planes: int,
         planes: int,
         stride: int = 1,
-        downsample: Optional[nn.Module] = None,
+        downsample: nn.Module | None = None,
     ) -> None:
         super().__init__()
         out_channels = planes * self.expansion

@@ -55,7 +55,10 @@ SCHEDULERS: dict[str, type] = SCHEDULERS_REGISTRY.items
 
 
 def register_model(name: str) -> Callable[[type[T]], type[T]]:
-    """Decorator registering a model class under ``name`` (duplicate names raise :class:`RegistryError`)."""
+    """Decorator registering a model class under ``name`` (duplicate names raise
+    :class:`RegistryError`).
+    """
+
     def deco(cls: type[T]) -> type[T]:
         MODELS_REGISTRY.add(name, cls)
         cls.variant_name = name  # type: ignore[attr-defined]
@@ -68,7 +71,10 @@ register_variant = register_model
 
 
 def register_loss(name: str) -> Callable[[T], T]:
-    """Decorator registering a loss function under ``name`` (duplicate names raise :class:`RegistryError`)."""
+    """Decorator registering a loss function under ``name`` (duplicate names raise
+    :class:`RegistryError`).
+    """
+
     def deco(fn: T) -> T:
         LOSSES_REGISTRY.add(name, fn)
         return fn
@@ -77,7 +83,10 @@ def register_loss(name: str) -> Callable[[T], T]:
 
 
 def register_sampler(name: str) -> Callable[[T], T]:
-    """Decorator registering a sampler function under ``name`` (duplicate names raise :class:`RegistryError`)."""
+    """Decorator registering a sampler function under ``name`` (duplicate names raise
+    :class:`RegistryError`).
+    """
+
     def deco(fn: T) -> T:
         SAMPLERS_REGISTRY.add(name, fn)
         return fn
@@ -86,7 +95,10 @@ def register_sampler(name: str) -> Callable[[T], T]:
 
 
 def register_optimizer(name: str) -> Callable[[type[T]], type[T]]:
-    """Decorator registering a optimizer class under ``name`` (duplicate names raise :class:`RegistryError`)."""
+    """Decorator registering a optimizer class under ``name`` (duplicate names raise
+    :class:`RegistryError`).
+    """
+
     def deco(cls: type[T]) -> type[T]:
         OPTIMIZERS_REGISTRY.add(name.lower(), cls)
         return cls
@@ -98,6 +110,7 @@ def register_metric(
     name: str, *, variants: tuple[str, ...] | None = None
 ) -> Callable[[type[T]], type[T]]:
     """Decorator registering a metric class under ``name``, optionally only for ``variants``."""
+
     def deco(cls: type[T]) -> type[T]:
         return METRICS_REGISTRY.add(name, cls, variants=variants)
 
@@ -144,7 +157,10 @@ def get_optimizer(name: str) -> type:
 
 
 def register_config(name: str) -> Callable[[type[T]], type[T]]:
-    """Decorator registering a config schema under ``name`` (duplicate names raise :class:`RegistryError`)."""
+    """Decorator registering a config schema under ``name`` (duplicate names raise
+    :class:`RegistryError`).
+    """
+
     def deco(cls: type[T]) -> type[T]:
         CONFIGS_REGISTRY.add(name, cls)
         return cls
@@ -162,7 +178,10 @@ def get_config_schema(name: str = "llm") -> type:
 
 
 def register_logger(name: str) -> Callable[[T], T]:
-    """Decorator registering a experiment-logger factory under ``name`` (duplicate names raise :class:`RegistryError`)."""
+    """Decorator registering a experiment-logger factory under ``name`` (duplicate names raise
+    :class:`RegistryError`).
+    """
+
     def deco(factory: T) -> T:
         LOGGERS_REGISTRY.add(name, factory)
         return factory
@@ -171,12 +190,17 @@ def register_logger(name: str) -> Callable[[T], T]:
 
 
 def build_logger(name: str, *, cfg: Any = None, **kwargs: Any) -> Any:
-    """Build the experiment logger registered as ``name`` (``cfg`` and ``kwargs`` go to its factory)."""
+    """Build the experiment logger registered as ``name`` (``cfg`` and ``kwargs`` go to its
+    factory).
+    """
     return LOGGERS_REGISTRY.get(name)(cfg=cfg, **kwargs)
 
 
 def register_trainer(name: str) -> Callable[[type[T]], type[T]]:
-    """Decorator registering a trainer class under ``name`` (duplicate names raise :class:`RegistryError`)."""
+    """Decorator registering a trainer class under ``name`` (duplicate names raise
+    :class:`RegistryError`).
+    """
+
     def deco(cls: type[T]) -> type[T]:
         TRAINERS_REGISTRY.add(name, cls)
         return cls
@@ -194,7 +218,10 @@ def get_trainer(name: str = "default") -> type:
 
 
 def register_dataset(name: str) -> Callable[[T], T]:
-    """Decorator registering a dataset spec under ``name`` (duplicate names raise :class:`RegistryError`)."""
+    """Decorator registering a dataset spec under ``name`` (duplicate names raise
+    :class:`RegistryError`).
+    """
+
     def deco(factory: T) -> T:
         DATASETS_REGISTRY.add(name, factory)
         return factory

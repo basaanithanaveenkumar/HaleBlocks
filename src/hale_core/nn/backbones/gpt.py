@@ -11,6 +11,7 @@ from hale_core.nn.stacks.gpt import GPTStack
 
 class GPTBackbone(SequenceBackbone):
     """Decoder-only transformer backbone (GPT-style pre-norm blocks)."""
+
     def __init__(
         self,
         vocab_size: int,

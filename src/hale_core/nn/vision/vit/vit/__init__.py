@@ -42,7 +42,9 @@ Variants registered
   vit_22b    — ViT-22B/14: 6144-dim, 48 heads, 48 layers  (Zhai et al. 2022)
 """
 
-from hale_core.nn.vision.vit.vit._helpers import _trunc_normal_  # noqa: F401 - _trunc_normal_ is imported by Halos-lift
+from hale_core.nn.vision.vit.vit._helpers import (
+    _trunc_normal_,  # noqa: F401 - _trunc_normal_ is imported by Halos-lift
+)
 from hale_core.nn.vision.vit.vit.patch_embed import PatchEmbed
 from hale_core.nn.vision.vit.vit.vi_t22_b import ViT22B
 from hale_core.nn.vision.vit.vit.vi_t_attention import ViTAttention

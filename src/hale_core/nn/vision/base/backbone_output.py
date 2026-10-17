@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Optional
 
 import torch
 
@@ -34,6 +33,6 @@ class BackboneOutput:
     """
 
     pooled_output: torch.Tensor  # [B, embed_dim]
-    patch_tokens: Optional[torch.Tensor] = None  # [B, N, D] or None
+    patch_tokens: torch.Tensor | None = None  # [B, N, D] or None
     feature_maps: list[torch.Tensor] = field(default_factory=list)  # multi-scale
-    attentions: Optional[list[torch.Tensor]] = None  # transformer attention maps
+    attentions: list[torch.Tensor] | None = None  # transformer attention maps

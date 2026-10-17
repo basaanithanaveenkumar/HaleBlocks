@@ -15,6 +15,7 @@ class MuonOptimizer(BaseOptimizer):
     Raises:
         RuntimeError: when building, if this PyTorch build has no ``torch.optim.Muon``.
     """
+
     def _make_optimizer(self, params: Any, config: dict[str, Any]):
         muon_cls = getattr(torch.optim, "Muon", None)
         if muon_cls is None:

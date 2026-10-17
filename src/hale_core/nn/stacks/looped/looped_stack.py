@@ -1,4 +1,6 @@
-"""``LoopedStack``: Prelude, a weight-tied core block looped ``T`` times, coda (see the module docstring)."""
+"""``LoopedStack``: Prelude, a weight-tied core block looped ``T`` times, coda (see the module
+docstring).
+"""
 
 from __future__ import annotations
 

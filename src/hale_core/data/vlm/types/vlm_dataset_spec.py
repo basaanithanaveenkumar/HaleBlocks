@@ -17,6 +17,7 @@ from hale_core.data.vlm.types.vlm_sample import VLMSample
 @dataclass(frozen=True)
 class VLMDatasetSpec:
     """Where a VLM dataset lives on the Hub, its modality, and which fields hold media/text."""
+
     name: str
     hf_repo: str
     modality: VLMModality

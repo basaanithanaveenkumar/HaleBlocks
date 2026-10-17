@@ -1,4 +1,6 @@
-"""``ResNet101DCN``: ResNet-101 with DeformConv v2 in stages 2 & 3 — high-capacity detector backbone."""
+"""``ResNet101DCN``: ResNet-101 with DeformConv v2 in stages 2 & 3 — high-capacity detector
+backbone.
+"""
 
 from __future__ import annotations
 

@@ -9,6 +9,7 @@ import torch.nn.functional as F
 
 class SwiGLUExpert(nn.Module):
     """One SwiGLU feed-forward expert."""
+
     def __init__(self, d_model: int, d_ff: int, dropout: float = 0.0):
         super().__init__()
         self.w1 = nn.Linear(d_model, d_ff, bias=False)

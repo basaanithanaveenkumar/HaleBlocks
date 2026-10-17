@@ -9,6 +9,7 @@ import torch.nn.functional as F
 
 class NoiseBestKRouter(nn.Module):
     """Top-k expert router with optional noisy gating during training."""
+
     def __init__(self, d_model: int, n_experts: int, top_k: int):
         super().__init__()
         self.top_k = top_k

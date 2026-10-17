@@ -71,7 +71,9 @@ class ModelAdapter(ABC):
 
     # ------------------------------------------------------------------ template methods
     def signature(self) -> IOSignature:
-        """The effective I/O signature: the config's ``signature`` if given, else :meth:`default_signature`."""
+        """The effective I/O signature: the config's ``signature`` if given, else
+        :meth:`default_signature`.
+        """
         if self._signature_cfg is not None:
             return IOSignature.from_config(self._signature_cfg)
         return self.default_signature()

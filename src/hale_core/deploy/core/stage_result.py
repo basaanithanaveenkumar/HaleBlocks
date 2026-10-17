@@ -13,6 +13,7 @@ Status = Literal["ok", "skipped", "failed"]
 @dataclass
 class StageResult:
     """Outcome of one stage: status, duration, produced artifacts and message."""
+
     name: str
     stage_type: str
     status: Status

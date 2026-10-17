@@ -13,6 +13,7 @@ from hale_core.data.kinds import DatasetKind, LLMDomain, TrainingStage
 @dataclass(frozen=True)
 class LLMDatasetSpec:
     """Where an LLM dataset lives on the Hub and which row fields hold its text."""
+
     name: str
     hf_repo: str
     stage: TrainingStage

@@ -16,7 +16,9 @@ def test_open_stream_uses_hf_helper(monkeypatch, tmp_path):
         calls.update(kwargs)
         return iter([{"qpos": [0.0]}])
 
-    monkeypatch.setitem(sys.modules, "datasets", types.SimpleNamespace(load_dataset=fake_load_dataset))
+    monkeypatch.setitem(
+        sys.modules, "datasets", types.SimpleNamespace(load_dataset=fake_load_dataset)
+    )
     task = next(iter(LocoTaskType))
     spec = LocoDatasetSpec(name="toy", task_type=task, hf_repo="org/toy")
     assert list(spec.open_stream(cache_dir=tmp_path)) == [{"qpos": [0.0]}]

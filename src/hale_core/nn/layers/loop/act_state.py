@@ -1,4 +1,6 @@
-"""``ACTState``: Running Adaptive Computation Time accumulators, all ``(batch, seq)`` except ``output``."""
+"""``ACTState``: Running Adaptive Computation Time accumulators, all ``(batch, seq)`` except
+``output``.
+"""
 
 from __future__ import annotations
 

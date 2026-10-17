@@ -7,6 +7,7 @@ import torch.nn as nn
 
 class DenseMLP(nn.Module):
     """Two-layer feed-forward block (Linear → GELU → dropout → Linear)."""
+
     def __init__(self, d_model: int, d_ff: int, dropout: float = 0.0):
         super().__init__()
         self.net = nn.Sequential(

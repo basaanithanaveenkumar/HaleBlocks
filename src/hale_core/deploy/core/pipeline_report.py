@@ -14,6 +14,7 @@ from hale_core.deploy.core.stage_result import StageResult
 @dataclass
 class PipelineReport:
     """Results of one pipeline run: per-stage status, timing, artifacts and messages."""
+
     work_dir: Path
     results: list[StageResult] = field(default_factory=list)
 
@@ -49,7 +50,8 @@ class PipelineReport:
             )
 
     def write(self, path: Path | None = None) -> Path:
-        """Write the report as JSON (default: ``report.json`` in the work dir) and return the path."""
+        """Write the report as JSON (default: ``report.json`` in the work dir) and return the path.
+        """
         path = path or self.work_dir / "report.json"
         path.write_text(
             json.dumps({"ok": self.ok, "stages": [r.to_dict() for r in self.results]}, indent=2)

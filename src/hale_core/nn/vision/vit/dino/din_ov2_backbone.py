@@ -75,7 +75,8 @@ class DINOv2Backbone(BaseVisionBackbone):
         # Register tokens — extra learnable tokens inserted after CLS
         self.register_tokens = nn.Parameter(torch.zeros(1, n_register, embed_dim))
 
-        # Positional embedding for CLS + patches (registers share no positional info — design choice)
+        # Positional embedding for CLS + patches (registers share no positional info — design
+        # choice)
         n_cls = 1 if use_cls else 0
         self.pos_embed = nn.Parameter(torch.zeros(1, num_patches + n_cls, embed_dim))
         self.pos_drop = nn.Dropout(drop_rate)

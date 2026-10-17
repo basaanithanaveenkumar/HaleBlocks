@@ -10,6 +10,7 @@ from hale_core.nn.stacks.dit import DiTStack
 
 class DiTBackbone(SequenceBackbone):
     """Diffusion-transformer backbone: AdaLN-Zero blocks conditioned on the time embedding."""
+
     def __init__(
         self,
         vocab_size: int,

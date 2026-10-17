@@ -1,4 +1,6 @@
-"""Variants and registrations of :mod:`hale_core.nn.vision.cnn.efficientnet_b` (EfficientNet B0-B7 Vision Backbones)."""
+"""Variants and registrations of :mod:`hale_core.nn.vision.cnn.efficientnet_b` (EfficientNet B0-B7
+Vision Backbones).
+"""
 
 from __future__ import annotations
 

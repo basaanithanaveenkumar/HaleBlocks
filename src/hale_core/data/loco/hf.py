@@ -34,7 +34,12 @@ def open_loco_hf_stream(spec: LocoDatasetSpec, *, cache_dir: Path) -> Iterator[d
         from datasets import load_dataset
     except ImportError as exc:
         raise MissingDependencyError("datasets", "install with: uv add 'hale-blocks[vlm]'") from exc
-    logger.info("opening locomotion stream dataset={} repo={} split={}", spec.name, spec.hf_repo,
-                spec.split)
-    yield from load_dataset(path=spec.hf_repo, split=spec.split, streaming=spec.streaming,
-                            cache_dir=str(cache_dir / "hf"))
+    logger.info(
+        "opening locomotion stream dataset={} repo={} split={}", spec.name, spec.hf_repo, spec.split
+    )
+    yield from load_dataset(
+        path=spec.hf_repo,
+        split=spec.split,
+        streaming=spec.streaming,
+        cache_dir=str(cache_dir / "hf"),
+    )

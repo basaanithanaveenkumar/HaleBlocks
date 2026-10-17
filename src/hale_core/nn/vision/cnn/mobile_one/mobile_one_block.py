@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from typing import Optional
-
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -64,13 +62,13 @@ class MobileOneBlock(nn.Module):
             ]
         )
         # 1×1 branch in depthwise (acts as identity-like for same-size kernels)
-        self.dw_skip_1x1: Optional[_ConvBN] = None
+        self.dw_skip_1x1: _ConvBN | None = None
         if in_channels == out_channels:
             self.dw_skip_1x1 = _ConvBN(
                 in_channels, in_channels, kernel_size=1, stride=stride, groups=in_channels
             )
         # Identity branch for depthwise (only if stride=1 and same channels)
-        self.dw_bn: Optional[nn.BatchNorm2d] = None
+        self.dw_bn: nn.BatchNorm2d | None = None
         if stride == 1 and in_channels == out_channels:
             self.dw_bn = nn.BatchNorm2d(in_channels)
 
@@ -78,7 +76,7 @@ class MobileOneBlock(nn.Module):
         self.pw_branches: nn.ModuleList = nn.ModuleList(
             [_ConvBN(in_channels, out_channels, kernel_size=1) for _ in range(num_blocks)]
         )
-        self.pw_bn: Optional[nn.BatchNorm2d] = None
+        self.pw_bn: nn.BatchNorm2d | None = None
         if in_channels == out_channels:
             # Identity branch for pointwise
             self.pw_bn = nn.BatchNorm2d(in_channels)
@@ -87,8 +85,8 @@ class MobileOneBlock(nn.Module):
         self.act = nn.ReLU() if use_act else nn.Identity()
 
         # ── Reparam'd single conv (filled by reparametrize()) ─────────────────
-        self.reparam_dw: Optional[nn.Conv2d] = None
-        self.reparam_pw: Optional[nn.Conv2d] = None
+        self.reparam_dw: nn.Conv2d | None = None
+        self.reparam_pw: nn.Conv2d | None = None
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """Forward pass of :class:`MobileOneBlock`.

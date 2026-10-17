@@ -1,4 +1,6 @@
-"""``InternImageDownsample``: Between-stage downsampling: LayerNorm → 3×3 stride-2 conv → double channels."""
+"""``InternImageDownsample``: Between-stage downsampling: LayerNorm → 3×3 stride-2 conv → double
+channels.
+"""
 
 from __future__ import annotations
 

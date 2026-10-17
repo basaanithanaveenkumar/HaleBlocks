@@ -1,4 +1,7 @@
-"""Shared helpers of :mod:`hale_core.nn.vision.swin.swinv2` (SwinV2 — Swin Transformer V2 (Liu et al., 2022))."""
+"""Shared helpers of :mod:`hale_core.nn.vision.swin.swinv2` (SwinV2 — Swin Transformer V2 (Liu et
+al.,
+2022)).
+"""
 
 from __future__ import annotations
 

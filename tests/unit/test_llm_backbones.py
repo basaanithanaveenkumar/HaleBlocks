@@ -26,11 +26,21 @@ from hale_core.nn.llm import (  # noqa: E402
 from hale_core.nn.llm.hale_backbone import HaleSequenceLMBackbone  # noqa: E402
 from hale_core.nn.llm.hf_backbone import HFCausalLMBackbone  # noqa: E402
 
-#: model_type of every registered HF backbone (checked against the Hub when the catalogue was written).
+#: model_type of every registered HF backbone (checked against the Hub when the catalogue was
+#: written).
 MODEL_TYPES = {
-    "smollm2": "llama", "qwen2.5": "qwen2", "qwen3": "qwen3", "llama3": "llama", "gemma2": "gemma2",
-    "gemma3": "gemma3_text", "phi3": "phi3", "phi4": "phi3", "mistral": "mistral", "deepseek-r1": "qwen2",
-    "smollm3": "smollm3", "granite": "granite",
+    "smollm2": "llama",
+    "qwen2.5": "qwen2",
+    "qwen3": "qwen3",
+    "llama3": "llama",
+    "gemma2": "gemma2",
+    "gemma3": "gemma3_text",
+    "phi3": "phi3",
+    "phi4": "phi3",
+    "mistral": "mistral",
+    "deepseek-r1": "qwen2",
+    "smollm3": "smollm3",
+    "granite": "granite",
 }
 VOCAB = [f"w{i}" for i in range(60)]
 
@@ -48,9 +58,18 @@ def tiny_tokenizer():
 
 def tiny_hf_model(model_type: str, vocab: int):
     config = transformers.AutoConfig.for_model(
-        model_type, vocab_size=vocab, hidden_size=32, intermediate_size=64, num_hidden_layers=2,
-        num_attention_heads=4, num_key_value_heads=2, head_dim=8, max_position_embeddings=64,
-        pad_token_id=0, bos_token_id=1, eos_token_id=2,
+        model_type,
+        vocab_size=vocab,
+        hidden_size=32,
+        intermediate_size=64,
+        num_hidden_layers=2,
+        num_attention_heads=4,
+        num_key_value_heads=2,
+        head_dim=8,
+        max_position_embeddings=64,
+        pad_token_id=0,
+        bos_token_id=1,
+        eos_token_id=2,
     )
     torch.manual_seed(0)
     return transformers.AutoModelForCausalLM.from_config(config)
@@ -63,24 +82,36 @@ def tiny_hf_backbone(name: str = "qwen3-0.6b") -> HFCausalLMBackbone:
 
 
 # ---------------------------------------------------------------------------- registry
-TEXT_ONLY = [n for n in list_llm_backbones("hf") if not get_llm_backbone_spec(n).is_multimodal_checkpoint]
+TEXT_ONLY = [
+    n for n in list_llm_backbones("hf") if not get_llm_backbone_spec(n).is_multimodal_checkpoint
+]
 
 
 def test_registry_holds_only_causal_finetunable_backbones() -> None:
     hf, hale = list_llm_backbones("hf"), list_llm_backbones("hale")
-    assert len(TEXT_ONLY) == 26 and len(hf) == 47 and hale == ["hale-autoregressive", "hale-looped", "hale-mtp"]
+    assert (
+        len(TEXT_ONLY) == 26
+        and len(hf) == 47
+        and hale == ["hale-autoregressive", "hale-looped", "hale-mtp"]
+    )
     assert {get_llm_backbone_spec(n).family for n in TEXT_ONLY} == set(MODEL_TYPES)
     assert all(get_llm_backbone_spec(n).params_b <= 9.0 for n in hf)  # 8B class
-    assert get_llm_backbone_spec("deepseek-r1-qwen-7b").name == "deepseek-r1-distill-qwen-7b"  # alias
+    assert (
+        get_llm_backbone_spec("deepseek-r1-qwen-7b").name == "deepseek-r1-distill-qwen-7b"
+    )  # alias
     with pytest.raises(KeyError):
         get_llm_backbone_spec("hale-diffusion")
 
 
-@pytest.mark.parametrize("name", TEXT_ONLY)  # multimodal text towers: tests/unit/test_llm_text_towers.py
+@pytest.mark.parametrize(
+    "name", TEXT_ONLY
+)  # multimodal text towers: tests/unit/test_llm_text_towers.py
 def test_default_lora_targets_exist_in_the_architecture(name: str) -> None:
     spec = get_llm_backbone_spec(name)
     model = tiny_hf_model(MODEL_TYPES[spec.family], 64)
-    leaves = {n.rsplit(".", 1)[-1] for n, m in model.named_modules() if isinstance(m, torch.nn.Linear)}
+    leaves = {
+        n.rsplit(".", 1)[-1] for n, m in model.named_modules() if isinstance(m, torch.nn.Linear)
+    }
     assert set(spec.lora_targets) <= leaves, set(spec.lora_targets) - leaves
 
 
@@ -99,7 +130,10 @@ def test_hf_inputs_embeds_matches_input_ids_and_gives_hidden_states() -> None:
     assert b.hidden_states.shape == (2, 7, llm.hidden_size) and torch.isfinite(b.loss)
 
 
-@pytest.mark.parametrize("finetune, train_embeddings", [("lora", False), ("lora", True), ("full", False), ("frozen", False)])
+@pytest.mark.parametrize(
+    "finetune, train_embeddings",
+    [("lora", False), ("lora", True), ("full", False), ("frozen", False)],
+)
 def test_hf_finetuning_modes(finetune: str, train_embeddings: bool) -> None:
     llm = tiny_hf_backbone("smollm2-135m").eval()
     ids = llm.add_special_tokens(["<image>", "<halo_action>"])
@@ -107,8 +141,11 @@ def test_hf_finetuning_modes(finetune: str, train_embeddings: bool) -> None:
     assert llm.vocab_size == len(llm.tokenizer)
     x = torch.randint(3, 60, (2, 6))
     before = llm(input_ids=x).logits
-    cfg = LLMBackboneConfig(name="smollm2-135m", finetune=finetune,
-                            lora={"r": 4, "alpha": 8, "train_embeddings": train_embeddings})
+    cfg = LLMBackboneConfig(
+        name="smollm2-135m",
+        finetune=finetune,
+        lora={"r": 4, "alpha": 8, "train_embeddings": train_embeddings},
+    )
     configure_finetuning(llm, cfg)
     names = {n for n, p in llm.named_parameters() if p.requires_grad}
     if finetune == "frozen":
@@ -128,31 +165,70 @@ def test_hf_finetuning_modes(finetune: str, train_embeddings: bool) -> None:
 def write_hale_checkpoint(tmp: Path, variant: str = "autoregressive", **model) -> Path:
     tok = tiny_tokenizer()
     tok.save_pretrained(tmp / "tok")
-    model_cfg = dict(d_model=32, n_heads=4, n_layers=2, d_ff=64, max_length=32, dropout=0.0,
-                     attn_type="causal", use_time_cond=False, block_size=None, attn_impl="gqa",
-                     n_kv_heads=2, ffn_type="geglu", moe_num_experts=4, moe_top_k=2, moe_num_shared=1,
-                     arch="transformer", sliding_window=None, local_global_ratio=None,
-                     rope_theta_local=None, rope_theta_global=None, p_rope=None, qk_norm=False)
+    model_cfg = dict(
+        d_model=32,
+        n_heads=4,
+        n_layers=2,
+        d_ff=64,
+        max_length=32,
+        dropout=0.0,
+        attn_type="causal",
+        use_time_cond=False,
+        block_size=None,
+        attn_impl="gqa",
+        n_kv_heads=2,
+        ffn_type="geglu",
+        moe_num_experts=4,
+        moe_top_k=2,
+        moe_num_shared=1,
+        arch="transformer",
+        sliding_window=None,
+        local_global_ratio=None,
+        rope_theta_local=None,
+        rope_theta_global=None,
+        p_rope=None,
+        qk_norm=False,
+    )
     model_cfg.update(model)
     torch.manual_seed(0)
     from types import SimpleNamespace
 
-    bb = build_backbone(len(tok), SimpleNamespace(**model_cfg), **({"tie_embeddings": False} if variant == "mtp" else {}))
+    bb = build_backbone(
+        len(tok),
+        SimpleNamespace(**model_cfg),
+        **({"tie_embeddings": False} if variant == "mtp" else {}),
+    )
     state = {f"backbone.{k}": v for k, v in bb.state_dict().items()}
     if variant == "mtp":
         state["extra_heads.0.weight"] = torch.zeros(len(tok), 32)
     path = tmp / f"{variant}.pt"
-    torch.save({"variant": variant, "vocab_size": len(tok), "model_state_dict": state,
-                "config": {"model": model_cfg, "data": {"tokenizer_name": str(tmp / "tok")}}}, path)
+    torch.save(
+        {
+            "variant": variant,
+            "vocab_size": len(tok),
+            "model_state_dict": state,
+            "config": {"model": model_cfg, "data": {"tokenizer_name": str(tmp / "tok")}},
+        },
+        path,
+    )
     return path, bb
 
 
-@pytest.mark.parametrize("variant, impl", [("autoregressive", "gqa"), ("autoregressive", "mha"), ("mtp", "gqa")])
-def test_hale_checkpoint_round_trip_matches_native_forward(tmp_path: Path, variant: str, impl: str) -> None:
+@pytest.mark.parametrize(
+    "variant, impl", [("autoregressive", "gqa"), ("autoregressive", "mha"), ("mtp", "gqa")]
+)
+def test_hale_checkpoint_round_trip_matches_native_forward(
+    tmp_path: Path, variant: str, impl: str
+) -> None:
     path, native = write_hale_checkpoint(tmp_path, variant, attn_impl=impl)
     llm, ids = build_language_backbone(
-        LLMBackboneConfig(name=f"hale-{variant}", checkpoint=str(path), dtype="float32", finetune="lora",
-                          lora={"r": 4, "alpha": 8}),
+        LLMBackboneConfig(
+            name=f"hale-{variant}",
+            checkpoint=str(path),
+            dtype="float32",
+            finetune="lora",
+            lora={"r": 4, "alpha": 8},
+        ),
         special_tokens=["<image>"],
     )
     assert isinstance(llm, HaleSequenceLMBackbone) and ids["<image>"] == llm.vocab_size - 1

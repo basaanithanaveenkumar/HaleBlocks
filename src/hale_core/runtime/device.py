@@ -8,6 +8,7 @@ from loguru import logger
 
 class DeviceResolver:
     """Picks the torch device string for a run."""
+
     def resolve(self, device: str | None = None) -> str:
         """The device to use.
 

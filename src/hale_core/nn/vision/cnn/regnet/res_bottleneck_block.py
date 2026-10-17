@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from typing import Optional
-
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -53,7 +51,7 @@ class ResBottleneckBlock(nn.Module):
         self.bn3 = nn.BatchNorm2d(out_channels)
 
         # Shortcut projection when shape changes
-        self.shortcut: Optional[nn.Module] = None
+        self.shortcut: nn.Module | None = None
         if stride != 1 or in_channels != out_channels:
             self.shortcut = nn.Sequential(
                 nn.Conv2d(in_channels, out_channels, 1, stride=stride, bias=False),

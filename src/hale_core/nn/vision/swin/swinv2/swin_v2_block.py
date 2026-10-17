@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from typing import Optional
-
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -68,10 +66,10 @@ class SwinV2Block(nn.Module):
         self.drop_path = DropPath(drop_path) if drop_path > 0 else nn.Identity()
 
         # Cached shifted-window attention mask (computed once per H,W)
-        self._attn_mask: Optional[torch.Tensor] = None
-        self._mask_hw: Optional[tuple] = None
+        self._attn_mask: torch.Tensor | None = None
+        self._mask_hw: tuple | None = None
 
-    def _get_attn_mask(self, H: int, W: int, device: torch.device) -> Optional[torch.Tensor]:
+    def _get_attn_mask(self, H: int, W: int, device: torch.device) -> torch.Tensor | None:
         """Compute or retrieve cached attention mask for shifted windows.
 
         The mask ensures shifted-window tokens only attend within their

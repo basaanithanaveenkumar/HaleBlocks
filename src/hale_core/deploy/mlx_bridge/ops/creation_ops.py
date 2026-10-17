@@ -47,13 +47,17 @@ def full(size, fill_value, dtype=None, **_):
 
 @register(name=["aten.zeros.default"])
 def zeros(size, dtype=None, **_):
-    """Lower ``aten.zeros.default`` to MLX: ``mx.zeros(_shape(size), dtype=mlx_dtype(dtype) or mx.float32)``."""
+    """Lower ``aten.zeros.default`` to MLX: ``mx.zeros(_shape(size), dtype=mlx_dtype(dtype) or
+    mx.float32)``.
+    """
     return mx.zeros(_shape(size), dtype=mlx_dtype(dtype) or mx.float32)
 
 
 @register(name=["aten.ones.default"])
 def ones(size, dtype=None, **_):
-    """Lower ``aten.ones.default`` to MLX: ``mx.ones(_shape(size), dtype=mlx_dtype(dtype) or mx.float32)``."""
+    """Lower ``aten.ones.default`` to MLX: ``mx.ones(_shape(size), dtype=mlx_dtype(dtype) or
+    mx.float32)``.
+    """
     return mx.ones(_shape(size), dtype=mlx_dtype(dtype) or mx.float32)
 
 
@@ -65,37 +69,50 @@ def full_like(x, fill_value, dtype=None, **_):
 
 @register(name=["aten.zeros_like.default"])
 def zeros_like(x, dtype=None, **_):
-    """Lower ``aten.zeros_like.default`` to MLX: ``mx.zeros(x.shape, dtype=mlx_dtype(dtype) or x.dtype)``."""
+    """Lower ``aten.zeros_like.default`` to MLX: ``mx.zeros(x.shape, dtype=mlx_dtype(dtype) or
+    x.dtype)``.
+    """
     return mx.zeros(x.shape, dtype=mlx_dtype(dtype) or x.dtype)
 
 
 @register(name=["aten.ones_like.default"])
 def ones_like(x, dtype=None, **_):
-    """Lower ``aten.ones_like.default`` to MLX: ``mx.ones(x.shape, dtype=mlx_dtype(dtype) or x.dtype)``."""
+    """Lower ``aten.ones_like.default`` to MLX: ``mx.ones(x.shape, dtype=mlx_dtype(dtype) or
+    x.dtype)``.
+    """
     return mx.ones(x.shape, dtype=mlx_dtype(dtype) or x.dtype)
 
 
 @register(name=["aten.new_zeros.default"])
 def new_zeros(x, size, dtype=None, **_):
-    """Lower ``aten.new_zeros.default`` to MLX: ``mx.zeros(_shape(size), dtype=mlx_dtype(dtype) or x.dtype)``."""
+    """Lower ``aten.new_zeros.default`` to MLX: ``mx.zeros(_shape(size), dtype=mlx_dtype(dtype) or
+    x.dtype)``.
+    """
     return mx.zeros(_shape(size), dtype=mlx_dtype(dtype) or x.dtype)
 
 
 @register(name=["aten.new_ones.default"])
 def new_ones(x, size, dtype=None, **_):
-    """Lower ``aten.new_ones.default`` to MLX: ``mx.ones(_shape(size), dtype=mlx_dtype(dtype) or x.dtype)``."""
+    """Lower ``aten.new_ones.default`` to MLX: ``mx.ones(_shape(size), dtype=mlx_dtype(dtype) or
+    x.dtype)``.
+    """
     return mx.ones(_shape(size), dtype=mlx_dtype(dtype) or x.dtype)
 
 
 @register(name=["aten.scalar_tensor.default"])
 def scalar_tensor(value, dtype=None, **_):
-    """Lower ``aten.scalar_tensor.default`` to MLX: ``mx.array(value, dtype=mlx_dtype(dtype) or mx.float32)``."""
+    """Lower ``aten.scalar_tensor.default`` to MLX: ``mx.array(value, dtype=mlx_dtype(dtype) or
+    mx.float32)``.
+    """
     return mx.array(value, dtype=mlx_dtype(dtype) or mx.float32)
 
 
 @register(name=["aten._to_copy.default", "aten.to.dtype", "aten._to_dim_order_copy.default"])
 def to_copy(x, dtype=None, **_):
-    """Lower ``aten._to_copy.default``, ``aten.to.dtype``, ``aten._to_dim_order_copy.default`` to MLX: ``x.astype(mlx_dtype(dtype)) if dtype is not None else x``."""
+    """Lower ``aten._to_copy.default``, ``aten.to.dtype``, ``aten._to_dim_order_copy.default`` to
+    MLX:
+    ``x.astype(mlx_dtype(dtype)) if dtype is not None else x``.
+    """
     return x.astype(mlx_dtype(dtype)) if dtype is not None else x
 
 
@@ -117,7 +134,10 @@ def type_as(x, other):
     ]
 )
 def identity(x, *_, **__):
-    """Lower ``aten.clone.default``, ``aten.contiguous.default``, ``aten.alias.default``, ``aten.detach.default``, ``aten.lift_fresh_copy.default``, ``aten.dropout.default``, ``aten.alias_copy.default`` to MLX: ``x``."""
+    """Lower ``aten.clone.default``, ``aten.contiguous.default``, ``aten.alias.default``,
+    ``aten.detach.default``, ``aten.lift_fresh_copy.default``, ``aten.dropout.default``,
+    ``aten.alias_copy.default`` to MLX: ``x``.
+    """
     return x
 
 
@@ -137,7 +157,10 @@ def sym_size(x, dim):
     ]
 )
 def no_op(*_, **__):
-    """Lower ``aten._assert_tensor_metadata.default``, ``aten._assert_scalar.default``, ``aten.sym_constrain_range_for_size.default``, ``aten._assert_async.msg``, ``aten.sym_constrain_range.default`` to MLX: ``None``."""
+    """Lower ``aten._assert_tensor_metadata.default``, ``aten._assert_scalar.default``,
+    ``aten.sym_constrain_range_for_size.default``, ``aten._assert_async.msg``,
+    ``aten.sym_constrain_range.default`` to MLX: ``None``.
+    """
     return None
 
 

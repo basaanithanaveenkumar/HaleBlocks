@@ -134,7 +134,9 @@ class MLXProgram:
         return path
 
     def write_manifest(self, path: Path, extra: dict[str, Any] | None = None) -> Path:
-        """Write a JSON manifest (inputs, node/parameter counts, op histogram, ``extra``) to ``path``."""
+        """Write a JSON manifest (inputs, node/parameter counts, op histogram, ``extra``) to
+        ``path``.
+        """
         manifest = {
             "inputs": self.input_names,
             "num_nodes": len(self.nodes),

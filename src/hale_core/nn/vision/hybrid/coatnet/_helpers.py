@@ -1,4 +1,6 @@
-"""Shared helpers of :mod:`hale_core.nn.vision.hybrid.coatnet` (CoAtNet — Marrying Convolution and Attention (Dai et al., 2021))."""
+"""Shared helpers of :mod:`hale_core.nn.vision.hybrid.coatnet` (CoAtNet — Marrying Convolution and
+Attention (Dai et al., 2021)).
+"""
 
 from __future__ import annotations
 

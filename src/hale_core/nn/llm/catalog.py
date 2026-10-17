@@ -183,7 +183,8 @@ _HF_BACKBONES = (
         reasoning=True,
         paper=_R1,
     ),
-    # SmolLM3 - fully open (weights, data, recipe): clean ablations where you must know what the LM saw.
+    # SmolLM3 - fully open (weights, data, recipe): clean ablations where you must know what the LM
+    # saw.
     LLMBackboneSpec(
         "smollm3-3b",
         "smollm3",
@@ -229,7 +230,8 @@ _HF_BACKBONES = (
 
 #: Text towers of natively multimodal checkpoints (see the module docstring).
 _MULTIMODAL_TEXT_TOWERS = (
-    # Qwen3.5 small: hybrid Gated DeltaNet (linear) + full attention 3:1. Base = pre-training checkpoints.
+    # Qwen3.5 small: hybrid Gated DeltaNet (linear) + full attention 3:1. Base = pre-training
+    # checkpoints.
     *(
         LLMBackboneSpec(
             f"qwen3.5-{size}{suffix}",
@@ -247,7 +249,8 @@ _MULTIMODAL_TEXT_TOWERS = (
         for size, params in (("0.8b", 0.75), ("2b", 1.88), ("4b", 4.21))
         for suffix, repo_suffix in (("", ""), ("-base", "-Base"))
     ),
-    # Gemma 4 "E" models: per-layer embeddings (PLE) make the raw count larger than the effective size.
+    # Gemma 4 "E" models: per-layer embeddings (PLE) make the raw count larger than the effective
+    # size.
     LLMBackboneSpec(
         "gemma4-e2b",
         "gemma4",
@@ -257,7 +260,8 @@ _MULTIMODAL_TEXT_TOWERS = (
         modality="vision-language",
         attention="sliding_hybrid",
         paper=_GEMMA4,
-        notes="base; 2.4B of the 4.6B are per-layer embedding tables (~2B effective); pass token_ids",
+        notes="base; 2.4B of the 4.6B are per-layer embedding tables (~2B effective); pass "
+        "token_ids",
     ),
     LLMBackboneSpec(
         "gemma4-e2b-it",
@@ -279,7 +283,8 @@ _MULTIMODAL_TEXT_TOWERS = (
         modality="vision-language",
         attention="sliding_hybrid",
         paper=_GEMMA4,
-        notes="base; 2.9B of the 7.5B are per-layer embedding tables (~4B effective); pass token_ids",
+        notes="base; 2.9B of the 7.5B are per-layer embedding tables (~4B effective); pass "
+        "token_ids",
     ),
     LLMBackboneSpec(
         "gemma4-e4b-it",
@@ -292,7 +297,8 @@ _MULTIMODAL_TEXT_TOWERS = (
         paper=_GEMMA4,
         notes="instruction-tuned E4B; pass token_ids",
     ),
-    # Ministral 3: dense Llama-style decoder. The default Instruct repos are FP8; the -BF16 ones are trainable.
+    # Ministral 3: dense Llama-style decoder. The default Instruct repos are FP8; the -BF16 ones are
+    # trainable.
     LLMBackboneSpec(
         "ministral3-3b",
         "ministral3",
@@ -331,7 +337,8 @@ _MULTIMODAL_TEXT_TOWERS = (
         modality="vision-language",
         paper=_MINISTRAL3,
     ),
-    # Cosmos-Reason2: Qwen3-VL architecture post-trained for physical reasoning (GR00T N1.7's backbone).
+    # Cosmos-Reason2: Qwen3-VL architecture post-trained for physical reasoning (GR00T N1.7's
+    # backbone).
     LLMBackboneSpec(
         "cosmos-reason2-2b",
         "cosmos-reason2",
@@ -431,7 +438,8 @@ for _spec in _HF_BACKBONES + _MULTIMODAL_TEXT_TOWERS + _HALE_BACKBONES:
 
 #: HaloDiffusionLLM variants that are deliberately not backbones, and why (used in errors).
 UNSUPPORTED_HALE_VARIANTS: dict[str, str] = {
-    "diffusion": "masked diffusion: bidirectional attention and a noise-level input, no next-token head",
+    "diffusion": "masked diffusion: bidirectional attention and a noise-level input, no "
+    "next-token head",
     "block_diffusion": "block diffusion: doubled clean/noised stream with block-causal attention",
     "flow_matching": "flow matching: continuous vector field, no token logits",
 }
@@ -440,9 +448,11 @@ UNSUPPORTED_HALE_VARIANTS: dict[str, str] = {
 NOT_REGISTERED: dict[str, str] = {
     "Qwen/Qwen3.5-9B": "9.4B language model: above the 8B-class limit",
     "IFM/K2-Horizon-0.9B/3.7B/7B": "needs trust_remote_code (k2_horizon is not in transformers)",
-    "nvidia/Cosmos3-Edge": "omnimodal Mixture-of-Transformers world-action model (diffusion tower for "
+    "nvidia/Cosmos3-Edge": "omnimodal Mixture-of-Transformers world-action model (diffusion tower "
+    "for "
     "video / actions): a WAM backbone, not a causal LM",
     "Wan-AI/Wan2.2-TI2V-5B": "video diffusion transformer: a WAM backbone, not a causal LM",
     "google/gemma-4-12B / 26B-A4B / 31B": "above 8B, or MoE",
-    "mistralai/Ministral-3-*-Instruct-2512": "FP8-quantised weights; the -BF16 repos are registered instead",
+    "mistralai/Ministral-3-*-Instruct-2512": "FP8-quantised weights; the -BF16 repos are "
+    "registered instead",
 }

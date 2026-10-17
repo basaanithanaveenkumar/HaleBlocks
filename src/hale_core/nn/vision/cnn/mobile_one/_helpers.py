@@ -1,4 +1,6 @@
-"""Shared helpers of :mod:`hale_core.nn.vision.cnn.mobile_one` (MobileOne — Re-Parameterisable Efficient Backbone (Vasu et al. 2022, Apple Research))."""
+"""Shared helpers of :mod:`hale_core.nn.vision.cnn.mobile_one` (MobileOne — Re-Parameterisable
+Efficient Backbone (Vasu et al. 2022, Apple Research)).
+"""
 
 from __future__ import annotations
 

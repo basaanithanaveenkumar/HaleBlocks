@@ -11,6 +11,7 @@ ATTENTION = NamedRegistry("attention")
 
 def register_attention(name: str):
     """Decorator registering an attention implementation under ``name``."""
+
     def deco(cls):
         ATTENTION.add(name, cls)
         return cls

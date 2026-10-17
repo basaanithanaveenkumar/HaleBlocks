@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from typing import Optional
-
 import torch
 import torch.nn as nn
 
@@ -38,7 +36,7 @@ class EVABlock(nn.Module):
         rope_cos: torch.Tensor,
         rope_sin: torch.Tensor,
         return_attn: bool = False,
-    ) -> tuple[torch.Tensor, Optional[torch.Tensor]]:
+    ) -> tuple[torch.Tensor, torch.Tensor | None]:
         """Forward pass of :class:`EVABlock`.
 
         Args:

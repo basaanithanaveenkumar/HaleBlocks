@@ -11,6 +11,7 @@ from hale_core.nn.optim.base import BaseOptimizer
 
 class SGDOptimizer(BaseOptimizer):
     """``torch.optim.SGD`` (with optional momentum) behind the :class:`BaseOptimizer` interface."""
+
     def _make_optimizer(self, params: Any, config: dict[str, Any]):
         return torch.optim.SGD(
             params,

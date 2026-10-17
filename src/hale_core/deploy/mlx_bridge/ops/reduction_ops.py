@@ -69,7 +69,9 @@ def argmax(x, dim=None, keepdim=False):
 
 @register(name=["aten.any.dim", "aten.any.default", "aten.any.dims"])
 def any_(x, dim=None, keepdim=False):
-    """Lower ``aten.any.dim``, ``aten.any.default``, ``aten.any.dims`` to MLX: ``mx.any(x, axis=_axes(dim), keepdims=keepdim)``."""
+    """Lower ``aten.any.dim``, ``aten.any.default``, ``aten.any.dims`` to MLX: ``mx.any(x,
+    axis=_axes(dim), keepdims=keepdim)``.
+    """
     return mx.any(x, axis=_axes(dim), keepdims=keepdim)
 
 
@@ -95,13 +97,17 @@ def softmax(x, dim, dtype=None):
 
 @register(name=["aten._log_softmax.default", "aten.log_softmax.int"])
 def log_softmax(x, dim, half_to_float=False):
-    """Lower ``aten._log_softmax.default``, ``aten.log_softmax.int`` to MLX: ``x - mx.logsumexp(x, axis=dim, keepdims=True)``."""
+    """Lower ``aten._log_softmax.default``, ``aten.log_softmax.int`` to MLX: ``x - mx.logsumexp(x,
+    axis=dim, keepdims=True)``.
+    """
     return x - mx.logsumexp(x, axis=dim, keepdims=True)
 
 
 @register(name=["aten.logsumexp.default"])
 def logsumexp(x, dim, keepdim=False):
-    """Lower ``aten.logsumexp.default`` to MLX: ``mx.logsumexp(x, axis=_axes(dim), keepdims=keepdim)``."""
+    """Lower ``aten.logsumexp.default`` to MLX: ``mx.logsumexp(x, axis=_axes(dim),
+    keepdims=keepdim)``.
+    """
     return mx.logsumexp(x, axis=_axes(dim), keepdims=keepdim)
 
 

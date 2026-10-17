@@ -1,4 +1,6 @@
-"""Variants and registrations of :mod:`hale_core.nn.stacks.looped` (Looped (recurrent-depth) transformer stack: one shared block applied ``T`` times)."""
+"""Variants and registrations of :mod:`hale_core.nn.stacks.looped` (Looped (recurrent-depth)
+transformer stack: one shared block applied ``T`` times).
+"""
 
 from __future__ import annotations
 

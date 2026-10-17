@@ -10,6 +10,7 @@ from hale_core.nn.layers import DiTBlock, build_attention, build_ffn
 
 class DiTStack(nn.Module):
     """Stack of :class:`DiTBlock` layers conditioned on the time embedding."""
+
     def __init__(
         self,
         d_model: int,

@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from typing import Type, Union
-
 import torch
 import torch.nn as nn
 
@@ -30,7 +28,7 @@ class ResNet(BaseVisionBackbone):
 
     def __init__(
         self,
-        block: Type[Union[BasicBlock, Bottleneck]],
+        block: type[BasicBlock | Bottleneck],
         layers: list[int],
         img_size: int = 224,
         in_chans: int = 3,
@@ -96,7 +94,7 @@ class ResNet(BaseVisionBackbone):
 
     def _make_stage(
         self,
-        block: Type[Union[BasicBlock, Bottleneck]],
+        block: type[BasicBlock | Bottleneck],
         planes: int,
         n_blocks: int,
         stride: int,

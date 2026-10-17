@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from typing import Optional
-
 import torch
 import torch.nn as nn
 
@@ -27,7 +25,7 @@ class CoAtNetConvStage(nn.Module):
         out_ch: int,
         depth: int,
         stride: int = 2,
-        drop_path_rates: Optional[list] = None,
+        drop_path_rates: list | None = None,
     ) -> None:
         super().__init__()
         rates = drop_path_rates or [0.0] * depth

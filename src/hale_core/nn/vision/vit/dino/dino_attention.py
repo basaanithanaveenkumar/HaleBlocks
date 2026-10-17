@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from typing import Optional
-
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -54,7 +52,7 @@ class DINOAttention(nn.Module):
 
     def forward(
         self, x: torch.Tensor, return_attn: bool = False
-    ) -> tuple[torch.Tensor, Optional[torch.Tensor]]:
+    ) -> tuple[torch.Tensor, torch.Tensor | None]:
         """Forward pass of :class:`DINOAttention`.
 
         Args:

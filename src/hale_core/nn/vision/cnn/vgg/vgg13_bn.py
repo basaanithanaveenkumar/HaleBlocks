@@ -9,6 +9,7 @@ from hale_core.nn.vision.registry import register_vision_backbone
 @register_vision_backbone("vgg13_bn")
 class VGG13BN(VGG):
     """VGG-13 with batch normalisation (registered as ``vgg13_bn``)."""
+
     arch_name = "vgg13_bn"
 
     def __init__(self, **kwargs):

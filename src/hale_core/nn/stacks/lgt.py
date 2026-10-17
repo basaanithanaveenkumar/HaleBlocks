@@ -21,7 +21,9 @@ def is_global_layer(index: int, ratio: int) -> bool:
 
 
 class LGTStack(nn.Module):
-    """Local-global stack: sliding-window attention layers with a global layer every ``ratio + 1``."""
+    """Local-global stack: sliding-window attention layers with a global layer every ``ratio + 1``.
+    """
+
     def __init__(
         self,
         d_model: int,

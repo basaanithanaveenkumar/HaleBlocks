@@ -12,6 +12,7 @@ from typing import Any
 @dataclass
 class LayerProfile:
     """Measurements of one layer: parameters, latency, FLOPs, matmul count and I/O shapes."""
+
     name: str
     module_type: str
     params: int = 0

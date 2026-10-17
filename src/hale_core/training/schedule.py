@@ -13,6 +13,7 @@ from hale_core.config.run import RunConfig
 @dataclass(frozen=True)
 class TrainSchedule:
     """Resolved training length: number of epochs and total optimisation steps."""
+
     n_epochs: int
     total_steps: int
 

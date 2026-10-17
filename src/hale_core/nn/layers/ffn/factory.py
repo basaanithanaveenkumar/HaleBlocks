@@ -11,6 +11,7 @@ FFN = NamedRegistry("ffn")
 
 def register_ffn(name: str):
     """Decorator registering a feed-forward implementation under ``name``."""
+
     def deco(cls):
         FFN.add(name, cls)
         return cls

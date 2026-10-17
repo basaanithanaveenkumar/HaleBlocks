@@ -1,4 +1,7 @@
-"""Shared helpers of :mod:`hale_core.data.vlm.loader` (Sequential VLM dataloader with on-demand media caching)."""
+"""Shared helpers of :mod:`hale_core.data.vlm.loader` (Sequential VLM dataloader with on-demand
+media
+caching).
+"""
 
 from __future__ import annotations
 

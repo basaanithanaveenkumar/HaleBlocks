@@ -1,4 +1,7 @@
-"""Variants and registrations of :mod:`hale_core.data.llm.types` (LLM dataset sample skeleton (SmolLM2 paper))."""
+"""Variants and registrations of :mod:`hale_core.data.llm.types` (LLM dataset sample skeleton
+(SmolLM2
+paper)).
+"""
 
 from __future__ import annotations
 

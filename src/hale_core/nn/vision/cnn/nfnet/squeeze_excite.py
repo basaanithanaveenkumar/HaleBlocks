@@ -1,4 +1,6 @@
-"""``SqueezeExcite``: Channel attention: global-pool → squeeze linear → GELU → excite linear → sigmoid."""
+"""``SqueezeExcite``: Channel attention: global-pool → squeeze linear → GELU → excite linear →
+sigmoid.
+"""
 
 from __future__ import annotations
 

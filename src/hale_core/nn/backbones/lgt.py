@@ -11,6 +11,7 @@ from hale_core.nn.stacks.lgt import LGTStack
 
 class LGTBackbone(SequenceBackbone):
     """Local-global transformer backbone: sliding-window layers interleaved with global ones."""
+
     def __init__(
         self,
         vocab_size: int,

@@ -49,7 +49,6 @@ class EVA02Backbone(BaseVisionBackbone):
 
         self.patch_embed = PatchEmbed(img_size, patch_size, in_chans, embed_dim)
         self.grid_size = self.patch_embed.grid_size
-        num_patches = self.patch_embed.num_patches
 
         # No CLS token in EVA-02 style — mean-pool patches at the end
         # No learned positional embedding — RoPE handles position encoding in Q/K

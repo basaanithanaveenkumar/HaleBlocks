@@ -1,4 +1,7 @@
-"""Shared helpers of :mod:`hale_core.nn.vision.hybrid.maxvit` (MaxViT — Multi-Axis Vision Transformer (Tu et al., 2022))."""
+"""Shared helpers of :mod:`hale_core.nn.vision.hybrid.maxvit` (MaxViT — Multi-Axis Vision
+Transformer
+(Tu et al., 2022)).
+"""
 
 from __future__ import annotations
 

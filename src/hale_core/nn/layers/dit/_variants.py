@@ -1,4 +1,6 @@
-"""Variants and registrations of :mod:`hale_core.nn.layers.dit` (DiT block (Peebles & Xie): pre-norm attention + FFN with AdaLN-Zero)."""
+"""Variants and registrations of :mod:`hale_core.nn.layers.dit` (DiT block (Peebles & Xie): pre-norm
+attention + FFN with AdaLN-Zero).
+"""
 
 from __future__ import annotations
 

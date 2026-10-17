@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from typing import Optional
-
 import torch
 import torch.nn as nn
 
@@ -33,7 +31,7 @@ class SwinV2Stage(nn.Module):
         num_heads: int,
         window_size: int,
         downsample: bool = True,
-        drop_path_rates: Optional[list] = None,
+        drop_path_rates: list | None = None,
     ) -> None:
         super().__init__()
         # Optional spatial downsampling at the beginning of each stage

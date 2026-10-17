@@ -1,4 +1,7 @@
-"""``LoopDepthEmbedding``: Embedding of the loop step ``t`` (0-based), added to every token's input of that pass."""
+"""``LoopDepthEmbedding``: Embedding of the loop step ``t`` (0-based), added to every token's input
+of
+that pass.
+"""
 
 from __future__ import annotations
 
