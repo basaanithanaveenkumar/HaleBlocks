@@ -1,9 +1,12 @@
+"""``logging:`` section of a run config."""
+
 from typing import Literal
 
 from hale_core.config.sections.common import StrictModel
 
 
 class LoggingConfig(StrictModel):
+    """Logger backend, log level and the file/TensorBoard destinations of a run."""
     level: Literal["DEBUG", "INFO", "WARNING", "ERROR"] = "INFO"
     log_file: str | None = "logs/hale.log"
     backend: str = "experiment"

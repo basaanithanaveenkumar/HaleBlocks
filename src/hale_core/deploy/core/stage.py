@@ -44,6 +44,7 @@ class Stage(ABC):
         self.skip_if_unavailable = skip_if_unavailable
 
     def missing_dependencies(self) -> list[OptionalDependency]:
+        """Optional dependencies of this stage that are not installed."""
         return [dep for dep in self.dependencies if not dep.available]
 
     @abstractmethod

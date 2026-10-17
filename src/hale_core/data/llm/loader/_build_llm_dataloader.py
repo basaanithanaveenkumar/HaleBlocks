@@ -23,6 +23,16 @@ def build_llm_dataloader(
     prefetch_workers: int = 4,
     prefetch_queue: int = 16,
 ) -> SequentialLLMDataLoader:
+    """Build a :class:`SequentialLLMDataLoader` over named datasets or a training stage.
+
+    Args:
+        dataset_names: registry names to stream; mutually exclusive with ``stage``.
+        stage: a :class:`TrainingStage` whose default datasets are used.
+        cache_dir: local cache root.
+
+    Returns:
+        The loader (iterating yields :class:`LLMSample`).
+    """
     if dataset_names is None:
         if stage in (TrainingStage.PRETRAIN, "pretrain"):
             dataset_names = _all_pretrain_dataset_names()

@@ -1,9 +1,12 @@
+"""``viz:`` section of a run config."""
+
 from typing import Literal
 
 from hale_core.config.sections.common import StrictModel
 
 
 class VizConfig(StrictModel):
+    """How often training renders sample visualisations, and where they go."""
     enabled: bool = False
     every_n_steps: int | None = 500
     every_n_epochs: int | None = None

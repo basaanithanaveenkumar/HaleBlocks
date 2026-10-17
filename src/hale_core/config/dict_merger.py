@@ -22,6 +22,15 @@ class DictMerger:
     """
 
     def merge(self, base: Mapping[str, Any], child: Mapping[str, Any]) -> dict[str, Any]:
+        """Merge ``child`` onto ``base`` (see the class docstring for the rules).
+
+        Args:
+            base: parent mapping.
+            child: overriding mapping; ``_delete_: true`` in a sub-mapping replaces instead of merging.
+
+        Returns:
+            A new deep-copied dict; neither input is mutated.
+        """
         out = copy.deepcopy(dict(base))
         for key, value in child.items():
             if isinstance(value, Mapping):

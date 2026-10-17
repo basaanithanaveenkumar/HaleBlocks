@@ -32,6 +32,7 @@ class ShardManifest:
 
     # ------------------------------------------------------------------ io
     def save(self, directory: str | Path) -> Path:
+        """Write the manifest as JSON into ``directory`` and return the file path."""
         path = Path(directory) / MANIFEST_NAME
         path.write_text(json.dumps(asdict(self), indent=2))
         return path

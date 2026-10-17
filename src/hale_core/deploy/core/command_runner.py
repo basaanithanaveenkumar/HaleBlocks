@@ -29,6 +29,11 @@ class CommandRunner:
 
     @staticmethod
     def which(executable: str, hint: str = "") -> str:
+        """Absolute path of ``executable`` on ``PATH``.
+
+        Raises:
+            MissingDependencyError: if it is not installed (``hint`` says how to get it).
+        """
         path = shutil.which(executable)
         if path is None:
             raise MissingDependencyError(executable, hint or f"{executable} must be on PATH")
@@ -37,6 +42,16 @@ class CommandRunner:
     def run(
         self, command: Sequence[str], cwd: Path | None = None, env: Mapping[str, str] | None = None
     ) -> str:
+        """Run ``command`` and return its combined output.
+
+        Args:
+            command: argv list (no shell).
+            cwd: working directory.
+            env: extra environment variables.
+
+        Raises:
+            CommandError: on a non-zero exit (the output tail is included).
+        """
         argv = [str(c) for c in command]
         logger.info("$ {}", " ".join(argv))
         tail: deque[str] = deque(maxlen=self.tail_lines)

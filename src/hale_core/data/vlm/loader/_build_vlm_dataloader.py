@@ -18,6 +18,16 @@ def build_vlm_dataloader(
     prefetch_workers: int = 4,
     prefetch_queue: int = 8,
 ) -> SequentialVLMDataLoader:
+    """Build a :class:`SequentialVLMDataLoader` over named VLM datasets.
+
+    Args:
+        dataset_names: registry names to stream (default: the standard mixture).
+        cache_dir: root of the media cache.
+        cache_max_bytes: budget of the media cache (least recently used files are evicted).
+
+    Returns:
+        The loader (iterating yields :class:`VLMSample`).
+    """
     names = tuple(dataset_names or DEFAULT_VLM_MIXTURE)
     return SequentialVLMDataLoader(
         dataset_names=names,

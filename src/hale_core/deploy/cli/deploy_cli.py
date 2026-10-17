@@ -49,6 +49,11 @@ class DeployCLI:
         return parser
 
     def main(self, argv: Sequence[str] | None = None) -> int:
+        """Parse ``argv`` and run the sub-command.
+
+        Returns:
+            Exit code: 0 success, 1 a failed pipeline, 2 a config or registry error.
+        """
         args = self.parser.parse_args(argv)
         logger.remove()
         logger.add(sys.stderr, level=args.log_level)
@@ -62,17 +67,20 @@ class DeployCLI:
 
     @staticmethod
     def cmd_run(args) -> int:
+        """``run``: build the pipeline from the config and execute it."""
         report = DeployRunner.from_file(args.config, args.cfg_options, args.work_dir).run()
         return 0 if report.ok else 1
 
     @staticmethod
     def cmd_show(args) -> int:
+        """``show``: print the merged config (inheritance and overrides applied)."""
         # stdout (not the logger) is deliberate: the merged config IS this command's output.
         print(Config.fromfile(args.config, args.cfg_options).pretty())
         return 0
 
     @staticmethod
     def cmd_list(args) -> int:
+        """``list``: print every registered stage, adapter, runtime and calibration source."""
         from hale_core.deploy.registry import ADAPTERS, CALIBRATION, RUNTIMES, STAGES
 
         for module in (
@@ -92,6 +100,7 @@ class DeployCLI:
 
     @staticmethod
     def cmd_env(args) -> int:
+        """``env``: print detected accelerators and which deployment backends are installed."""
         from hale_core.deploy.environment import EnvironmentChecker
 
         checker = EnvironmentChecker()
@@ -108,4 +117,5 @@ class DeployCLI:
 
 
 def main(argv: Sequence[str] | None = None) -> int:
+    """Console entry point of ``hale-deploy``."""
     return DeployCLI().main(argv)

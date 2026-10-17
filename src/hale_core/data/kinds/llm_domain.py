@@ -6,6 +6,7 @@ from enum import StrEnum
 
 
 class LLMDomain(StrEnum):
+    """Content domain of an LLM dataset (web, code, math, chat …), used for mixtures."""
     WEB = "web"
     MATH = "math"
     CODE = "code"

@@ -47,6 +47,13 @@ class DeployRunner:
         overrides: list[str] | None = None,
         work_dir: str | Path | None = None,
     ) -> DeployRunner:
+        """Build a runner from a config file.
+
+        Args:
+            path: deployment config (``_base_`` inheritance allowed).
+            overrides: ``key.path=value`` strings.
+            work_dir: output directory; overrides the config's ``work_dir``.
+        """
         return cls(Config.fromfile(path, overrides or []), work_dir)
 
     def _import_plugins(self) -> None:
@@ -65,6 +72,7 @@ class DeployRunner:
             logger.debug("imported plugin {}", module)
 
     def build(self) -> tuple[Pipeline, ExportContext]:
+        """Import custom modules, build the adapter and stages, and return the pipeline and context."""
         torch.manual_seed(self.spec.seed)
         random.seed(self.spec.seed)
         adapter = ADAPTERS.build(self.spec.adapter)
@@ -82,6 +90,7 @@ class DeployRunner:
         return {"adapter": adapter} if "adapter" in inspect.signature(cls).parameters else {}
 
     def run(self) -> PipelineReport:
+        """Build and run the pipeline; the report is also written to the work directory."""
         pipeline, ctx = self.build()
         pipeline.validate()
         self.config.dump(self.work_dir / "config.yaml")

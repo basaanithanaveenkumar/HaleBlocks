@@ -56,14 +56,17 @@ class ExportContext:
 
     @cached_property
     def model(self) -> nn.Module:
+        """The adapter's model, built and loaded on first access."""
         return self.adapter.load()
 
     @cached_property
     def signature(self) -> IOSignature:
+        """The adapter's effective I/O signature."""
         return self.adapter.signature()
 
     @cached_property
     def export_module(self) -> ExportModule:
+        """The model wrapped for export (cached)."""
         return self.adapter.export_module(self.model)
 
     def sample_inputs(self, which: str = "opt") -> dict[str, torch.Tensor]:
@@ -95,6 +98,7 @@ class ExportContext:
         return self._references[which]
 
     def stage_dir(self, stage_name: str) -> Path:
+        """Per-stage output directory under the work directory (created)."""
         path = self.work_dir / stage_name
         path.mkdir(parents=True, exist_ok=True)
         return path

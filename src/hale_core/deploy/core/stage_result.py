@@ -12,6 +12,7 @@ Status = Literal["ok", "skipped", "failed"]
 
 @dataclass
 class StageResult:
+    """Outcome of one stage: status, duration, produced artifacts and message."""
     name: str
     stage_type: str
     status: Status
@@ -20,6 +21,7 @@ class StageResult:
     message: str = ""
 
     def to_dict(self) -> dict[str, Any]:
+        """JSON-serialisable form of the result."""
         return {
             "name": self.name,
             "type": self.stage_type,

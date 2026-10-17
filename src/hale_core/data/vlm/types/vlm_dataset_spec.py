@@ -13,6 +13,7 @@ from hale_core.data.vlm.types.vlm_sample import VLMSample
 
 @dataclass(frozen=True)
 class VLMDatasetSpec:
+    """Where a VLM dataset lives on the Hub, its modality, and which fields hold media/text."""
     name: str
     hf_repo: str
     modality: VLMModality
@@ -28,6 +29,7 @@ class VLMDatasetSpec:
     description: str = ""
 
     def open_stream(self, *, cache_dir: Path) -> Iterator[dict[str, Any]]:
+        """Stream this dataset's raw rows from the Hub (see :func:`open_hf_stream`)."""
         from hale_core.data.vlm.hf import open_hf_stream
 
         return open_hf_stream(self, cache_dir=cache_dir)

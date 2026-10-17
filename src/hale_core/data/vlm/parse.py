@@ -54,6 +54,14 @@ def default_row_parser(
     cache: MediaCache,
     sample_idx: int,
 ) -> VLMSample:
+    """Turn one raw VLM row into a :class:`VLMSample`, caching its media locally.
+
+    Args:
+        row: raw row from the stream.
+        spec: dataset spec naming the image/video/text fields.
+        cache: media cache that downloads or copies referenced files.
+        sample_idx: position of the row in the stream.
+    """
     if spec.row_parser is not None:
         return spec.row_parser(row, spec)
 

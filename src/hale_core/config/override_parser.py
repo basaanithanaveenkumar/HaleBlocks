@@ -22,6 +22,19 @@ class OverrideParser:
     def parse(
         self, overrides: Iterable[str], current: dict[str, Any] | None = None
     ) -> dict[str, Any]:
+        """Parse ``key.path=value`` strings into one nested, mergeable dict.
+
+        Args:
+            overrides: override strings; values are parsed as YAML.
+            current: the config being overridden, needed to patch list items by index.
+
+        Returns:
+            A nested dict to merge with :class:`DictMerger`.
+
+        Raises:
+            ConfigError: for a string without ``=``, an empty key path, a list index out of range
+                or a path that descends into a non-mapping.
+        """
         result: dict[str, Any] = {}
         for item in overrides:
             if "=" not in item:

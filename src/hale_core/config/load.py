@@ -33,6 +33,18 @@ def load_yaml_tree(path: str | Path) -> dict[str, Any]:
 
 
 def validate_config[T: BaseModel](raw: dict[str, Any], schema: type[T]) -> T:
+    """Validate a merged raw config into ``schema``, logging the payload on failure.
+
+    Args:
+        raw: merged config dict.
+        schema: pydantic model class.
+
+    Returns:
+        The validated model instance.
+
+    Raises:
+        pydantic.ValidationError: if ``raw`` does not satisfy the schema.
+    """
     try:
         return schema.model_validate(raw)
     except Exception:
@@ -41,6 +53,16 @@ def validate_config[T: BaseModel](raw: dict[str, Any], schema: type[T]) -> T:
 
 
 def load_registered_config(path: str | Path, schema: str = "llm") -> BaseModel:
+    """Load ``path`` and validate it with the config schema registered as ``schema``.
+
+    Args:
+        path: YAML config (inheritance resolved by :func:`load_yaml_tree`).
+        schema: key in the ``CONFIGS`` registry (``"llm"`` = :class:`RunConfig`; downstream
+            packages register their own, e.g. ``"vlm"``).
+
+    Returns:
+        The validated config; ``experiment.source_yaml`` is set when the schema has it.
+    """
     import hale_core.config  # noqa: F401 — ensure default schemas register
 
     path = Path(path).resolve()
@@ -55,6 +77,7 @@ def load_registered_config(path: str | Path, schema: str = "llm") -> BaseModel:
 
 
 def load_config(path: str | Path) -> RunConfig:
+    """Load ``path`` as an LLM :class:`RunConfig` (the ``"llm"`` schema)."""
     cfg = load_registered_config(path, schema="llm")
     assert isinstance(cfg, RunConfig)
     return cfg

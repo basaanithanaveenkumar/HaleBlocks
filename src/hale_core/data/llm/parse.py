@@ -34,6 +34,16 @@ def _format_conversations(messages: list[dict[str, Any]]) -> tuple[str | None, s
 
 
 def default_row_parser(row: dict[str, Any], spec: LLMDatasetSpec, *, sample_idx: int) -> LLMSample:
+    """Turn one raw dataset row into an :class:`LLMSample`.
+
+    The first non-empty field of each kind listed in ``spec`` (text, prompt, response,
+    chosen/rejected, conversations) is used, so one parser covers most Hub datasets.
+
+    Args:
+        row: raw row from the stream.
+        spec: the dataset spec naming the candidate fields.
+        sample_idx: position of the row in the stream.
+    """
     text = _first_str(row, spec.text_fields)
     prompt = _first_str(row, spec.prompt_fields)
     response = _first_str(row, spec.response_fields)

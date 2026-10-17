@@ -1,3 +1,5 @@
+"""``train:`` section of a run config: optimisation, schedule, precision and checkpoints."""
+
 from __future__ import annotations
 
 from typing import Literal

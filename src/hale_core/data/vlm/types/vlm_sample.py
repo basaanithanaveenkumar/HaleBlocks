@@ -11,6 +11,7 @@ from hale_core.data.kinds import VLMModality
 
 @dataclass
 class VLMSample:
+    """One parsed VLM training sample: text and/or conversation plus local media paths."""
     dataset: str
     modality: VLMModality
     text: str | None = None
@@ -20,4 +21,5 @@ class VLMSample:
     metadata: dict[str, Any] = field(default_factory=dict)
 
     def has_vision(self) -> bool:
+        """Whether the sample carries at least one image or a video."""
         return bool(self.images or self.video)

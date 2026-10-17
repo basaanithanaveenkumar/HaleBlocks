@@ -12,6 +12,18 @@ from hale_core.data.llm.types import LLMDatasetSpec
 
 
 def open_hf_stream(spec: LLMDatasetSpec, *, cache_dir: Path) -> Iterator[dict[str, Any]]:
+    """Stream the rows of an LLM dataset from the Hugging Face Hub.
+
+    Args:
+        spec: dataset spec (repo, subset, split, streaming).
+        cache_dir: cache root; HF files go to ``cache_dir / "hf"``.
+
+    Yields:
+        Raw row dicts.
+
+    Raises:
+        ImportError: if the ``datasets`` package is not installed.
+    """
     try:
         from datasets import load_dataset
     except ImportError as exc:

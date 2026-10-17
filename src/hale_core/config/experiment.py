@@ -12,15 +12,23 @@ from hale_core.config.run import RunConfig
 
 
 def variant_root(cfg: RunConfig) -> Path:
+    """Directory holding every run of ``cfg.variant``: ``<experiment.root>/<variant>``."""
     return Path(cfg.experiment.root) / cfg.variant
 
 
 def default_run_name(cfg: RunConfig, when: datetime | None = None) -> str:
+    """Run folder name ``<variant>_<YYYYmmdd_HHMMSS>``.
+
+    Args:
+        cfg: run config (supplies the variant).
+        when: timestamp to use; defaults to now.
+    """
     stamp = (when or datetime.now()).strftime("%Y%m%d_%H%M%S")
     return f"{cfg.variant}_{stamp}"
 
 
 def latest_run_dir(cfg: RunConfig) -> Path | None:
+    """Resolved target of the ``latest`` symlink of this variant, or ``None`` if no run exists."""
     link = variant_root(cfg) / "latest"
     if link.exists():
         return link.resolve()

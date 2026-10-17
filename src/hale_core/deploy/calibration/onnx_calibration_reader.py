@@ -25,13 +25,16 @@ class OnnxCalibrationReader:
         self._iterator: Iterator[dict[str, np.ndarray]] = source.as_numpy(signature)
 
     def get_next(self) -> dict[str, np.ndarray] | None:
+        """Next calibration batch for ONNX Runtime, or ``None`` when exhausted."""
         return next(self._iterator, None)
 
     def rewind(self) -> None:
+        """Restart the batch stream from the beginning."""
         self._iterator = self.source.as_numpy(self.signature)
 
     @classmethod
     def register_with_onnxruntime(cls) -> None:
+        """Register this class as a virtual subclass of ORT's ``CalibrationDataReader``."""
         from onnxruntime.quantization import CalibrationDataReader
 
         CalibrationDataReader.register(cls)

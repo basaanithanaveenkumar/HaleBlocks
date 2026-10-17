@@ -30,6 +30,18 @@ class Config(Mapping[str, Any]):
 
     @classmethod
     def fromfile(cls, path: str | Path, overrides: Iterable[str] = ()) -> Config:
+        """Load ``path`` with its ``_base_``/``inherits`` chain and apply CLI overrides.
+
+        Args:
+            path: YAML or JSON config file.
+            overrides: ``key.path=value`` strings (``--cfg-options``), applied after inheritance.
+
+        Returns:
+            The merged config; ``filename`` records the source file.
+
+        Raises:
+            ConfigError: for missing/unparsable files, inheritance cycles or malformed overrides.
+        """
         data = ConfigLoader().load(path)
         cfg = cls(data, filename=str(Path(path).resolve()))
         overrides = list(overrides)
@@ -52,6 +64,7 @@ class Config(Mapping[str, Any]):
         return node
 
     def to_dict(self) -> dict[str, Any]:
+        """A deep copy of the merged config as a plain dict."""
         return copy.deepcopy(self._data)
 
     def dump(self, path: str | Path) -> Path:
@@ -67,6 +80,7 @@ class Config(Mapping[str, Any]):
         return path
 
     def pretty(self) -> str:
+        """The merged config rendered as YAML (key order preserved)."""
         return yaml.safe_dump(self._data, sort_keys=False)
 
     # Mapping protocol

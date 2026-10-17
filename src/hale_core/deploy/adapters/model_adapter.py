@@ -52,6 +52,7 @@ class ModelAdapter(ABC):
 
     # ------------------------------------------------------------------ overridable
     def default_signature(self) -> IOSignature:
+        """The I/O signature used when the config does not override it."""
         raise ConfigError(
             f"{type(self).__name__} has no default signature; set adapter.signature in the config"
         )
@@ -70,6 +71,7 @@ class ModelAdapter(ABC):
 
     # ------------------------------------------------------------------ template methods
     def signature(self) -> IOSignature:
+        """The effective I/O signature: the config's ``signature`` if given, else :meth:`default_signature`."""
         if self._signature_cfg is not None:
             return IOSignature.from_config(self._signature_cfg)
         return self.default_signature()
@@ -87,6 +89,7 @@ class ModelAdapter(ABC):
         return model
 
     def export_module(self, model: nn.Module) -> ExportModule:
+        """Wrap ``model`` in an :class:`ExportModule` with positional inputs in signature order."""
         sig = self.signature()
         return ExportModule(model, self.forward_for_export, sig.input_names, sig.outputs).eval()
 

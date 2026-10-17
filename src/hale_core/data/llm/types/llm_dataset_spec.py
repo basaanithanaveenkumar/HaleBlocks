@@ -12,6 +12,7 @@ from hale_core.data.kinds import DatasetKind, LLMDomain, TrainingStage
 
 @dataclass(frozen=True)
 class LLMDatasetSpec:
+    """Where an LLM dataset lives on the Hub and which row fields hold its text."""
     name: str
     hf_repo: str
     stage: TrainingStage
@@ -32,6 +33,7 @@ class LLMDatasetSpec:
     mix_weight: float | None = None
 
     def open_stream(self, *, cache_dir: Path) -> Iterator[dict[str, Any]]:
+        """Stream this dataset's raw rows from the Hub (see :func:`open_hf_stream`)."""
         from hale_core.data.llm.hf import open_hf_stream
 
         return open_hf_stream(self, cache_dir=cache_dir)

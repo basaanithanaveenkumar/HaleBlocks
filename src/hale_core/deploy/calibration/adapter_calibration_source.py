@@ -27,6 +27,7 @@ class AdapterCalibrationSource(CalibrationSource):
         self.fallback = RandomCalibrationSource(num_batches, seed=seed)
 
     def batches(self, signature: IOSignature) -> Iterator[dict[str, torch.Tensor]]:
+        """Yield calibration batches produced by the model adapter's own data hook."""
         provided = self.adapter.calibration_batches(self.num_batches)
         if provided is None:
             yield from self.fallback.batches(signature)

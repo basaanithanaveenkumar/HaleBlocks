@@ -16,6 +16,11 @@ from hale_core.config.sections.common import StrictModel
 
 
 class RunConfig(StrictModel):
+    """Validated configuration of one LLM training run (the ``"llm"`` config schema).
+
+    Groups the ``model``, ``train``, ``data``, ``sample``, ``eval``, ``viz``, ``logging`` and
+    ``experiment`` sections; ``variant`` selects the model/loss/sampler from the registries.
+    """
     variant: str
     model: ModelConfig = Field(default_factory=ModelConfig)
     train: TrainConfig = Field(default_factory=TrainConfig)

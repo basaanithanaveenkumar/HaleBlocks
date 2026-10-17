@@ -23,6 +23,7 @@ class NpzCalibrationSource(CalibrationSource):
         self.directory = Path(directory)
 
     def batches(self, signature: IOSignature) -> Iterator[dict[str, torch.Tensor]]:
+        """Yield batches stored in ``.npz`` files, one array per signature input."""
         files = sorted(self.directory.glob("*.npz"))[: self.num_batches]
         if not files:
             raise ConfigError(f"no .npz calibration files in {self.directory}")

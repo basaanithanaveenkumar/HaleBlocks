@@ -1,9 +1,12 @@
+"""``eval:`` section of a run config."""
+
 from pydantic import Field
 
 from hale_core.config.sections.common import StrictModel
 
 
 class EvalConfig(StrictModel):
+    """When and how much to evaluate during training (interval, batches, metrics)."""
     metrics: list[str] = Field(
         default_factory=lambda: [
             "loss",

@@ -26,6 +26,7 @@ class Artifact:
 
     @property
     def size_bytes(self) -> int:
+        """Size of the artifact on disk (files summed for a directory)."""
         if self.path.is_dir():
             return sum(p.stat().st_size for p in self.path.rglob("*") if p.is_file())
         return self.path.stat().st_size if self.path.exists() else 0
@@ -41,6 +42,7 @@ class Artifact:
         return digest.hexdigest()
 
     def to_dict(self) -> dict[str, Any]:
+        """JSON-serialisable description (kind, path, producer, metadata)."""
         data = asdict(self)
         data["path"] = str(self.path)
         data["size_bytes"] = self.size_bytes

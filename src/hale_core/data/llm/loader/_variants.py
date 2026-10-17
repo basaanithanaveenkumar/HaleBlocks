@@ -16,6 +16,13 @@ def build_smollm2_stage_loader(
     cache_dir: str | Path = "~/.cache/hale-blocks/llm",
     samples_per_dataset: int | None = None,
 ) -> SequentialLLMDataLoader:
+    """Loader for SmolLM2 training stage ``stage`` (its published dataset mixture).
+
+    Args:
+        stage: SmolLM2 stage number.
+        cache_dir: local cache root.
+        samples_per_dataset: cap per dataset (``None`` = stream everything).
+    """
     mixture = SMOLLM2_PRETRAIN_STAGES[stage]
     names = [name for name, _weight in mixture.datasets]
     return SequentialLLMDataLoader(

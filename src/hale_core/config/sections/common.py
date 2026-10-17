@@ -1,3 +1,5 @@
+"""Shared pydantic base model for config sections (strict: unknown keys are errors)."""
+
 from pydantic import BaseModel, ConfigDict
 
 

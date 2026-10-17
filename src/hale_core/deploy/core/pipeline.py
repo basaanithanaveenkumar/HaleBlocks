@@ -43,6 +43,14 @@ class Pipeline:
         self.on_error = on_error
 
     def validate(self, initial: set[str] | None = None) -> None:
+        """Check that every stage's required artifacts are produced by an earlier stage.
+
+        Args:
+            initial: artifact kinds available before the first stage.
+
+        Raises:
+            PipelineError: naming the first stage whose requirements are unmet.
+        """
         available = set(initial or {TORCH_MODULE})
         for stage in self.stages:
             if not stage.enabled:
@@ -56,6 +64,14 @@ class Pipeline:
             available.update(stage.provides)
 
     def run(self, ctx: ExportContext) -> PipelineReport:
+        """Run the stages in order and collect their results.
+
+        A failing stage stops the pipeline (or is recorded and skipped when ``on_error`` is
+        ``continue``).
+
+        Returns:
+            The pipeline report.
+        """
         self.validate()
         report = PipelineReport(ctx.work_dir)
         for index, stage in enumerate(self.stages, 1):

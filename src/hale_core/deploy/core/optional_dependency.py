@@ -24,12 +24,18 @@ class OptionalDependency:
 
     @cached_property
     def available(self) -> bool:
+        """Whether the module can be imported (checked without importing it)."""
         try:
             return importlib.util.find_spec(self.module) is not None
         except (ImportError, ValueError):  # parent package missing / broken namespace package
             return False
 
     def load(self) -> ModuleType:
+        """Import and return the module.
+
+        Raises:
+            MissingDependencyError: if it is not installed.
+        """
         try:
             return importlib.import_module(self.module)
         except ImportError as exc:

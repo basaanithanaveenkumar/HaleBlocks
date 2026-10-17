@@ -46,10 +46,12 @@ class TensorSpec:
 
     @property
     def torch_dtype(self) -> torch.dtype:
+        """The ``torch.dtype`` of this input."""
         return DTYPES[self.dtype]
 
     @property
     def is_integer(self) -> bool:
+        """Whether the dtype is an integer type (token ids, masks)."""
         return not (self.torch_dtype.is_floating_point or self.torch_dtype == torch.bool)
 
     @property
@@ -59,6 +61,7 @@ class TensorSpec:
 
     @classmethod
     def from_config(cls, cfg: dict) -> TensorSpec:
+        """Build a spec from a config dict (``name``, ``dtype``, ``dims``, value range)."""
         try:
             return cls(
                 name=cfg["name"],

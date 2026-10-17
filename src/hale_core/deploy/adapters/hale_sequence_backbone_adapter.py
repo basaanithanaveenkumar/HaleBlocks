@@ -42,15 +42,18 @@ class HaleSequenceBackboneAdapter(ModelAdapter):
         self.opt_seq = opt_seq
 
     def build_model(self) -> nn.Module:
+        """Build the backbone from the adapter's config (weights loaded by :meth:`load`)."""
         from hale_core.nn.backbones.factory import build_backbone
 
         return build_backbone(self.vocab_size, **self.backbone_kwargs)
 
     @property
     def time_conditioned(self) -> bool:
+        """Whether the backbone takes a diffusion time ``t`` input."""
         return bool(self.backbone_kwargs.get("use_time_cond"))
 
     def default_signature(self) -> IOSignature:
+        """Inputs ``input_ids`` (and ``t`` when time-conditioned) with dynamic batch/sequence; output ``logits``."""
         max_len = int(self.backbone_kwargs.get("max_length", 512))
         inputs = [
             {
@@ -76,4 +79,5 @@ class HaleSequenceBackboneAdapter(ModelAdapter):
         )
 
     def forward_for_export(self, model: nn.Module, inputs: dict[str, torch.Tensor]) -> torch.Tensor:
+        """Call the backbone with the exported inputs and return its logits."""
         return model(inputs["input_ids"], t=inputs.get("t"))

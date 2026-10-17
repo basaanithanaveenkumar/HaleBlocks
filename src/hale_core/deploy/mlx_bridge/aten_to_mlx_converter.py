@@ -70,6 +70,16 @@ class AtenToMLXConverter:
     def convert(
         self, module: nn.Module, example_args: tuple[torch.Tensor, ...], dynamic_shapes: Any = None
     ) -> MLXProgram:
+        """Export ``module`` with ``torch.export`` and lower it to an :class:`MLXProgram`.
+
+        Args:
+            module: model to convert (eval mode).
+            example_args: example inputs; dynamic dims must be >= 2 (export specialises size 1).
+            dynamic_shapes: ``torch.export`` dynamic-shape spec.
+
+        Raises:
+            ConversionError: for ATen ops without a registered MLX converter.
+        """
         program = self.export(module, example_args, dynamic_shapes)
         mlx_program = self.lower(program)
         if self.quantize:
@@ -85,6 +95,7 @@ class AtenToMLXConverter:
     def export(
         self, module: nn.Module, example_args, dynamic_shapes=None
     ) -> torch.export.ExportedProgram:
+        """``torch.export`` the module, preserving the ops the MLX bridge implements natively."""
         with torch.no_grad():
             # Deferred runtime asserts: guards the symbolic solver cannot prove (e.g. the mask
             # utilities in transformers) become graph asserts instead of export failures.
@@ -105,6 +116,7 @@ class AtenToMLXConverter:
 
     # ------------------------------------------------------------------ lowering
     def lower(self, program: torch.export.ExportedProgram) -> MLXProgram:
+        """Translate an exported program's ATen graph node by node into an :class:`MLXProgram`."""
         sig = program.graph_signature
         tensors = {**program.state_dict, **program.constants}
         params: dict[str, Any] = {}

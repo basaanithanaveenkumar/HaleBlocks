@@ -30,6 +30,7 @@ class DimSpec:
 
     @property
     def is_dynamic(self) -> bool:
+        """Whether the dimension varies (``min != max``)."""
         return self.min != self.max
 
     @property

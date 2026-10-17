@@ -47,6 +47,7 @@ class TorchModuleAdapter(ModelAdapter):
         self.positional = positional
 
     def build_model(self) -> nn.Module:
+        """Import and instantiate the configured ``torch.nn.Module`` class."""
         module_name, _, attr = self.factory.partition(":")
         try:
             target = getattr(importlib.import_module(module_name), attr)
@@ -65,4 +66,5 @@ class TorchModuleAdapter(ModelAdapter):
         return model
 
     def forward_for_export(self, model: nn.Module, inputs: dict) -> Any:
+        """Call the module with the inputs in signature order."""
         return model(*inputs.values()) if self.positional else model(**inputs)

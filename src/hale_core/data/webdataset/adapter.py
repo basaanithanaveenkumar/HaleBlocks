@@ -37,6 +37,7 @@ class WebDatasetAdapter:
 
     @property
     def enabled(self) -> bool:
+        """Whether WebDataset sharding is switched on in the config."""
         return self.config.enabled
 
     def prepare(

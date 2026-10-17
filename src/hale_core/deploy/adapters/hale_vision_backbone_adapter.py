@@ -41,11 +41,13 @@ class HaleVisionBackboneAdapter(ModelAdapter):
         self.max_batch = max_batch
 
     def build_model(self) -> nn.Module:
+        """Build the registered vision backbone named in the config."""
         from hale_core.nn.vision.registry import build_vision_backbone
 
         return build_vision_backbone(self.name, **self.kwargs)
 
     def default_signature(self) -> IOSignature:
+        """Input ``images`` ``(B, 3, H, W)`` with a dynamic batch; outputs the backbone features."""
         size = int(self.kwargs.get("img_size", 224))
         channels = int(self.kwargs.get("in_chans", 3))
         return IOSignature.from_config(
@@ -64,4 +66,5 @@ class HaleVisionBackboneAdapter(ModelAdapter):
         )
 
     def forward_for_export(self, model: nn.Module, inputs: dict) -> Any:
+        """Run the backbone on ``inputs["images"]`` and return the exported feature tensor(s)."""
         return model(inputs["pixel_values"])

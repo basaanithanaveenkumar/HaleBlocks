@@ -1,3 +1,5 @@
+"""``data:`` section of a run config: dataset, tokenizer, sequence length and loader settings."""
+
 from __future__ import annotations
 
 from typing import Literal

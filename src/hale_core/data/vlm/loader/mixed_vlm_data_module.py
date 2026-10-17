@@ -53,6 +53,7 @@ class MixedVLMDataModule:
         )
 
     def train_loader(self) -> Iterator[dict]:
+        """Yield collated training batches of ``batch_size`` samples from the mixture."""
         batch: list[VLMSample] = []
         for sample in self._loader:
             batch.append(sample)
@@ -63,7 +64,9 @@ class MixedVLMDataModule:
             yield _collate_vlm_batch(batch)
 
     def val_loader(self, train_loader):
+        """Validation batches: this module reuses the training stream (no held-out split)."""
         return train_loader
 
     def viz_prompt(self, step: int) -> str:
+        """Label shown in visualisations for ``step``."""
         return f"vlm-mixture step={step}"

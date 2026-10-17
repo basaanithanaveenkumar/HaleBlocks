@@ -39,18 +39,21 @@ class MediaCache:
             logger.debug("evicted cache file {} ({:.1f} MB)", old_path, old_size / 1e6)
 
     def reserve(self, dataset: str, sample_idx: int, suffix: str) -> Path:
+        """Path for a media file of ``dataset``/``sample_idx`` (parent directories created)."""
         safe = dataset.replace("/", "_")
         path = self.root / safe / f"{sample_idx:08d}{suffix}"
         path.parent.mkdir(parents=True, exist_ok=True)
         return path
 
     def store_bytes(self, path: Path, payload: bytes) -> Path:
+        """Write ``payload`` to ``path`` and account for it in the cache budget."""
         path.write_bytes(payload)
         with self._lock:
             self._touch(path, len(payload))
         return path
 
     def store_file(self, src: Path, dest: Path) -> Path:
+        """Copy ``src`` to ``dest`` (no copy if they are the same file) and account for it."""
         if src.resolve() == dest.resolve():
             size = dest.stat().st_size
         else:
@@ -61,6 +64,11 @@ class MediaCache:
         return dest
 
     def resolve_local(self, value: str | Path, *, dest: Path) -> Path | None:
+        """Materialise ``value`` (local path or http(s) URL) at ``dest``.
+
+        Returns:
+            The cached path, or ``None`` if ``value`` is neither an existing file nor a URL.
+        """
         path = Path(value)
         if path.exists():
             return self.store_file(path, dest)

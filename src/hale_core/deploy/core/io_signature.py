@@ -48,6 +48,7 @@ class IOSignature:
 
     @property
     def input_names(self) -> list[str]:
+        """Input names in positional order."""
         return [s.name for s in self.inputs]
 
     def shape(self, spec: TensorSpec, which: str = "opt") -> tuple[int, ...]:
@@ -85,6 +86,7 @@ class IOSignature:
 
     # ------------------------------------------------------------------ backend dialects
     def onnx_dynamic_axes(self) -> dict[str, dict[int, str]]:
+        """``dynamic_axes`` argument for ``torch.onnx.export`` (dynamic dims named by axis)."""
         axes = {
             s.name: {i: d for i, d in s.symbolic_dims.items() if self.dims[d].is_dynamic}
             for s in self.inputs
@@ -112,6 +114,7 @@ class IOSignature:
     def tensorrt_profiles(
         self,
     ) -> dict[str, tuple[tuple[int, ...], tuple[int, ...], tuple[int, ...]]]:
+        """Per-input ``(min, opt, max)`` shapes for a TensorRT optimisation profile."""
         return {
             s.name: (self.shape(s, "min"), self.shape(s, "opt"), self.shape(s, "max"))
             for s in self.inputs
@@ -119,6 +122,7 @@ class IOSignature:
 
     @property
     def is_dynamic(self) -> bool:
+        """Whether any input has a dynamic dimension."""
         return any(d.is_dynamic for d in self.dims.values())
 
     @classmethod

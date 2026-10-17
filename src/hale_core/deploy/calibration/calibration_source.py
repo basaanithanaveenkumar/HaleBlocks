@@ -29,6 +29,7 @@ class CalibrationSource(ABC):
         """Yield ``num_batches`` input dicts."""
 
     def as_numpy(self, signature: IOSignature) -> Iterator[dict[str, np.ndarray]]:
+        """The batches of :meth:`batches` converted to NumPy (for ONNX Runtime / Quark)."""
         for batch in self.batches(signature):
             yield {k: v.detach().cpu().numpy() for k, v in batch.items()}
 

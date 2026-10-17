@@ -27,6 +27,7 @@ class RandomCalibrationSource(CalibrationSource):
         self.seed = seed
 
     def batches(self, signature: IOSignature) -> Iterator[dict[str, torch.Tensor]]:
+        """Yield random batches matching the signature (shapes at ``opt``, valid integer ranges)."""
         generator = torch.Generator().manual_seed(self.seed)
         for _ in range(self.num_batches):
             yield signature.sample(self.which, generator)
