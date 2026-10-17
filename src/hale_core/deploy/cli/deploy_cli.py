@@ -67,6 +67,7 @@ class DeployCLI:
 
     @staticmethod
     def cmd_show(args) -> int:
+        # stdout (not the logger) is deliberate: the merged config IS this command's output.
         print(Config.fromfile(args.config, args.cfg_options).pretty())
         return 0
 
@@ -82,6 +83,7 @@ class DeployCLI:
             *args.imports,
         ):
             importlib.import_module(module)
+        # stdout is deliberate here and in ``cmd_env``: the listing is the command's output.
         for registry in (STAGES, ADAPTERS, RUNTIMES, CALIBRATION):
             print(f"{registry.name}s:")
             for key in registry.qualified_keys():  # includes downstream scopes (hale_llm.X ...)

@@ -319,14 +319,13 @@ def _try_fuse(model: nn.Module) -> None:
     """
     import torch.quantization as tq
 
-    try:
-        tq.fuse_modules(model, [["conv", "bn", "relu"]], inplace=True)
-    except Exception:
-        pass  # not all models have these patterns
-    try:
-        tq.fuse_modules(model, [["conv", "relu"]], inplace=True)
-    except Exception:
-        pass
+    for pattern in (["conv", "bn", "relu"], ["conv", "relu"]):
+        try:
+            tq.fuse_modules(model, [pattern], inplace=True)
+        except (AttributeError, AssertionError, RuntimeError) as exc:
+            # fuse_modules raises these when the named submodules do not exist or do not form a
+            # fusable chain; most models simply lack the pattern, which is not an error.
+            logger.debug("QAT fusion of {} skipped: {}", pattern, exc)
 
 
 def _batch_to_device(batch: Any, device: torch.device) -> Any:

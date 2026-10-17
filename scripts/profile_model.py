@@ -21,6 +21,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
 import torch
+from loguru import logger
 
 from hale_core.profiling import ModelProfiler
 from hale_core.nn import GPTBackbone, LGTBackbone, DiTBackbone
@@ -107,9 +108,8 @@ def main() -> None:
     args = parse_args()
     device = torch.device(args.device)
 
-    print(f"\n[profile] variant={args.variant}  device={device}  "
-          f"batch={args.batch_size}  seq={args.seq_len}  "
-          f"d_model={args.d_model}  n_layers={args.n_layers}")
+    logger.info("profiling variant={} device={} batch={} seq={} d_model={} n_layers={}",
+                args.variant, device, args.batch_size, args.seq_len, args.d_model, args.n_layers)
 
     builder = _BUILDERS[args.variant]
     model, dummy = builder(args)
@@ -133,6 +133,7 @@ def main() -> None:
 
     report = profiler.report()
 
+    # The report itself is this script's output, so it goes to stdout; status lines use the logger.
     print("\n" + report.summary_table(top_k=args.top, sort_by=args.sort))
 
     if args.torch_profiler:
@@ -144,10 +145,10 @@ def main() -> None:
         Path(args.json).parent.mkdir(parents=True, exist_ok=True)
         with open(args.json, "w") as f:
             json.dump(report.to_dict(), f, indent=2)
-        print(f"\n[profile] per-layer JSON saved → {args.json}")
+        logger.info("per-layer JSON saved → {}", args.json)
 
     if args.trace:
-        print(f"[profile] Chrome trace saved → {args.trace}")
+        logger.info("Chrome trace saved → {}", args.trace)
 
 
 if __name__ == "__main__":
