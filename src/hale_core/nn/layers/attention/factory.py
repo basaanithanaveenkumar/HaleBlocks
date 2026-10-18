@@ -2,6 +2,9 @@
 
 from __future__ import annotations
 
+from collections.abc import Callable
+from typing import Any
+
 from hale_core.nn.layers.attention.grouped import GroupedQueryAttention
 from hale_core.nn.layers.attention.mha import TorchMultiHeadAttention
 from hale_core.registry import NamedRegistry
@@ -9,10 +12,10 @@ from hale_core.registry import NamedRegistry
 ATTENTION = NamedRegistry("attention")
 
 
-def register_attention(name: str):
+def register_attention(name: str) -> Callable[[type], type]:
     """Decorator registering an attention implementation under ``name``."""
 
-    def deco(cls):
+    def deco(cls: type) -> type:
         ATTENTION.add(name, cls)
         return cls
 
@@ -22,6 +25,30 @@ def register_attention(name: str):
 register_attention("mha")(TorchMultiHeadAttention)
 register_attention("gqa")(GroupedQueryAttention)
 register_attention("mqa")(GroupedQueryAttention)
+
+
+def _build_mha(cls: type, d_model: int, n_heads: int, dropout: float, **_: Any) -> Any:
+    return cls(d_model, n_heads, dropout)
+
+
+def _build_mqa(cls: type, d_model: int, n_heads: int, dropout: float, **extra: Any) -> Any:
+    extra.pop("n_kv_heads", None)
+    return cls(d_model, n_heads, n_kv_heads=1, dropout=dropout, **extra)
+
+
+def _build_gqa(cls: type, d_model: int, n_heads: int, dropout: float, **extra: Any) -> Any:
+    n_kv_heads = extra.pop("n_kv_heads", None)
+    kv = n_kv_heads if n_kv_heads is not None else max(1, n_heads // 4)
+    return cls(d_model, n_heads, n_kv_heads=kv, dropout=dropout, **extra)
+
+
+# Strategy per registry key: how a flat config maps onto that class's constructor. A new
+# attention type registers its class and, if its signature differs, a strategy here.
+ATTENTION_CONSTRUCTORS: dict[str, Callable[..., Any]] = {
+    "mha": _build_mha,
+    "mqa": _build_mqa,
+    "gqa": _build_gqa,
+}
 
 
 def build_attention(
@@ -44,13 +71,24 @@ def build_attention(
         dropout: attention dropout.
         n_kv_heads: key/value heads for grouped-query attention.
         rope_theta: RoPE base; ``None`` disables rotary embeddings.
+        rotary_dim: number of rotated dimensions per head (``None`` = full head).
+        qk_norm: normalise queries and keys before the dot product.
+
+    Returns:
+        The attention module.
+
+    Raises:
+        KeyError: if ``impl`` is not registered.
     """
-    extra = {"rope_theta": rope_theta, "rotary_dim": rotary_dim, "qk_norm": qk_norm}
-    if impl == "mha":
-        return ATTENTION.get("mha")(d_model, n_heads, dropout)
-    if impl == "mqa":
-        return ATTENTION.get("mqa")(d_model, n_heads, n_kv_heads=1, dropout=dropout, **extra)
-    if impl == "gqa":
-        kv = n_kv_heads if n_kv_heads is not None else max(1, n_heads // 4)
-        return ATTENTION.get("gqa")(d_model, n_heads, n_kv_heads=kv, dropout=dropout, **extra)
-    raise KeyError(f"unknown attention impl {impl!r}; registered={sorted(ATTENTION.items)}")
+    cls = ATTENTION.get(impl)
+    construct = ATTENTION_CONSTRUCTORS.get(impl, _build_gqa)
+    return construct(
+        cls,
+        d_model,
+        n_heads,
+        dropout,
+        n_kv_heads=n_kv_heads,
+        rope_theta=rope_theta,
+        rotary_dim=rotary_dim,
+        qk_norm=qk_norm,
+    )
