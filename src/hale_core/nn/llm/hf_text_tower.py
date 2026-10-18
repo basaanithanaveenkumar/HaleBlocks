@@ -17,13 +17,21 @@ from typing import Any
 
 import torch
 from torch import nn
-from transformers import (
-    AutoModelForCausalLM,
-    AutoModelForImageTextToText,
-    GenerationMixin,
-    PreTrainedModel,
-)
-from transformers.modeling_outputs import CausalLMOutputWithPast
+
+from hale_core.exceptions import MissingDependencyError
+
+try:
+    from transformers import (
+        AutoModelForCausalLM,
+        AutoModelForImageTextToText,
+        GenerationMixin,
+        PreTrainedModel,
+    )
+    from transformers.modeling_outputs import CausalLMOutputWithPast
+except ImportError as err:  # PreTrainedModel is a base class, so the import cannot be deferred
+    raise MissingDependencyError(
+        "transformers", "install the finetune extra: pip install 'hale-blocks[finetune]'"
+    ) from err
 
 # Imported lazily by ``hf_backbone`` (``transformers`` is the optional ``finetune`` extra).
 
