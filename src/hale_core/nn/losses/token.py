@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from typing import Any
+
 import torch
 
 from hale_core.nn.losses import functions as _token_losses  # noqa: F401
@@ -9,7 +11,7 @@ from hale_core.nn.losses.reduce import reduce_per_token
 from hale_core.nn.losses.registry import get_token_loss
 
 
-def loss_settings(model) -> dict:
+def loss_settings(model: Any) -> dict[str, Any]:
     """Token-loss settings from ``model.cfg.train`` (type, focal gamma/alpha, label smoothing).
 
     Models without a training config get the defaults (cross-entropy).
@@ -32,7 +34,7 @@ def token_nll(
     ignore_index: int | None = None,
     reduction: str = "mean",
     loss_type: str = "ce",
-    **kwargs,
+    **kwargs: Any,
 ) -> torch.Tensor:
     """Per-token loss via `losses.registry` (`ce`, `focal`, `label_smoothing`, `kl`, …)."""
     ignore = -100 if ignore_index is None else ignore_index
@@ -40,7 +42,9 @@ def token_nll(
     return reduce_per_token(nll, targets, ignore_index=ignore_index, reduction=reduction)
 
 
-def model_token_nll(model, logits: torch.Tensor, targets: torch.Tensor, **kwargs) -> torch.Tensor:
+def model_token_nll(
+    model: Any, logits: torch.Tensor, targets: torch.Tensor, **kwargs: Any
+) -> torch.Tensor:
     """Token loss of ``logits`` against ``targets`` using the model's configured loss type.
 
     Explicit ``kwargs`` (e.g. ``reduction``, ``ignore_index``) override the model settings.

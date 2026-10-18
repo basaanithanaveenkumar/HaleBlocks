@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import operator
+from typing import Any
 
 import mlx.core as mx
 
@@ -17,7 +18,7 @@ def _shape(size):
 
 
 @register(name=["aten.arange.start_step", "aten.arange.start", "aten.arange.default"])
-def arange(start, end=None, step=1, dtype=None, **_):
+def arange(start: Any, end: Any = None, step: Any = 1, dtype: Any = None, **_: Any) -> Any:
     """Lower ``aten.arange.start_step``, ``aten.arange.start``, ``aten.arange.default`` to MLX."""
     if end is None:
         start, end = 0, start
@@ -31,7 +32,7 @@ def arange(start, end=None, step=1, dtype=None, **_):
 
 
 @register(name=["aten.full.default"])
-def full(size, fill_value, dtype=None, **_):
+def full(size: Any, fill_value: Any, dtype: Any = None, **_: Any) -> Any:
     """Lower ``aten.full.default`` to MLX."""
     return mx.full(
         _shape(size),
@@ -46,7 +47,7 @@ def full(size, fill_value, dtype=None, **_):
 
 
 @register(name=["aten.zeros.default"])
-def zeros(size, dtype=None, **_):
+def zeros(size: Any, dtype: Any = None, **_: Any) -> Any:
     """Lower ``aten.zeros.default`` to MLX: ``mx.zeros(_shape(size), dtype=mlx_dtype(dtype) or
     mx.float32)``.
     """
@@ -54,7 +55,7 @@ def zeros(size, dtype=None, **_):
 
 
 @register(name=["aten.ones.default"])
-def ones(size, dtype=None, **_):
+def ones(size: Any, dtype: Any = None, **_: Any) -> Any:
     """Lower ``aten.ones.default`` to MLX: ``mx.ones(_shape(size), dtype=mlx_dtype(dtype) or
     mx.float32)``.
     """
@@ -62,13 +63,13 @@ def ones(size, dtype=None, **_):
 
 
 @register(name=["aten.full_like.default"])
-def full_like(x, fill_value, dtype=None, **_):
+def full_like(x: Any, fill_value: Any, dtype: Any = None, **_: Any) -> Any:
     """Lower ``aten.full_like.default`` to MLX."""
     return mx.full(x.shape, fill_value, dtype=mlx_dtype(dtype) or x.dtype)
 
 
 @register(name=["aten.zeros_like.default"])
-def zeros_like(x, dtype=None, **_):
+def zeros_like(x: Any, dtype: Any = None, **_: Any) -> Any:
     """Lower ``aten.zeros_like.default`` to MLX: ``mx.zeros(x.shape, dtype=mlx_dtype(dtype) or
     x.dtype)``.
     """
@@ -76,7 +77,7 @@ def zeros_like(x, dtype=None, **_):
 
 
 @register(name=["aten.ones_like.default"])
-def ones_like(x, dtype=None, **_):
+def ones_like(x: Any, dtype: Any = None, **_: Any) -> Any:
     """Lower ``aten.ones_like.default`` to MLX: ``mx.ones(x.shape, dtype=mlx_dtype(dtype) or
     x.dtype)``.
     """
@@ -84,7 +85,7 @@ def ones_like(x, dtype=None, **_):
 
 
 @register(name=["aten.new_zeros.default"])
-def new_zeros(x, size, dtype=None, **_):
+def new_zeros(x: Any, size: Any, dtype: Any = None, **_: Any) -> Any:
     """Lower ``aten.new_zeros.default`` to MLX: ``mx.zeros(_shape(size), dtype=mlx_dtype(dtype) or
     x.dtype)``.
     """
@@ -92,7 +93,7 @@ def new_zeros(x, size, dtype=None, **_):
 
 
 @register(name=["aten.new_ones.default"])
-def new_ones(x, size, dtype=None, **_):
+def new_ones(x: Any, size: Any, dtype: Any = None, **_: Any) -> Any:
     """Lower ``aten.new_ones.default`` to MLX: ``mx.ones(_shape(size), dtype=mlx_dtype(dtype) or
     x.dtype)``.
     """
@@ -100,7 +101,7 @@ def new_ones(x, size, dtype=None, **_):
 
 
 @register(name=["aten.scalar_tensor.default"])
-def scalar_tensor(value, dtype=None, **_):
+def scalar_tensor(value: Any, dtype: Any = None, **_: Any) -> Any:
     """Lower ``aten.scalar_tensor.default`` to MLX: ``mx.array(value, dtype=mlx_dtype(dtype) or
     mx.float32)``.
     """
@@ -108,7 +109,7 @@ def scalar_tensor(value, dtype=None, **_):
 
 
 @register(name=["aten._to_copy.default", "aten.to.dtype", "aten._to_dim_order_copy.default"])
-def to_copy(x, dtype=None, **_):
+def to_copy(x: Any, dtype: Any = None, **_: Any) -> Any:
     """Lower ``aten._to_copy.default``, ``aten.to.dtype``, ``aten._to_dim_order_copy.default`` to
     MLX:
     ``x.astype(mlx_dtype(dtype)) if dtype is not None else x``.
@@ -117,7 +118,7 @@ def to_copy(x, dtype=None, **_):
 
 
 @register(name=["aten.type_as.default"])
-def type_as(x, other):
+def type_as(x: Any, other: Any) -> Any:
     """Lower ``aten.type_as.default`` to MLX: ``x.astype(other.dtype)``."""
     return x.astype(other.dtype)
 
@@ -133,7 +134,7 @@ def type_as(x, other):
         "aten.alias_copy.default",
     ]
 )
-def identity(x, *_, **__):
+def identity(x: Any, *_: Any, **__: Any) -> Any:
     """Lower ``aten.clone.default``, ``aten.contiguous.default``, ``aten.alias.default``,
     ``aten.detach.default``, ``aten.lift_fresh_copy.default``, ``aten.dropout.default``,
     ``aten.alias_copy.default`` to MLX: ``x``.
@@ -142,7 +143,7 @@ def identity(x, *_, **__):
 
 
 @register(name=["aten.sym_size.int"])
-def sym_size(x, dim):
+def sym_size(x: Any, dim: Any) -> Any:
     """Lower ``aten.sym_size.int`` to MLX: ``x.shape[dim]``."""
     return x.shape[dim]
 
@@ -156,7 +157,7 @@ def sym_size(x, dim):
         "aten.sym_constrain_range.default",
     ]
 )
-def no_op(*_, **__):
+def no_op(*_: Any, **__: Any) -> Any:
     """Lower ``aten._assert_tensor_metadata.default``, ``aten._assert_scalar.default``,
     ``aten.sym_constrain_range_for_size.default``, ``aten._assert_async.msg``,
     ``aten.sym_constrain_range.default`` to MLX: ``None``.

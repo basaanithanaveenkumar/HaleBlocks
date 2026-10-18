@@ -275,8 +275,8 @@ def _resolve_backend(requested: str) -> str:
         fallback = "qnnpack"
         try:
             torch.backends.quantized.engine = fallback
-        except RuntimeError:
-            pass  # running in an environment with no quant engine
+        except RuntimeError as err:
+            logger.debug("no quantized engine available, keeping default: {}", err)
         return fallback
 
 

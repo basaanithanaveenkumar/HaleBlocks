@@ -215,7 +215,7 @@ class PruningManager:
             try:
                 torch_prune.remove(module, param_name)
             except ValueError:
-                pass  # already removed or never applied
+                logger.debug("prune mask already removed for {}", param_name)
         self._permanent = True
         logger.info("PruningManager: masks baked into weights (permanent)")
 

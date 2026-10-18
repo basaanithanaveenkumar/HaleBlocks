@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import math
+from typing import Any
 
 import mlx.core as mx
 
@@ -12,14 +13,16 @@ register = MLX_OPS.register_module
 
 
 @register(name=["aten.linear.default"])
-def linear(x, weight, bias=None):
+def linear(x: Any, weight: Any, bias: Any = None) -> Any:
     """Lower ``aten.linear.default`` to MLX."""
     y = x @ weight.T
     return y + bias if bias is not None else y
 
 
 @register(name=["hale.quantized_linear"])
-def quantized_linear(x, w_q, scales, biases, bias=None, *, group_size: int, bits: int):
+def quantized_linear(
+    x: Any, w_q: Any, scales: Any, biases: Any, bias: Any = None, *, group_size: int, bits: int
+) -> Any:
     """Weight-only quantized linear produced by the converter's quantization pass."""
     y = mx.quantized_matmul(
         x, w_q, scales, biases, transpose=True, group_size=group_size, bits=bits
@@ -28,7 +31,7 @@ def quantized_linear(x, w_q, scales, biases, bias=None, *, group_size: int, bits
 
 
 @register(name=["aten.mm.default", "aten.bmm.default", "aten.matmul.default"])
-def matmul(a, b):
+def matmul(a: Any, b: Any) -> Any:
     """Lower ``aten.mm.default``, ``aten.bmm.default``, ``aten.matmul.default`` to MLX: ``a @
     b``.
     """
@@ -36,7 +39,7 @@ def matmul(a, b):
 
 
 @register(name=["aten.addmm.default"])
-def addmm(bias, a, b, beta=1, alpha=1):
+def addmm(bias: Any, a: Any, b: Any, beta: Any = 1, alpha: Any = 1) -> Any:
     """Lower ``aten.addmm.default`` to MLX."""
     out = a @ b
     if alpha != 1:
@@ -45,21 +48,28 @@ def addmm(bias, a, b, beta=1, alpha=1):
 
 
 @register(name=["aten.baddbmm.default"])
-def baddbmm(bias, a, b, beta=1, alpha=1):
+def baddbmm(bias: Any, a: Any, b: Any, beta: Any = 1, alpha: Any = 1) -> Any:
     """Lower ``aten.baddbmm.default`` to MLX: ``addmm(bias, a, b, beta, alpha)``."""
     return addmm(bias, a, b, beta, alpha)
 
 
 @register(name=["aten.t.default", "aten.numpy_T.default"])
-def t(x):
+def t(x: Any) -> Any:
     """Lower ``aten.t.default``, ``aten.numpy_T.default`` to MLX: ``x.T if x.ndim == 2 else x``."""
     return x.T if x.ndim == 2 else x
 
 
 @register(name=["aten.scaled_dot_product_attention.default"])
 def scaled_dot_product_attention(
-    q, k, v, attn_mask=None, dropout_p=0.0, is_causal=False, scale=None, enable_gqa=False
-):
+    q: Any,
+    k: Any,
+    v: Any,
+    attn_mask: Any = None,
+    dropout_p: Any = 0.0,
+    is_causal: Any = False,
+    scale: Any = None,
+    enable_gqa: Any = False,
+) -> Any:
     """``mx.fast.scaled_dot_product_attention`` (fused Metal kernel, native GQA).
 
     torch's ``is_causal`` aligns the mask top-left (``tril`` with diagonal 0); it is built

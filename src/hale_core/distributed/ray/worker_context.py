@@ -6,6 +6,8 @@ import os
 import sys
 from dataclasses import dataclass
 
+from loguru import logger
+
 
 @dataclass(frozen=True)
 class WorkerContext:
@@ -53,7 +55,7 @@ class WorkerContext:
                     world_size=dist.get_world_size(),
                 )
         except ImportError:  # pragma: no cover - torch is a hard dependency
-            pass
+            logger.debug("torch.distributed unavailable; reading rank from the environment")
         return cls(
             rank=int(os.environ.get("RANK", 0)),
             local_rank=int(os.environ.get("LOCAL_RANK", 0)),

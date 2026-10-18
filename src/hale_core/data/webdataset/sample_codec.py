@@ -12,6 +12,7 @@ from pathlib import PurePath
 from typing import Any
 
 import torch
+from loguru import logger
 
 from hale_core.exceptions import DataError
 
@@ -155,7 +156,7 @@ class SampleCodec:
                 value.save(buf, format="PNG")
                 return "png", buf.getvalue()
         except ImportError:  # pragma: no cover - pillow is optional
-            pass
+            logger.debug("Pillow not installed; image values cannot be PNG-encoded")
         raise TypeError(f"cannot store a {type(value).__name__} in WebDataset (no codec)")
 
     @staticmethod

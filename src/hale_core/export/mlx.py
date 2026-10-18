@@ -89,7 +89,7 @@ def export_mlx(
     cfg: ExportConfig,
     *,
     model_config: dict[str, Any] | None = None,
-    tokenizer=None,
+    tokenizer: Any = None,
     output_dir: str | Path | None = None,
     model_name: str = "model",
 ) -> str:

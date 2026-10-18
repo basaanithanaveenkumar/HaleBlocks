@@ -11,7 +11,7 @@ from hale_core.distributed.ray.worker_context import WorkerContext
 from hale_core.registry import get_trainer
 
 
-def train(cfg: RunConfig, tokenizer=None, *, trainer: str = "default", **kwargs) -> Any:
+def train(cfg: RunConfig, tokenizer: Any = None, *, trainer: str = "default", **kwargs) -> Any:
     """Build the registered ``trainer`` and run it.
 
     With ``cfg.train.ray.enabled`` the run is launched on Ray Train instead: every Ray worker

@@ -2,22 +2,25 @@
 
 from __future__ import annotations
 
+from collections.abc import Callable
+from typing import Any
+
 from hale_core.registry import NamedRegistry
 
 BACKBONES = NamedRegistry("backbone")
 
 
-def register_backbone(name: str):
+def register_backbone(name: str) -> Callable[[type], type]:
     """Decorator registering a backbone class under ``name`` in ``BACKBONES``."""
 
-    def deco(cls):
+    def deco(cls: type) -> type:
         BACKBONES.add(name, cls)
         return cls
 
     return deco
 
 
-def backbone_kwargs(vocab_size: int, model_cfg, **overrides) -> dict:
+def backbone_kwargs(vocab_size: int, model_cfg: Any, **overrides: Any) -> dict[str, Any]:
     """Constructor kwargs of a backbone from a ``ModelConfig`` (``overrides`` win)."""
     kwargs = {
         "vocab_size": vocab_size,
@@ -50,13 +53,19 @@ def backbone_kwargs(vocab_size: int, model_cfg, **overrides) -> dict:
     return kwargs
 
 
-def build_backbone(vocab_size: int, model_cfg=None, **overrides):
+def build_backbone(vocab_size: int, model_cfg: Any = None, **overrides: Any) -> Any:
     """Build the backbone named by ``model_cfg.arch`` for a vocabulary of ``vocab_size``.
 
     Args:
         vocab_size: tokenizer vocabulary size.
         model_cfg: the ``model:`` config section (defaults when ``None``).
         **overrides: constructor arguments that replace config values.
+
+    Returns:
+        The instantiated backbone module.
+
+    Raises:
+        RegistryError: if ``arch`` is not a registered backbone.
     """
     if model_cfg is not None:
         kwargs = backbone_kwargs(vocab_size, model_cfg, **overrides)

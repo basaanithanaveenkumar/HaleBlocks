@@ -9,7 +9,7 @@ from hale_core.registry import NamedRegistry
 TOKEN_LOSSES = NamedRegistry("token_loss")
 
 
-def register_token_loss(name: str):
+def register_token_loss(name: str) -> Callable[[Callable], Callable]:
     """Decorator registering a token-loss function under ``name``."""
 
     def deco(fn: Callable) -> Callable:

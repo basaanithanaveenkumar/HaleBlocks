@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from typing import Any
+
 import mlx.core as mx
 
 from hale_core.deploy.registry import MLX_OPS
@@ -20,7 +22,7 @@ _INT64_MAX = 2**63 - 1
         "aten.view_copy.default",
     ]
 )
-def reshape(x, shape):
+def reshape(x: Any, shape: Any) -> Any:
     """Lower ``aten.view.default``, ``aten._unsafe_view.default``, ``aten.reshape.default``,
     ``aten.view_copy.default`` to MLX: ``mx.reshape(x, [int(s) for s in shape])``.
     """
@@ -28,7 +30,7 @@ def reshape(x, shape):
 
 
 @register(name=["aten.flatten.using_ints"])
-def flatten(x, start_dim=0, end_dim=-1):
+def flatten(x: Any, start_dim: Any = 0, end_dim: Any = -1) -> Any:
     """Lower ``aten.flatten.using_ints`` to MLX: ``mx.flatten(x, start_axis=start_dim,
     end_axis=end_dim)``.
     """
@@ -36,7 +38,7 @@ def flatten(x, start_dim=0, end_dim=-1):
 
 
 @register(name=["aten.permute.default", "aten.permute_copy.default"])
-def permute(x, dims):
+def permute(x: Any, dims: Any) -> Any:
     """Lower ``aten.permute.default``, ``aten.permute_copy.default`` to MLX: ``mx.transpose(x,
     [int(d)
     for d in dims])``.
@@ -45,13 +47,13 @@ def permute(x, dims):
 
 
 @register(name=["aten.transpose.int"])
-def transpose(x, dim0, dim1):
+def transpose(x: Any, dim0: Any, dim1: Any) -> Any:
     """Lower ``aten.transpose.int`` to MLX: ``mx.swapaxes(x, dim0, dim1)``."""
     return mx.swapaxes(x, dim0, dim1)
 
 
 @register(name=["aten.unsqueeze.default", "aten.unsqueeze_copy.default"])
-def unsqueeze(x, dim):
+def unsqueeze(x: Any, dim: Any) -> Any:
     """Lower ``aten.unsqueeze.default``, ``aten.unsqueeze_copy.default`` to MLX: ``mx.expand_dims(x,
     dim if dim >= 0 else dim + x.ndim + 1)``.
     """
@@ -59,7 +61,7 @@ def unsqueeze(x, dim):
 
 
 @register(name=["aten.squeeze.dim", "aten.squeeze.dims", "aten.squeeze.default"])
-def squeeze(x, dim=None):
+def squeeze(x: Any, dim: Any = None) -> Any:
     """Lower ``aten.squeeze.dim``, ``aten.squeeze.dims``, ``aten.squeeze.default`` to MLX."""
     if dim is None:
         return mx.squeeze(x)
@@ -69,7 +71,7 @@ def squeeze(x, dim=None):
 
 
 @register(name=["aten.expand.default", "aten.expand_copy.default"])
-def expand(x, size, implicit=False):
+def expand(x: Any, size: Any, implicit: Any = False) -> Any:
     """Lower ``aten.expand.default``, ``aten.expand_copy.default`` to MLX."""
     size = [int(s) for s in size]
     lead = len(size) - x.ndim
@@ -78,7 +80,7 @@ def expand(x, size, implicit=False):
 
 
 @register(name=["aten.repeat.default"])
-def repeat(x, repeats):
+def repeat(x: Any, repeats: Any) -> Any:
     """Lower ``aten.repeat.default`` to MLX."""
     reps = [int(r) for r in repeats]
     if len(reps) > x.ndim:
@@ -87,19 +89,19 @@ def repeat(x, repeats):
 
 
 @register(name=["aten.cat.default", "aten.concat.default"])
-def cat(tensors, dim=0):
+def cat(tensors: Any, dim: Any = 0) -> Any:
     """Lower ``aten.cat.default``, ``aten.concat.default`` to MLX."""
     return mx.concatenate([t for t in tensors if t.size > 0 or len(tensors) == 1], axis=dim)
 
 
 @register(name=["aten.stack.default"])
-def stack(tensors, dim=0):
+def stack(tensors: Any, dim: Any = 0) -> Any:
     """Lower ``aten.stack.default`` to MLX: ``mx.stack(list(tensors), axis=dim)``."""
     return mx.stack(list(tensors), axis=dim)
 
 
 @register(name=["aten.split.Tensor", "aten.split_copy.Tensor"])
-def split(x, split_size, dim=0):
+def split(x: Any, split_size: Any, dim: Any = 0) -> Any:
     """Lower ``aten.split.Tensor``, ``aten.split_copy.Tensor`` to MLX."""
     n = x.shape[dim]
     bounds = list(range(split_size, n, split_size))
@@ -107,7 +109,7 @@ def split(x, split_size, dim=0):
 
 
 @register(name=["aten.split_with_sizes.default", "aten.split_with_sizes_copy.default"])
-def split_with_sizes(x, split_sizes, dim=0):
+def split_with_sizes(x: Any, split_sizes: Any, dim: Any = 0) -> Any:
     """Lower ``aten.split_with_sizes.default``, ``aten.split_with_sizes_copy.default`` to MLX."""
     bounds, total = [], 0
     for s in split_sizes[:-1]:
@@ -117,7 +119,7 @@ def split_with_sizes(x, split_sizes, dim=0):
 
 
 @register(name=["aten.unbind.int"])
-def unbind(x, dim=0):
+def unbind(x: Any, dim: Any = 0) -> Any:
     """Lower ``aten.unbind.int`` to MLX: ``[mx.take(x, i, axis=dim) for i in
     range(x.shape[dim])]``.
     """
@@ -125,7 +127,7 @@ def unbind(x, dim=0):
 
 
 @register(name=["aten.slice.Tensor", "aten.slice_copy.Tensor"])
-def slice_(x, dim=0, start=None, end=None, step=1):
+def slice_(x: Any, dim: Any = 0, start: Any = None, end: Any = None, step: Any = 1) -> Any:
     """Lower ``aten.slice.Tensor``, ``aten.slice_copy.Tensor`` to MLX."""
     dim = dim % x.ndim
     size = x.shape[dim]
@@ -136,20 +138,20 @@ def slice_(x, dim=0, start=None, end=None, step=1):
 
 
 @register(name=["aten.select.int", "aten.select_copy.int"])
-def select(x, dim, index):
+def select(x: Any, dim: Any, index: Any) -> Any:
     """Lower ``aten.select.int``, ``aten.select_copy.int`` to MLX."""
     dim = dim % x.ndim
     return mx.take(x, index % x.shape[dim], axis=dim)
 
 
 @register(name=["aten.index_select.default"])
-def index_select(x, dim, index):
+def index_select(x: Any, dim: Any, index: Any) -> Any:
     """Lower ``aten.index_select.default`` to MLX: ``mx.take(x, index, axis=dim)``."""
     return mx.take(x, index, axis=dim)
 
 
 @register(name=["aten.index.Tensor"])
-def index(x, indices):
+def index(x: Any, indices: Any) -> Any:
     """Lower ``aten.index.Tensor`` to MLX: ``x[tuple((slice(None) if i is None else i for i in
     indices))]``.
     """
@@ -157,19 +159,25 @@ def index(x, indices):
 
 
 @register(name=["aten.gather.default"])
-def gather(x, dim, index, sparse_grad=False):
+def gather(x: Any, dim: Any, index: Any, sparse_grad: Any = False) -> Any:
     """Lower ``aten.gather.default`` to MLX: ``mx.take_along_axis(x, index, axis=dim)``."""
     return mx.take_along_axis(x, index, axis=dim)
 
 
 @register(name=["aten.embedding.default"])
-def embedding(weight, indices, padding_idx=-1, scale_grad_by_freq=False, sparse=False):
+def embedding(
+    weight: Any,
+    indices: Any,
+    padding_idx: Any = -1,
+    scale_grad_by_freq: Any = False,
+    sparse: Any = False,
+) -> Any:
     """Lower ``aten.embedding.default`` to MLX: ``mx.take(weight, indices, axis=0)``."""
     return mx.take(weight, indices, axis=0)
 
 
 @register(name=["aten.constant_pad_nd.default", "aten.pad.default"])
-def constant_pad(x, pad, value=0.0, mode="constant"):
+def constant_pad(x: Any, pad: Any, value: Any = 0.0, mode: Any = "constant") -> Any:
     """Lower ``aten.constant_pad_nd.default``, ``aten.pad.default`` to MLX."""
     pairs = [(0, 0)] * x.ndim
     for i in range(len(pad) // 2):  # torch pads from the last dim backwards
@@ -178,7 +186,7 @@ def constant_pad(x, pad, value=0.0, mode="constant"):
 
 
 @register(name=["aten.triu.default"])
-def triu(x, diagonal=0):
+def triu(x: Any, diagonal: Any = 0) -> Any:
     """Lower ``aten.triu.default`` to MLX."""
     return (
         mx.triu(x, k=diagonal)
@@ -188,7 +196,7 @@ def triu(x, diagonal=0):
 
 
 @register(name=["aten.tril.default"])
-def tril(x, diagonal=0):
+def tril(x: Any, diagonal: Any = 0) -> Any:
     """Lower ``aten.tril.default`` to MLX."""
     return (
         mx.tril(x, k=diagonal)
@@ -198,7 +206,7 @@ def tril(x, diagonal=0):
 
 
 @register(name=["aten.roll.default"])
-def roll(x, shifts, dims=()):
+def roll(x: Any, shifts: Any, dims: Any = ()) -> Any:
     """Lower ``aten.roll.default`` to MLX: ``mx.roll(x, list(shifts), axis=list(dims) if dims else
     None)``.
     """
@@ -206,7 +214,7 @@ def roll(x, shifts, dims=()):
 
 
 @register(name=["aten.flip.default"])
-def flip(x, dims):
+def flip(x: Any, dims: Any) -> Any:
     """Lower ``aten.flip.default`` to MLX."""
     index = [slice(None)] * x.ndim
     for d in dims:
@@ -215,7 +223,7 @@ def flip(x, dims):
 
 
 @register(name=["aten.as_strided.default", "aten.as_strided_copy.default"])
-def as_strided(x, size, stride, storage_offset=0):
+def as_strided(x: Any, size: Any, stride: Any, storage_offset: Any = 0) -> Any:
     """Only *restrides* that keep the logical shape are supported (decompositions emit them to
     change memory format, e.g. ``adaptive_avg_pool2d``); MLX arrays are logically contiguous,
     so those are identities. Genuine strided windows have no safe MLX equivalent."""
