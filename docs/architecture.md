@@ -290,3 +290,84 @@ clean  2 :   0  0  0  0 |  1  1  1  1
 noisy  0 :   1  1  1  1 |  0  0  1  1
 noisy  2 :   0  0  1  1 |  1  1  0  0
 ```
+
+---
+
+## Core classes, errors and config loading
+
+The shared core (`hale_core.registry`, `hale_core.config`, `hale_core.exceptions`) is what every
+downstream Hale repository imports. Every raised error derives from `HaleCoreError`; the
+subclasses also inherit the matching builtin (`KeyError`, `ValueError`, ...) so existing
+`except` clauses keep working.
+
+```mermaid
+classDiagram
+  class Registry {
+    +name: str
+    +parent: Registry
+    +scope: str
+    +register_module(name, force) decorator
+    +get(key) Any
+    +build(cfg) Any
+    +find_scope(scope) Registry
+  }
+  class NamedRegistry {
+    +add(name, obj)
+    +items
+  }
+  class VariantRegistry
+  class ConfigLoader {
+    +load(path) dict
+    +locate(ref, relative_to) Path
+  }
+  class DictMerger {
+    +merge(base, child) dict
+  }
+  class OverrideParser {
+    +parse(cfg, overrides) dict
+  }
+  class Config {
+    +fromfile(path, cfg_options) Config
+  }
+  class HaleCoreError
+  class ConfigError
+  class RegistryError
+  class DataError
+  class ExportError
+  class MissingDependencyError
+
+  Registry <|-- NamedRegistry
+  Config ..> ConfigLoader : uses
+  Config ..> OverrideParser : uses
+  ConfigLoader o-- DictMerger : injected
+  HaleCoreError <|-- ConfigError
+  HaleCoreError <|-- RegistryError
+  HaleCoreError <|-- DataError
+  HaleCoreError <|-- ExportError
+  HaleCoreError <|-- MissingDependencyError
+  Registry ..> RegistryError : raises
+  ConfigLoader ..> ConfigError : raises
+```
+
+```mermaid
+sequenceDiagram
+  participant U as caller
+  participant C as Config.fromfile
+  participant L as ConfigLoader
+  participant M as DictMerger
+  participant O as OverrideParser
+  participant R as Registry
+  U->>C: fromfile("child.yaml", cfg_options)
+  C->>L: load(path)
+  L->>L: read YAML, resolve _base_ (relative paths)
+  L->>L: detect cycles -> ConfigError
+  L->>M: merge(base, child) (_delete_ replaces dicts)
+  M-->>L: merged dict
+  L-->>C: dict
+  C->>O: parse dotted overrides (model.depth=12)
+  O-->>C: dict
+  C-->>U: Config
+  U->>R: build({"type": "gqa", ...})
+  R->>R: get("gqa") (falls back to parent scope)
+  R-->>U: instance (RegistryError lists close matches if unknown)
+```

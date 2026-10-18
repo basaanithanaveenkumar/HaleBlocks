@@ -60,6 +60,27 @@ from hale_core.data import MixedVLMDataModule
 | Blog | [Stop copying attention.py: a registry for transformer research](docs/blog/2026-09-28-stop-copying-attention.md) |
 | Claude Code skills | [`.claude/skills/`](.claude/skills) — `haleblocks-dev`, `haleblocks-components`, `haleblocks-data`, `hale-publish` |
 
+## Quick start
+
+```python
+from hale_core.registry import Registry
+from hale_core.config import ConfigLoader
+
+MODELS = Registry("model")
+
+@MODELS.register_module()
+class Tiny:
+    def __init__(self, depth: int = 2) -> None:
+        self.depth = depth
+
+model = MODELS.build({"type": "Tiny", "depth": 4})   # cfg["type"] picks the class
+cfg = ConfigLoader().load("configs/gpt_small.yaml")       # resolves `_base_`, deep-merges
+```
+
+Configs support `_base_` inheritance, `_delete_: true` and dotted CLI overrides
+(`--cfg-options model.depth=12`); see [`docs/configuration.md`](docs/configuration.md).
+Errors derive from `hale_core.exceptions.HaleCoreError`.
+
 ## Install
 
 ```bash
