@@ -74,8 +74,13 @@ for _preset in (
         "Dehghani et al. 2019; Graves, Adaptive Computation Time, arXiv:1603.08983",
         # tau = 0.001: on the toy char corpus tau = 0.01 makes nearly every token stop after 2
         # passes, 0.001 gives depths 2..8 that follow difficulty (measured, notebooks/looped/02).
-        {"n_loops": 8, "input_injection": "none", "halting": "act", "act_init_bias": -1.0,
-         "ponder_weight": 0.001},
+        {
+            "n_loops": 8,
+            "input_injection": "none",
+            "halting": "act",
+            "act_init_bias": -1.0,
+            "ponder_weight": 0.001,
+        },
     ),
     LoopPreset(
         "input_injection",
@@ -89,11 +94,20 @@ for _preset in (
         "recurrent_depth",
         "Prelude -> shared core x T -> coda, trained with a random T and truncated backprop, so "
         "the loop count becomes a test-time compute knob.",
-        "Geiping et al., Scaling up Test-Time Compute with Latent Reasoning, 2025, arXiv:2502.05171",
+        "Geiping et al., Scaling up Test-Time Compute with Latent Reasoning, 2025, "
+        "arXiv:2502.05171",
         # No depth embedding: a step coordinate the block never saw in training (t > 8) breaks
         # test-time scaling; without it the measured loss stays flat up to 24 passes.
-        {"n_loops": 8, "prelude_layers": 1, "coda_layers": 1, "depth_embedding": "none",
-         "input_injection": "concat", "sandwich_norm": True, "min_loops": 2, "bptt_loops": 4},
+        {
+            "n_loops": 8,
+            "prelude_layers": 1,
+            "coda_layers": 1,
+            "depth_embedding": "none",
+            "input_injection": "concat",
+            "sandwich_norm": True,
+            "min_loops": 2,
+            "bptt_loops": 4,
+        },
     ),
     LoopPreset(
         "deq_fixed_point",
@@ -101,8 +115,14 @@ for _preset in (
         "pass (a one-step 'phantom' gradient) for O(1) memory. Post-norms keep the map contractive "
         "so the fixed point exists (without them the residual plateaus around 0.7 per pass).",
         "Bai, Kolter & Koltun, Deep Equilibrium Models, NeurIPS 2019, arXiv:1909.01377",
-        {"n_loops": 16, "depth_embedding": "none", "input_injection": "concat", "bptt_loops": 1,
-         "sandwich_norm": True, "exit_tolerance": 1e-2},
+        {
+            "n_loops": 16,
+            "depth_embedding": "none",
+            "input_injection": "concat",
+            "bptt_loops": 1,
+            "sandwich_norm": True,
+            "exit_tolerance": 1e-2,
+        },
     ),
     LoopPreset(
         "scratchpad",
@@ -116,8 +136,14 @@ for _preset in (
         "A router gives every token its own depth: easy tokens leave the loop after one pass, hard "
         "ones keep recursing; first and last layers stay unshared.",
         "Bae et al., Mixture-of-Recursions, 2025, arXiv:2507.10524",
-        {"n_loops": 4, "prelude_layers": 1, "coda_layers": 1, "input_injection": "none",
-         "halting": "mor", "mor_balance_weight": 0.01},
+        {
+            "n_loops": 4,
+            "prelude_layers": 1,
+            "coda_layers": 1,
+            "input_injection": "none",
+            "halting": "mor",
+            "mor_balance_weight": 0.01,
+        },
     ),
     LoopPreset(
         "relaxed_recursive",

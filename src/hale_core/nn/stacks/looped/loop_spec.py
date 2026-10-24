@@ -91,7 +91,9 @@ class LoopSpec:
         if self.mor_balance_weight < 0:
             raise ValueError(f"mor_balance_weight must be >= 0, got {self.mor_balance_weight}")
         if self.halting == "mor" and self.exit_tolerance is not None:
-            raise ValueError("halting='mor' fixes each token's depth; exit_tolerance does not apply")
+            raise ValueError(
+                "halting='mor' fixes each token's depth; exit_tolerance does not apply"
+            )
         if self.exit_tolerance is not None and self.exit_tolerance <= 0:
             raise ValueError(f"exit_tolerance must be > 0, got {self.exit_tolerance}")
 

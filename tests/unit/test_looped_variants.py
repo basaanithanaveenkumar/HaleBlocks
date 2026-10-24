@@ -1,4 +1,4 @@
-"""Looped-transformer variants: presets, sharing schedules, relaxed recursion, Mixture-of-Recursions."""
+"""Looped variants: presets, sharing schedules, relaxed recursion, Mixture-of-Recursions."""
 
 from __future__ import annotations
 
@@ -18,8 +18,18 @@ VOCAB = 40
 
 def looped(n_layers: int = 2, attn_impl: str = "gqa", attn_type: str = "causal", **loop):
     torch.manual_seed(0)
-    return build_backbone(VOCAB, arch="looped", d_model=32, n_heads=4, n_layers=n_layers, d_ff=64,
-                          max_length=16, attn_type=attn_type, attn_impl=attn_impl, loop=loop)
+    return build_backbone(
+        VOCAB,
+        arch="looped",
+        d_model=32,
+        n_heads=4,
+        n_layers=n_layers,
+        d_ff=64,
+        max_length=16,
+        attn_type=attn_type,
+        attn_impl=attn_impl,
+        loop=loop,
+    )
 
 
 def tokens(batch: int = 2, seq: int = 10) -> torch.Tensor:
@@ -68,7 +78,9 @@ def test_sharing_schedules() -> None:
     def order(sharing: str, n_loops: int = 4) -> str:
         stack = looped(n_layers=2, n_loops=n_loops, sharing=sharing).stack
         names = {id(layer): "AB"[i] for i, layer in enumerate(stack.core)}
-        return " ".join("".join(names[id(m)] for m in stack.pass_layers(t, n_loops)) for t in range(n_loops))
+        return " ".join(
+            "".join(names[id(m)] for m in stack.pass_layers(t, n_loops)) for t in range(n_loops)
+        )
 
     assert order("cycle") == "AB AB AB AB"
     assert order("cycle_rev") == "AB BA AB BA"
@@ -89,10 +101,15 @@ def test_relaxed_recursion_starts_exactly_tied_and_specialises_per_pass() -> Non
     tied = looped(n_loops=3).eval()
     relaxed = looped(n_loops=3, lora_rank=2).eval()
     wrapped = [m for m in relaxed.stack.core.modules() if isinstance(m, LoopLoRALinear)]
-    assert wrapped and not any(isinstance(m, LoopLoRALinear) for m in relaxed.stack.ln_out.modules())
+    assert wrapped and not any(
+        isinstance(m, LoopLoRALinear) for m in relaxed.stack.ln_out.modules()
+    )
     # Copy the shared weights across (the relaxed model stores them under ``.base``).
-    state = {k.replace(".base.", "."): v for k, v in relaxed.state_dict().items()
-             if not k.endswith((".down", ".up"))}
+    state = {
+        k.replace(".base.", "."): v
+        for k, v in relaxed.state_dict().items()
+        if not k.endswith((".down", ".up"))
+    }
     tied.load_state_dict(state)
     torch.testing.assert_close(relaxed(tokens()), tied(tokens()))  # B_t = 0: identical
     with torch.no_grad():
@@ -109,9 +126,12 @@ def test_relaxed_recursion_skips_fused_pytorch_attention() -> None:
     n_gqa = sum(isinstance(m, LoopLoRALinear) for m in gqa.stack.core.modules())
     n_mha = sum(isinstance(m, LoopLoRALinear) for m in mha.stack.core.modules())
     assert n_gqa > n_mha > 0  # mha: only the FFN projections are adapted
-    assert all(not isinstance(m, LoopLoRALinear)
-               for a in mha.stack.core.modules() if isinstance(a, nn.MultiheadAttention)
-               for m in a.modules())
+    assert all(
+        not isinstance(m, LoopLoRALinear)
+        for a in mha.stack.core.modules()
+        if isinstance(a, nn.MultiheadAttention)
+        for m in a.modules()
+    )
 
 
 def test_test_time_loops_beyond_training_reuse_the_last_delta() -> None:

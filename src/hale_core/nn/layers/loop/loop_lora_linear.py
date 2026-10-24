@@ -63,7 +63,9 @@ class LoopLoRALinear(nn.Module):
         if self.pass_index is None:
             return out
         t = min(self.pass_index, self.down.shape[0] - 1)
-        return out + (x @ self.down[t].transpose(0, 1).to(x.dtype)) @ self.up[t].transpose(0, 1).to(x.dtype)
+        return out + (x @ self.down[t].transpose(0, 1).to(x.dtype)) @ self.up[t].transpose(0, 1).to(
+            x.dtype
+        )
 
     @staticmethod
     def wrap(module: nn.Module, n_loops: int, rank: int) -> int:
