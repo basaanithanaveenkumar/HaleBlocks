@@ -7,7 +7,9 @@ from hale_core.nn.stacks.dit import DiTStack
 from hale_core.nn.stacks.gpt import GPTStack
 from hale_core.nn.stacks.lgt import LGTStack, is_global_layer
 from hale_core.nn.stacks.looped import (
+    LOOP_PRESETS,
     LoopedStack,
+    LoopPreset,
     LoopSpec,
     LoopStats,
     loop_aux_loss,
@@ -21,7 +23,9 @@ __all__ = [
     "GPTStack",
     "LGTStack",
     "DiTStack",
+    "LOOP_PRESETS",
     "LoopedStack",
+    "LoopPreset",
     "LoopSpec",
     "LoopStats",
     "is_global_layer",

@@ -45,7 +45,8 @@ def loop_budget(module: nn.Module, n_loops: int | None) -> Iterator[None]:
 
 
 def loop_aux_loss(module: nn.Module) -> torch.Tensor | None:
-    """Sum of the ACT ponder losses of the last forward of every looped stack in ``module``."""
+    """Sum of the auxiliary losses (ACT ponder cost, MoR load balance) of the last forward of
+    every looped stack in ``module``."""
     losses = [s.aux_loss for s in looped_stacks(module) if s.aux_loss is not None]
     return torch.stack(losses).sum() if losses else None
 
@@ -65,4 +66,6 @@ def loop_stats(module: nn.Module) -> dict[str, float]:
             out[f"{prefix}/mean_updates"] = stats.mean_updates
         if stats.residual is not None:
             out[f"{prefix}/residual"] = stats.residual
+        if stats.router_balance is not None:
+            out[f"{prefix}/router_balance"] = float(stats.router_balance.detach())
     return out

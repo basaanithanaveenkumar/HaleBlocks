@@ -17,7 +17,13 @@ variants (all through :class:`LoopSpec`):
   recurrent-depth recipe that makes the loop count a test-time-compute knob;
 * fixed-point early exit at inference (``h_t ~= h_{t-1}``, the DEQ view, arXiv:1909.01377);
 * scratchpad tokens - learned working-memory slots carried across passes and dropped from the
-  output.
+  output;
+* Mixture-of-Recursions - a router gives every token its own depth (``halting="mor"``);
+* relaxed recursion - a low-rank per-pass delta on the shared weights (``lora_rank``);
+* layer-sharing schedules for multi-layer cores (``sharing``: cycle / cycle_rev / sequence).
+
+Each published recipe is a named preset (:data:`LOOP_PRESETS`):
+``LoopSpec.preset_spec("recurrent_depth")`` or ``loop: {preset: recurrent_depth}`` in YAML.
 """
 
 from hale_core.nn.stacks.looped._variants import (
@@ -27,11 +33,19 @@ from hale_core.nn.stacks.looped._variants import (
     looped_stacks,
     set_loop_budget,
 )
+from hale_core.nn.stacks.looped.loop_presets import (
+    LOOP_PRESETS,
+    LoopPreset,
+    register_loop_preset,
+    resolve_loop_preset,
+)
 from hale_core.nn.stacks.looped.loop_spec import LoopSpec
 from hale_core.nn.stacks.looped.loop_stats import LoopStats
 from hale_core.nn.stacks.looped.looped_stack import LoopedStack
 
 __all__ = [
+    "LOOP_PRESETS",
+    "LoopPreset",
     "LoopSpec",
     "LoopStats",
     "LoopedStack",
@@ -39,5 +53,7 @@ __all__ = [
     "loop_budget",
     "loop_stats",
     "looped_stacks",
+    "register_loop_preset",
+    "resolve_loop_preset",
     "set_loop_budget",
 ]

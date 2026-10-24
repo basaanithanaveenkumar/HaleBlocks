@@ -4,6 +4,9 @@ docstring).
 
 from __future__ import annotations
 
+import contextlib
+from collections.abc import Iterator
+
 import torch
 import torch.nn as nn
 
@@ -12,6 +15,9 @@ from hale_core.nn.layers.loop import (
     ACTHalting,
     LoopDepthEmbedding,
     LoopInputInjection,
+    LoopLoRALinear,
+    RecursionRouter,
+    RouterDecision,
 )
 from hale_core.nn.stacks.looped.loop_spec import LoopSpec
 from hale_core.nn.stacks.looped.loop_stats import LoopStats
@@ -82,6 +88,15 @@ class LoopedStack(nn.Module):
             + [layer(False) for _ in range(spec.coda_layers)]
         )
         self.n_core_layers = n_layers
+        if spec.sharing == "sequence" and spec.n_loops < n_layers:
+            raise ValueError(
+                f"sharing='sequence' runs each of the {n_layers} core layers for a share of the "
+                f"passes; it needs n_loops >= n_layers, got n_loops={spec.n_loops}"
+            )
+        if spec.lora_rank:
+            # Relaxed recursion: per-pass low-rank deltas on the shared core only.
+            for layer in self.core:
+                LoopLoRALinear.wrap(layer, spec.n_loops, spec.lora_rank)
         self.depth_embedding = LoopDepthEmbedding(spec.depth_embedding, d_model, spec.n_loops)
         self.injection = LoopInputInjection(spec.input_injection, d_model)
         self.halting = (
@@ -89,6 +104,7 @@ class LoopedStack(nn.Module):
             if spec.halting == "act"
             else None
         )
+        self.router = RecursionRouter(d_model, spec.n_loops) if spec.halting == "mor" else None
         self.scratch = (
             nn.Parameter(torch.randn(spec.scratch_tokens, d_model) * 0.02)
             if spec.scratch_tokens
@@ -98,6 +114,7 @@ class LoopedStack(nn.Module):
         #: Loop count used outside training (``None`` = ``spec.n_loops``); see :func:`loop_budget`.
         self.eval_loops: int | None = None
         self.last_stats: LoopStats | None = None
+        self._pass_record: list[torch.Tensor] | None = None
 
     # ------------------------------------------------------------------ structure
     @property
@@ -127,11 +144,50 @@ class LoopedStack(nn.Module):
 
     @property
     def aux_loss(self) -> torch.Tensor | None:
-        """``ponder_weight * ponder_cost`` of the last forward (ACT only), for the task loss."""
+        """Auxiliary loss of the last forward, for the task loss.
+
+        ``ponder_weight * ponder_cost`` with ACT, ``mor_balance_weight * router_balance`` with
+        Mixture-of-Recursions, ``None`` otherwise.
+        """
         stats = self.last_stats
-        if stats is None or stats.ponder_cost is None:
+        if stats is None:
             return None
-        return self.spec.ponder_weight * stats.ponder_cost
+        if stats.ponder_cost is not None:
+            return self.spec.ponder_weight * stats.ponder_cost
+        if stats.router_balance is not None:
+            return self.spec.mor_balance_weight * stats.router_balance
+        return None
+
+    @contextlib.contextmanager
+    def record_passes(self) -> Iterator[list[torch.Tensor]]:
+        """Collect the detached state after every pass of the forwards run inside the block.
+
+        ``with stack.record_passes() as states: model(x)`` leaves one ``(B, S, d)`` tensor per
+        pass in ``states`` (scratch slots included, before the coda and the final norm) - what
+        the notebooks and animations use to look inside the loop.
+        """
+        record: list[torch.Tensor] = []
+        previous, self._pass_record = self._pass_record, record
+        try:
+            yield record
+        finally:
+            self._pass_record = previous
+
+    def pass_layers(self, step: int, n_loops: int) -> list[nn.Module]:
+        """Core layers applied at 0-based pass ``step`` of ``n_loops`` (the sharing schedule).
+
+        ``cycle``: every pass runs ``core[0..n-1]``. ``cycle_rev``: odd passes run them in
+        reverse. ``sequence``: pass ``step`` runs layer ``floor(step * n / n_loops)`` ``n`` times,
+        so the whole loop is ``A..A B..B`` and each pass still costs ``n`` layer applications.
+        """
+        core = list(self.core)
+        sharing = self.spec.sharing
+        if sharing == "cycle_rev" and step % 2 == 1:
+            return core[::-1]
+        if sharing == "sequence":
+            index = min(step * len(core) // max(n_loops, 1), len(core) - 1)
+            return [core[index]] * len(core)
+        return core
 
     def num_loops(self) -> int:
         """Passes for the next forward: sampled in training when ``min_loops`` is set."""
@@ -191,19 +247,27 @@ class LoopedStack(nn.Module):
         grad_from = n_loops - spec.bptt_loops if self.training and spec.bptt_loops else 0
         state = torch.zeros_like(inputs) if self.injection.starts_from_zero else inputs
         act = self.halting.init_state(state, active) if self.halting is not None else None
+        route = self.router(inputs, active, n_loops) if self.router is not None else None
+        if route is not None:  # nobody needs more passes than the deepest routed token
+            n_loops = max(1, min(n_loops, int(route.depth.max())))
+        always = torch.zeros_like(active)
+        always[:, : spec.scratch_tokens] = True  # memory slots update on every pass
         check_exit = spec.exit_tolerance is not None and not self.training and act is None
         residual = None
         loops = 0
         for step in range(n_loops):
             previous = state
+            LoopLoRALinear.set_pass(self, step)
             with torch.set_grad_enabled(torch.is_grad_enabled() and step >= grad_from):
                 x = self.injection(state, inputs)
                 depth = self.depth_embedding(step, x)
                 if depth is not None:
                     x = x + depth
-                for layer in self.core:
+                for layer in self.pass_layers(step, n_loops):
                     x = layer(x, **kw)
-            state = x
+            state = x if route is None else self._routed_update(state, x, route, step, always)
+            if self._pass_record is not None:
+                self._pass_record.append(state.detach())
             loops = step + 1
             if act is not None:
                 act = self.halting.step(act, state, last=loops == n_loops)
@@ -214,6 +278,10 @@ class LoopedStack(nn.Module):
                 if residual < spec.exit_tolerance:
                     break
 
+        LoopLoRALinear.set_pass(self, None)
+        if route is not None:
+            self.last_stats = self._routed_stats(route, active, loops)
+            return state
         if act is None:
             self.last_stats = LoopStats(loops=loops, residual=residual)
             return state
@@ -225,6 +293,31 @@ class LoopedStack(nn.Module):
             token_updates=act.n_updates.detach()[:, self.spec.scratch_tokens :],
         )
         return torch.where(active.unsqueeze(-1), act.output, state)
+
+    # ------------------------------------------------------------------ routing
+    @staticmethod
+    def _routed_update(
+        state: torch.Tensor,
+        new: torch.Tensor,
+        route: RouterDecision,
+        step: int,
+        always: torch.Tensor,
+    ) -> torch.Tensor:
+        """Mixture-of-Recursions: tokens still recursing take a gated step, the rest stay put."""
+        running = route.running(step) | always
+        gate = torch.where(always, torch.ones_like(route.gate), route.gate)
+        stepped = state + gate.unsqueeze(-1) * (new - state)
+        return torch.where(running.unsqueeze(-1), stepped, state)
+
+    def _routed_stats(self, route: RouterDecision, active: torch.Tensor, loops: int) -> LoopStats:
+        depth = route.depth.clamp(max=loops).float()
+        real = active.float()
+        return LoopStats(
+            loops=loops,
+            mean_updates=float((depth * real).sum() / real.sum().clamp_min(1.0)),
+            token_updates=depth.detach()[:, self.spec.scratch_tokens :],
+            router_balance=route.balance_loss,
+        )
 
     # ------------------------------------------------------------------ helpers
     def _prepend_scratch(self, h: torch.Tensor, kw: dict) -> tuple[torch.Tensor, dict]:
